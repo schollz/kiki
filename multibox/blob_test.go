@@ -2,6 +2,7 @@ package multibox
 
 import (
 	crypto_rand "crypto/rand"
+	"fmt"
 	"testing"
 
 	"golang.org/x/crypto/nacl/box"
@@ -24,6 +25,7 @@ func TestKeyPairs(t *testing.T) {
 	dec, err := decryptWithKeyPair(enc, senderPublicKey, recipientPrivateKey)
 	assert.Nil(t, err)
 	assert.Equal(t, "hello world", string(dec))
+	fmt.Println(recipientPublicKey)
 }
 
 func Test1(t *testing.T) {
