@@ -5,9 +5,13 @@ import (
 	"errors"
 	"io"
 
+	"github.com/schollz/kiki/src/compress"
 	"golang.org/x/crypto/nacl/secretbox"
 )
 
+func CompressAndEncryptWithRandomSecret(msg []byte) (encrypted []byte, secretKey [32]byte, err error) {
+	return EncryptWithRandomSecret(compress.CompressByte(msg))
+}
 func EncryptWithRandomSecret(msg []byte) (encrypted []byte, secretKey [32]byte, err error) {
 	if _, err = io.ReadFull(crypto_rand.Reader, secretKey[:]); err != nil {
 		return
@@ -37,5 +41,11 @@ func Decrypt(encrypted []byte, secretKey [32]byte) (decrypted []byte, err error)
 	if !ok {
 		err = errors.New("decryption failed")
 	}
+	return
+}
+
+func DecryptAndDecompress(encrypted []byte, secretKey [32]byte) (decrypted []byte, err error) {
+	decrypted, err = Decrypt(encrypted, secretKey)
+	decrypted = compress.DecompressByte(decrypted)
 	return
 }

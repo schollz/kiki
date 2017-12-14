@@ -44,6 +44,9 @@ func TestKeyPairEncryption(t *testing.T) {
 	dec, err := jane.Decrypt(enc, bob)
 	assert.Nil(t, err)
 	assert.Equal(t, []byte(`hello, world`), dec)
+	dec, err = bob.Decrypt(enc, bob)
+	assert.NotNil(t, err)
+	assert.NotEqual(t, []byte(`hello, world`), dec)
 }
 
 func TestKeyPairs(t *testing.T) {
