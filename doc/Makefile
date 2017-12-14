@@ -6,3 +6,5 @@ production:
 
 build:
 	hugo -t twotwothree
+	rm -rf ../docs
+	mv tmp ../docs

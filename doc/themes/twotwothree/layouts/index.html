@@ -1,7 +1,5 @@
 {{ partial "header.html" . }}
 
-{{ range where .Data.Pages "Title" "Home" }}
-  {{ template "_default/single.html" . }}
-{{ end }}
+{{ with .Site.GetPage "page" "index.md" }}{{ .Content }}{{ end }}
 
 {{ partial "footer.html" . }}
