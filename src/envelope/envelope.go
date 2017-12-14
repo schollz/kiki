@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"time"
 
-	"github.com/schollz/projectx/src/keypair"
-	"github.com/schollz/projectx/src/symmetric"
+	"github.com/schollz/kiki/src/keypair"
+	"github.com/schollz/kiki/src/symmetric"
 )
 
 type Envelope struct {

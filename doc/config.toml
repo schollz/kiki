@@ -1,6 +1,6 @@
 baseURL = ""
 languageCode = "en-us"
-title = "ProjectX"
+title = "KiKi"
 publishDir = "tmp"
 RSSLink = "rss.xml"
 enableGitInfo = true
