@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- COMMON TAGS -->
+		<title>{{ .Site.Title }}</title>
+		<!-- Search Engine -->
+		<meta name="description" content="{{ .Description }}">
+		<meta name="image" content="{{ $.Param "image" }}">
+		<!-- Schema.org for Google -->
+		<meta itemprop="name" content="{{ .Title }}">
+		<meta itemprop="description" content="{{ .Description }}">
+		<meta itemprop="image" content="{{ $.Param "image" }}">
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:title" content="{{ .Title }}">
+		<meta name="twitter:description" content="{{ .Description }}">
+		<meta name="twitter:site" content="@{{ $.Site.Params.twitter }}">
+		<meta name="twitter:creator" content="@{{ $.Site.Params.twitter }}">
+		<meta name="twitter:image:src" content="{{ $.Param "image" }}">
+		<!-- Twitter - Article -->
+		<!-- Open Graph general (Facebook, Pinterest & Google+) -->
+		<meta name="og:title" content="{{ .Title }}">
+		<meta name="og:description" content="{{ .Description }}">
+		{{ if $.Param "image" }}<meta name="og:image" content="{{ .Site.BaseURL}}{{ $.Param "image" }}">{{ end }}
+		<meta name="og:url" content="{{ .Permalink }}">
+		<meta name="og:site_name" content="{{ .Title }}">
+		<meta name="og:type" content="article">
+		<!-- Open Graph - Article -->
+		<meta name="article:author" content="{{ $.Site.Params.twitter }}">
+		<meta name="article:tag" content="{{ range .Params.tags }}{{.}} {{end}}">
+		<link rel="stylesheet" type="text/css" href="/css/style.css">
+	</head>
+	<body>
+		<main>
+			<div class="container">
+				
+			    {{ if eq "KiKi" .Title }}
+				{{ else }}
+				<div class="menu">
+					<a href="/doc/">Documentation</a>
+					<a href="/">{{ .Site.Title }}</a>
+				</div>
+				{{ end }}
