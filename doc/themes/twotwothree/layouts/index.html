@@ -1,0 +1,7 @@
+{{ partial "header.html" . }}
+
+{{ range where .Data.Pages "Title" "Home" }}
+  {{ template "_default/single.html" . }}
+{{ end }}
+
+{{ partial "footer.html" . }}

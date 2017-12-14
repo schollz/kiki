@@ -1,0 +1,15 @@
+baseURL = ""
+languageCode = "en-us"
+title = "ProjectX"
+publishDir = "tmp"
+RSSLink = "rss.xml"
+enableGitInfo = true
+pygmentsCodeFences=true 
+
+[permalinks]
+  post = "/:slug/"
+
+[params]
+  twitter = "yakczar"
+  navigation = ["projects.md","about.md","contact.md"]
+  analytics=true
