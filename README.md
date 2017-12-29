@@ -1,6 +1,6 @@
 # KiKi
 
-Documentation: [KiKi](https://KiKi.io/)
+Documentation: [KiKi](https://github.com/schollz/kiki/blob/master/doc/content/overview.md)
 
 ## About the project
 

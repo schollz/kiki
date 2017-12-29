@@ -1,8 +1,10 @@
 # Overview
 
-KiKi is a distributed social network that you can use off the grid, which provides secure end-to-end communication with people inside your social circle.
+High level: KiKi is a distributed social network that you can use off the grid, which provides secure end-to-end communication with people inside your social circles.
 
-All the information in the network is stored in **Letters** that are sealed in special cryptographically secure **Envelopes**. In KiKi, you - the **Person** - are essentially a pair of keys used for [asymetrical cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography). These keys are used to open Envelopes and seal and sign Letters. You interact with with KiKi through a **Feed** that displays the contents of all Letters that you can open. These letters are downloaded to your computer, so you can access the Feed anytime, even off-line.
+Medium level: Kiki is like a poor-man's mailservice. Every user in Kiki is a mail carrier. They carry mail for other people and receive mail from other people. Letters are sealed using special encryption that only allows the recipient (friends, public) to read them.
+
+Low level: All the information in the network is stored in **Letters** that are sealed in special cryptographically secure **Envelopes**. In KiKi, you - the **Person** - are essentially a pair of keys used for [asymetrical cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography). These keys are used to open Envelopes and seal and sign Letters. You interact with with KiKi through a **Feed** that displays the contents of all Letters that you can open. These letters are downloaded to your computer, so you can access the Feed anytime, even off-line.
 
 Everyone on KiKi also carries Letters addressed to others. This makes KiKi distributed, because everyone is a mailman/mail-woman. Once two people encounter each other on LAN or when connecting to a public server, they will exchange Letters that they carried for each other. This ensures that the network can exist as a mesh, outside of the realm of ISPs. It also ensures that no federated servers are necessary, it will work with a few people that can connect onto a local network.
 
@@ -219,3 +221,22 @@ There are some other [similar-minded networks out there](https://github.com/topi
 - diaspora:
 - humhub:
 - scuttlebutt:
+
+# Roadmap
+
+There are a number of facets that need work:
+
+## Low level targets
+
+- [ ] Public key loading/parsing
+- [ ] Encryption / decryption
+- [ ] Message bundling (envelopes + letters)
+
+## Medium level targets
+
+- [ ] Carrier server, implementation begun here: https://gist.github.com/schollz/f25d77afc9130b72390748bdbce0d9a3
+- [ ] Command-line read/post (kiki read / kiki post something.md)
+
+## High level targets
+
+- [ ] Interactive web-based UI, implementation begun here: https://github.com/schollz/kiki/tree/master/kikiscratch
