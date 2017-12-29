@@ -92,9 +92,8 @@ The **Envelope** is the public meta data for a sealed **Letter** (see [Letter](#
 
 ```golang
 type Envelope struct {
-    Sender     string   // public key of the sender
-    Recipients []string // secret passphrase encrypted by
-    // each recipient public key
+    Sender     string       // public key of the sender
+    Recipients []string     // secret passphrase encrypted by each recipient public key
     SealedContent string    // encrypted compressed Letter
     Timestamp     time.Time // time of entry
     ID            string    // hash of SealedContent

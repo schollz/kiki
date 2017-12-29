@@ -1,9 +1,12 @@
 package keypair
 
 import (
+	"bytes"
 	crypto_rand "crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 
 	"golang.org/x/crypto/nacl/box"
@@ -51,6 +54,42 @@ func NewFromPublic(public string) (kp *KeyPair, err error) {
 	kp.public, err = keyStringToBytes(kp.Public)
 	if err != nil {
 		return
+	}
+	return
+}
+
+func (kp KeyPair) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString("{")
+	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", "public", kp.Public))
+	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\"", "private", kp.Private))
+	buffer.WriteString("}")
+	return buffer.Bytes(), nil
+}
+
+type KeyPairJSON struct {
+	Public  string
+	Private string
+}
+
+func (kp *KeyPair) UnmarshalJSON(b []byte) (err error) {
+	var kpBase KeyPairJSON
+	err = json.Unmarshal(b, &kpBase)
+	if err != nil {
+		return
+	}
+	kp.Public = kpBase.Public
+	kp.Private = kpBase.Private
+	if len(kpBase.Public) > 0 {
+		kp.public, err = keyStringToBytes(kpBase.Public)
+		if err != nil {
+			return
+		}
+	}
+	if len(kpBase.Private) > 0 {
+		kp.private, err = keyStringToBytes(kpBase.Private)
+		if err != nil {
+			return
+		}
 	}
 	return
 }
