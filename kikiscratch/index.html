@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="generator" content="Hugo 0.31.1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Hugo Themes</title>
+
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+  <link type="text/css" rel="stylesheet" href="css/style.css" />
+
+</head>
+
+<body class="grey lighten-5">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="js/materialize.min.js"></script>
+  <script src="http://localhost:1313/onetwothree/js/caption.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $("img").addClass("materialboxed").addClass("responsive-img");
+      $('.materialboxed').materialbox();
+      $('.tooltipped').tooltip();
+      $('.modal').modal();
+    });
+
+  </script>
+  <div class="row section">
+    <div class="col">
+      <!-- Modal Trigger -->
+      <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>
+      <p>You have to include jQuery and Materialize JS + CSS for the modal to work. You can include it from
+        <a href="http://materializecss.com/getting-started.html">CDN (getting started)</a>.
+    </div>
+  </div>
+
+  <!-- Modal Structure -->
+  <div id="modal1" class="modal modal-fixed-footer">
+      <div class="modal-content">
+        <h4>Modal Header</h4>
+        <div class="row">
+            <form class="col s12">
+              <div class="row">
+                <div class="input-field col s12">
+                  <textarea id="textarea1" class="materialize-textarea" style="height:90%;"></textarea>
+                  <label for="textarea1">Textarea</label>
+                </div>
+              </div>
+            </form>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Agree</a>
+          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Agree</a>
+      </div>
+    </div>
+            
+
+  <div class="fixed-action-btn">
+    <a class="btn-floating btn-large red">
+      <i class="large material-icons">mode_edit</i>
+    </a>
+    <ul>
+      <li>
+        <a class="btn-floating red">
+          <i class="material-icons">insert_chart</i>
+        </a>
+      </li>
+      <li>
+        <a class="btn-floating yellow darken-1">
+          <i class="material-icons">format_quote</i>
+        </a>
+      </li>
+      <li>
+        <a class="btn-floating green">
+          <i class="material-icons">publish</i>
+        </a>
+      </li>
+      <li>
+        <a class="btn-floating blue">
+          <i class="material-icons">attach_file</i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="container">
+
+
+    <div class="row">
+
+
+
+      <div class="col s12 m4 l3">
+
+        <div class="card-panel">
+          <h1>kiki</h1>
+        </div>
+
+
+
+        <ul class="collection with-header">
+          <li class="collection-header">
+            <h4>Friends</h4>
+          </li>
+          <li class="collection-item">
+            <div>
+              Alvin
+              <a href="#!" class="secondary-content tooltipped vertical-align" data-position="right" data-delay="50" data-tooltip="See Alvin's posts">
+                <i class="material-icons">filter_list</i>&nbsp;
+              </a>
+              <a href="#!" class="secondary-content tooltipped vertical-align" data-position="top" data-delay="50" data-tooltip="Unfollow">
+                <i class="material-icons">block</i>&nbsp;
+              </a>
+              <a href="#!" class="secondary-content tooltipped vertical-align" data-position="left" data-delay="50" data-tooltip="Message Alvin">
+                <i class="material-icons">message</i>&nbsp;
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <span class="new badge">4</span>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+        </ul>
+
+        <ul class="collection with-header">
+          <li class="collection-header">
+            <h4>Following</h4>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+        </ul>
+
+        <ul class="collection with-header">
+          <li class="collection-header">
+            <h4>Followers</h4>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+          <li class="collection-item">
+            <div>Alvin
+              <a href="#!" class="secondary-content">
+                <i class="material-icons">send</i>
+              </a>
+            </div>
+          </li>
+        </ul>
+
+
+
+      </div>
+
+
+
+      <div class="col s12 m8 l9">
+
+
+
+
+        <div class="card-panel grey lighten-5 z-depth-3 hoverable">
+          <nav>
+            <div class="nav-wrapper deep-orange  darken-1">
+              <div class="col s12 ">
+                <a href="#!" class="breadcrumb">
+                  &nbsp;Zack
+                </a>
+                <a href="#!">
+                  <i class="material-icons right">person_add</i>
+                  <i class="material-icons right">people</i>
+                </a>
+                <a href="#!">
+                  <i class="material-icons right">favorite</i>
+                </a>
+
+              </div>
+
+            </div>
+
+          </nav>
+
+
+
+          <p>Have you ever seen a bunny sit near a flower? Well, here you go.</p>
+
+
+          <p>
+            <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg"
+              alt="Some image" />
+          </p>
+          <p>This is indeed a bunny, sitting near a flower.</p>
+
+
+          <a class="btn-floating waves-effect waves-light red right valign-wrapper">
+            <i class="material-icons">reply</i>
+          </a>
+          <span class="left valign-wrapper">
+            <i class="material-icons">access_time</i>&nbsp;1:31pm December 29th, 2017
+            <i class="material-icons right">favorite</i>&nbsp;x 6
+          </span>
+          <br>
+          <br>
+          <br>
+          <div class="divider"></div>
+          <br>
+
+          <nav>
+            <div class="nav-wrapper deep-orange  darken-1">
+              <div class="col s12">
+                <a href="#!" class="breadcrumb">Bob</a>
+                <a href="#!" class="breadcrumb">Zack</a>
+              </div>
+            </div>
+          </nav>
+
+          <p>Sounds cool!</p>
+
+          <a class="btn-floating waves-effect waves-light red right">
+            <i class="material-icons">reply</i>
+          </a>
+          <span class="left">
+            1:31pm December 29th, 2017
+          </span>
+          <br>
+          <br>
+          <br>
+          <div class="divider"></div>
+          <br>
+
+
+          <nav>
+            <div class="nav-wrapper">
+              <div class="col s12">
+                <a href="#!" class="breadcrumb">
+                  <i class="material-icons">face</i>&nbsp;Jane</a>
+                <a href="#!" class="breadcrumb">Bob</a>
+              </div>
+            </div>
+          </nav>
+
+          <p>Hi bob!</p>
+
+          <a class="btn-floating waves-effect waves-light red right valign-wrapper">
+            <i class="material-icons">reply</i>
+          </a>
+          <span class="left valign-wrapper">
+            <i class="material-icons">access_time</i>1:31pm December 29th, 2017
+          </span>
+          <br>
+          <br>
+          <br>
+          <div class="divider"></div>
+          <br>
+        </div>
+
+
+
+        <div class="card-panel grey lighten-5 z-depth-3 hoverable">
+          <nav>
+            <div class="nav-wrapper deep-orange  darken-1">
+              <div class="col s12 ">
+                <a href="#!" class="breadcrumb">
+                  <i class="material-icons">face</i>&nbsp;Zack</a>
+
+              </div>
+
+            </div>
+
+          </nav>
+
+          <p>Have you ever seen a bunny sit near a flower? Well, here you go.</p>
+
+
+          <p>
+            <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg"
+              alt="Some image" />
+          </p>
+          <p>This is indeed a bunny, sitting near a flower.</p>
+
+
+          <a class="btn-floating waves-effect waves-light red right valign-wrapper">
+            <i class="material-icons">reply</i>
+          </a>
+          <span class="left valign-wrapper">
+            <i class="material-icons">access_time</i>1:31pm December 29th, 2017
+          </span>
+          <br>
+          <br>
+
+        </div>
+
+        <div class="card-panel grey lighten-5 z-depth-3 hoverable">
+          <p>
+            <aside>March 10, 2014
+
+            </aside>
+            <a href="http://localhost:1313/onetwothree/post/migrate-from-jekyll/" style="color:black;">Migrate to Hugo from Jekyll</a>
+
+
+            <h2 id="move-static-content-to-static">Move static content to
+              <code>static</code>
+            </h2>
+
+            <p>Jekyll has a rule that any directory not starting with
+              <code>_</code> will be copied as-is to the
+              <code>_site</code> output. Hugo keeps all static content under
+              <code>static</code>. You should therefore move it all there. With Jekyll, something that looked like</p>
+
+
+          </p>
+        </div>
+
+
+
+
+
+
+        <div class="row">
+          <div class="col s12 m12">
+            <div class="card">
+              <nav>
+                <div class="nav-wrapper deep-orange  darken-1">
+                  <div class="col s12 ">
+                    <a href="#!" class="breadcrumb">
+                      <i class="material-icons">face</i>&nbsp;Zack - December 29th, 2017</a>
+
+                  </div>
+
+                </div>
+
+              </nav>
+
+              <div class="card-content">
+                <a class="btn-floating halfway-fab waves-effect waves-light red">
+                  <i class="material-icons">reply</i>
+                </a>
+                <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require
+                  little markup to use effectively.</p>
+                <p>Here is a picture of a bunny.</p>
+                <p>
+                  <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg"
+                    alt="Some image" />
+                </p>
+                <p>That is all</p>
+              </div>
+            </div>
+            <div class="card">
+              <nav>
+                <div class="nav-wrapper deep-orange  darken-1">
+                  <div class="col s12 ">
+                    <a href="#!" class="breadcrumb">Bob</a>
+                    <a href="#!" class="breadcrumb">Zack</a>
+
+                  </div>
+
+                </div>
+
+              </nav>
+
+              <div class="card-content">
+                <a class="btn-floating halfway-fab waves-effect waves-light red">
+                  <i class="material-icons">reply</i>
+                </a>
+                <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require
+                  little markup to use effectively.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col s12 m12">
+            <div class="card blue-grey darken-1">
+              <div class="card-content white-text">
+                <span class="card-title">Card Title</span>
+                <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require
+                  little markup to use effectively.</p>
+              </div>
+              <div class="card-action">
+                <a href="#">This is a link</a>
+                <a href="#">This is a link</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="card-panel grey lighten-5 z-depth-3 hoverable">
+          <p>
+            <aside>April 2, 2014
+
+            </aside>
+            <a href="http://localhost:1313/onetwothree/post/goisforlovers/" style="color:black;">(Hu)go Template Primer</a>
+            <p>Hugo uses the excellent [go][] [html/template][gohtmltemplate] library for its template engine. It is an extremely
+              lightweight engine that provides a very small amount of logic. In our experience that it is just the right
+              amount of logic to be able to create a good static website. If you have used other template systems from different
+              languages or frameworks you will find a lot of similarities in go templates.</p>
+
+
+          </p>
+        </div>
+
+        <div class="card-panel grey lighten-5 z-depth-3 hoverable">
+          <p>
+            <aside>April 2, 2014
+
+            </aside>
+            <a href="http://localhost:1313/onetwothree/post/hugoisforlovers/" style="color:black;">Getting Started with Hugo</a>
+
+
+            <h2 id="step-1-install-hugo">Step 1. Install Hugo</h2>
+
+            <p>Goto
+              <a href="https://github.com/spf13/hugo/releases">hugo releases</a> and download the appropriate version for your os and architecture.</p>
+
+            <p>Save it somewhere specific as we will be using it in the next step.</p>
+
+            <p>More complete instructions are available at
+              <a href="http://localhost:1313/onetwothree/overview/installing/">installing hugo</a>
+            </p>
+
+
+          </p>
+        </div>
+
+
+
+        <ul class="pagination">
+          <li class="disabled">
+            <a href="#!">
+              <i class="material-icons">chevron_left</i>
+            </a>
+          </li>
+          <li class="active">
+            <a href="#!">1</a>
+          </li>
+          <li class="waves-effect">
+            <a href="#!">2</a>
+          </li>
+          <li class="waves-effect">
+            <a href="#!">3</a>
+          </li>
+          <li class="waves-effect">
+            <a href="#!">4</a>
+          </li>
+          <li class="waves-effect">
+            <a href="#!">5</a>
+          </li>
+          <li class="waves-effect">
+            <a href="#!">
+              <i class="material-icons">chevron_right</i>
+            </a>
+          </li>
+        </ul>
+
+      </div>
+
+
+
+    </div>
+    <footer class="page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">Footer Content</h5>
+            <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 class="white-text">Links</h5>
+            <ul>
+              <li>
+                <a class="grey-text text-lighten-3" href="#!">Link 1</a>
+              </li>
+              <li>
+                <a class="grey-text text-lighten-3" href="#!">Link 2</a>
+              </li>
+              <li>
+                <a class="grey-text text-lighten-3" href="#!">Link 3</a>
+              </li>
+              <li>
+                <a class="grey-text text-lighten-3" href="#!">Link 4</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          © 2014 Copyright Text
+          <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+        </div>
+      </div>
+    </footer>
+</body>
+
+</html>

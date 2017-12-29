@@ -1,0 +1,62 @@
+*,
+:before,
+:after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  font: 14px arial, sans-serif;
+  line-height: 1.45;
+  margin: 0;
+  padding: 0;
+}
+footer {
+  color: #666;
+  font-size: .9em;
+  padding: 1em 1em 2em;
+  text-align: center;
+}
+body {
+  flex: 1;
+  padding: 0 1em;
+  max-width: 50em;
+}
+.container {
+  margin: 0 auto;
+  max-width: 50em;
+}
+.homeLink:link,
+.homeLink:visited {
+  color: #000;
+  text-decoration: none;
+}
+pre {
+  background: #eee;
+  padding: 1em;
+  border-radius: 1em;
+}
+blockquote {
+  background: #ddd;
+  padding: 0.1em 1em;
+  border-radius: 1em;
+}
+
+img {
+  max-width: 100%;
+}
+table{
+  border-collapse: collapse;
+  width: 100%;
+}
+td {
+  border: 1px solid #666;
+  padding: .25em .45em;
+}
+.menu {
+ float: right;
+}
