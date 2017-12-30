@@ -3,6 +3,7 @@ package envelope
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -54,6 +55,8 @@ func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (
 	recipients = append(recipients, sender) // the sender should always be open their own letter
 	e.Recipients = make([]string, len(recipients))
 	for i, recipient := range recipients {
+		fmt.Println(i, recipient)
+		fmt.Println(*recipient.Keys)
 		encryptedSecret, err2 := sender.Keys.Encrypt(secretKey[:], recipient.Keys)
 		if err2 != nil {
 			err = err2

@@ -31,6 +31,9 @@ func Setup(file string) (d *Database) {
 func (d *Database) Open() (err error) {
 	d.Lock()
 	d.db, err = storm.Open(d.file)
+	if err != nil {
+		err = errors.Wrap(err, "problem opening db: '"+d.file+"'")
+	}
 	return
 }
 
@@ -43,20 +46,22 @@ func (d *Database) Close() (err error) {
 
 // AddEnvelope adds an envelope to the database.
 func (d *Database) AddEnvelope(e *envelope.Envelope) (err error) {
-	d.Lock()
-	defer d.Unlock()
-	d.db, err = storm.Open(d.file)
-	defer d.db.Close()
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
 	err = d.db.Save(e)
 	return
 }
 
 // AddUnsealedEnvelope adds an unsealed envelope to the database.
 func (d *Database) AddUnsealedEnvelope(e *envelope.UnsealedEnvelope) (err error) {
-	d.Lock()
-	defer d.Unlock()
-	d.db, err = storm.Open(d.file)
-	defer d.db.Close()
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
 	err = d.db.Save(e)
 	return
 }
@@ -82,6 +87,39 @@ func (d *Database) GetUnsealedEnvelope(id string) (e *envelope.UnsealedEnvelope,
 	defer d.Close()
 	e = new(envelope.UnsealedEnvelope)
 	err = d.db.One("ID", id, e)
+	return
+}
+
+// GetEnvelopes gets all of the sealed envelopes
+func (d *Database) GetEnvelopes() (e []*envelope.Envelope, err error) {
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
+
+	// get count
+	query := d.db.Select().OrderBy("Timestamp")
+	count, err := d.db.Count(new(envelope.Envelope))
+	if err != nil {
+		err = errors.Wrap(err, "problem counting")
+		return
+	}
+	// pre make array
+	e = make([]*envelope.Envelope, count)
+
+	// collect all of them
+	i := 0
+	query = d.db.Select().OrderBy("Timestamp")
+	err = query.Each(new(envelope.Envelope), func(record interface{}) error {
+		u := record.(*envelope.Envelope)
+		e[i] = u
+		i++
+		return nil
+	})
+	if err != nil {
+		err = errors.Wrap(err, "problem querying")
+	}
 	return
 }
 
