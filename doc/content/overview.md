@@ -72,20 +72,28 @@ The `Personal` key pair is stores on your computer in `$HOME/.kiki/secret.json`.
 
 ### Feed
 
-The Feed contains all the information that is determined from opening Envelopes and reading Letters. Feeds are reconstructed on loading.
+The Feed contains all the information that is determined from opening Envelopes and reading Letters. To aid in speed, opened envelopes are stored in a database `$HOME/.kiki/feed.db` which is never shared but contains a bucket `UnsealedEnvelopes` (more below), a bucket `AssignedNames`, a bucket `AssignedPhotos`,  and a bucket `Keystore` for general information. 
+
+Feeds can be completlely reconstructed from the main database of SealedEnvelopes, `$HOME/.kiki/kiki.db`. One of the main objects is the `Feed` object, which is stored in the `Keystore` bucket, marshaled into the `feed` key:
 
 ```golang
 type Feed struct {
-    ToFriends   []KeyPair // key pairs that you have shared with friends
-    FromFriends []KeyPair // key pairs shared by other friends to  you
-    LetterList  map[string]struct{}
-    Special     map[string][]string // user-defined groups
-    Following   map[string]struct{}
-    Followers   map[string]struct{}
+    RegionKey *keypair.KeyPair // key pair determine by running instance (the "public" public/private key pair)
+    KeysForFriends []*keypair.KeyPair // key pairs that are shared with friends
+    KeysFromFriends []*keypair.KeyPair // key pairs that friends share with you
+    UnsealedEnvelopeCatalog  map[string]struct{} // map of IDs of all unsealed envelopes
 }
 ```
 
-The `ToFriends` key pairs are used to ensure privacy for communicating with friends. 
+The `KeysForFriends` is a list of each public/private key given out to friends. Only the first key is used to send keys to friends. When a friend is blocked, then a new key is *prepended* to this list and that new key is posted to all the remaining friends. The friend that is blocked will not obtain this new key, therefore they will not be able to view any future messages.
+
+The `KeysFromFriends` is the list of public/private keys that can be used to unseal envelopes. If any of these are successful then you know the message is from a friend.
+
+The `UnsealedEnvelopeCatalog` is used to compare with a carrier catalog to determine what they need to synchronize.
+
+
+There are also some things that warrant their own bucket. The `AssignedNames` bucket contains a map of the string of the public key to the display name assigned by that person. `AssignedPhoto` is similar, it contains the public key of a user mapped to the base64 string of the image assigned by that public key.
+
 
 ### Envelope
 
@@ -100,7 +108,6 @@ type Envelope struct {
 	SealedContent string    `json:"sealed_content"` // encrypted compressed Letter
 	Timestamp     time.Time `json:"timestamp"`      // time of entry
 	ID            string    `json:"id"`             // hash of SealedContent
-	content       *letter.Letter
 }
 ```
 
@@ -108,7 +115,22 @@ The `ID` is a SHA-256 sum of the `Data` of the LetterContent contained in the Le
 
 Each Letter is sealed in an Envelope which requires opening. To open you will need to decrypt the *secret passphrase* which will in turn decrypt the `SealedContent`. To decrypt the *secret passphrase*, you will try your private keys (e.g. your Personal key, your Region key, and all of your acquired Friends keys) against each element in the `Recipients`. If one of the recipients includes you, then one of your private key swill be able to decrypt the *secret passphrase* for unsealing the `SealedContent`. At scale (millions of users), a typical user might require using ~hundreds of private keys against ~tens of recipient ciphers, resulting in thousands of attempts per Letter. For typical computers, this will still only take 50 - 200 ms. (<small>IDEA: Add random amounts of "fake" recipients to obfuscate how many recipients there actually are</small>).
 
-All the Envelopes are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/envelopes.db`. This is the file that is synced when connecting to other KiKi instances. The primary key of this database is the ID, which has a unique restraint. Thus, to sync db X with db Y, you will simply try to add each row in X into Y.
+All the Envelopes are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/kiki.db`. This is the file that is synced when connecting to other KiKi instances. The primary key of this database is the ID, which has a unique restraint. Thus, to sync db X with db Y, you will simply try to add each row in X into Y.
+
+When an Envelope is opened it reutns a `UnsealedEnvelope`:
+
+```golang
+// UnsealedEnvelope is created when an enveloped is opened
+type UnsealedEnvelope struct {
+    Sender     *keypair.KeyPair   `json:"sender"`    // public key of the sender
+    Recipients []*keypair.Keypair `json:"recipients` // public key of the determined recipient
+    Letter     *letter.Letter     `json:"letter"`    // the unsealed contents of the letter
+    Timestamp  time.Time          `json:"timestamp"` // time of entry
+    ID         string             `json:"id"`        // hash of SealedContent
+}
+```
+
+The unsealed envelope is stored in a bbolt database in `$HOME/.kiki/feed.db` in a bucket `UnsealdEnvelopes`.
 
 
 ### Letter
