@@ -3,55 +3,39 @@ package server
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"mime/multipart"
 	"net/http"
-	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/schollz/kiki/src/database"
-	"github.com/schollz/kiki/src/envelope"
-	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/kiki"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
 )
 
 func init() {
 	logging.Setup()
-
 }
 
 var (
-	DataFolder   = "."
-	DatabaseName = "kiki.db"
-	Port         = "8003"
-	RegionKey    *person.Person
-	db           *database.Database
+	// Port defines what port the carrier should listen on
+	Port = "8003"
 )
 
+// Run will start the server listening
 func Run() {
-	// Setup database
-	db = database.Setup(path.Join(DataFolder, DatabaseName))
-
-	// setup kiki instance
-	var err error
-	RegionKey, err = person.FromPublicPrivateKeys("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
-		"GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q=") // define region key
-	if err != nil {
-		panic(err)
-	}
-	db.Set("AssignedNames", RegionKey.Public(), "Public")
-
 	// Startup server
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/identity", handlerIdentity) // handler for generating new identity
 	r.POST("/letter", handlerLetter)
+	r.POST("/assign", handlerAssign)
 	r.POST("/open", handlerOpen)
-	r.Run(":" + Port) // listen and serve on 0.0.0.0:8080
+	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
 }
 
 func respondWithJSON(c *gin.Context, message string, err error) {
@@ -63,26 +47,7 @@ func respondWithJSON(c *gin.Context, message string, err error) {
 }
 
 func handlerIdentity(c *gin.Context) {
-	// generate a new person
-	p, err := person.New()
-	if err != nil {
-		panic(err)
-	}
-
-	// generate a key for friends
-	myfriends, err := person.New()
-	if err != nil {
-		panic(err)
-	}
-	myfriendsByte, err := json.Marshal(myfriends)
-	// post the key to yourself
-	e, err := envelope.SelfAddress(p, "friends-key", string(myfriendsByte))
-	if err != nil {
-		panic(err)
-	}
-
-	// post the envelope
-	err = db.AddEnvelope(e)
+	p, err := kiki.NewPerson()
 
 	// return response
 	if err != nil {
@@ -97,31 +62,35 @@ func handlerOpen(c *gin.Context) {
 }
 
 func handleOpen(c *gin.Context) (err error) {
-	// get opener
-	file, err := c.FormFile("opener")
+	opener, err := getIdentity(c)
 	if err != nil {
 		return
 	}
-	data, err := readFormFile(file)
+	err = kiki.OpenEnvelopes(opener)
 	if err != nil {
 		return
 	}
-	var opener *person.Person
-	err = json.Unmarshal(data, &opener)
-
-	// get all the envelopes
-	envelopes, err := db.GetEnvelopes()
-	if err != nil {
-		return
-	}
-	for _, e := range envelopes {
-		ue, err := e.Unseal([]*person.Person{opener, RegionKey})
-		if err != nil {
-			continue
-		}
-		fmt.Println(ue.Letter.Content.Kind, ue.Letter.Content.Data)
-	}
+	err = kiki.RegenerateFeed()
 	return
+}
+
+func handlerAssign(c *gin.Context) {
+	respondWithJSON(c, "assigned", handleAssign(c))
+}
+
+func handleAssign(c *gin.Context) (err error) {
+	sender, err := getIdentity(c)
+	if err != nil {
+		return
+	}
+
+	assignmentType := c.PostForm("assign")
+	assignData := c.PostForm("data")
+	if len(assignData) == 0 {
+		return errors.New("assigned data cannot be empty")
+	}
+
+	return kiki.PostMessage(sender, []*person.Person{sender}, "assign-"+assignmentType, assignData, true)
 }
 
 func handlerLetter(c *gin.Context) {
@@ -129,24 +98,17 @@ func handlerLetter(c *gin.Context) {
 }
 
 func handleLetter(c *gin.Context) (err error) {
-	// get sender
-	file, err := c.FormFile("sender")
+	sender, err := getIdentity(c)
+	if err != nil {
+		return
+	}
+
+	// get message
+	file, err := c.FormFile("message")
 	if err != nil {
 		return
 	}
 	data, err := readFormFile(file)
-	if err != nil {
-		return
-	}
-	var sender *person.Person
-	err = json.Unmarshal(data, &sender)
-
-	// get message
-	file, err = c.FormFile("message")
-	if err != nil {
-		return
-	}
-	data, err = readFormFile(file)
 	if err != nil {
 		return
 	}
@@ -157,9 +119,6 @@ func handleLetter(c *gin.Context) (err error) {
 
 	// get recipients
 	recipients := []*person.Person{sender}
-	if isPublic {
-		recipients = append(recipients, RegionKey)
-	}
 	recipientsString := c.PostForm("recipients")
 	if recipientsString != "" {
 		var recipientPublicKeys []string
@@ -176,28 +135,10 @@ func handleLetter(c *gin.Context) (err error) {
 			recipients = append(recipients, otherRecipient)
 		}
 	}
-
-	// make letter
-	logging.Log.Info("writing letter")
-	l, err := letter.New("post", message, sender.Public())
-	if err != nil {
-		return
+	if len(message) == 0 {
+		return errors.New("message cannot be empty")
 	}
-
-	// seal envelope
-	logging.Log.Info("sealing envelope")
-	e, err := envelope.New(l, sender, recipients)
-	if err != nil {
-		return
-	}
-
-	// add envelope to database
-	logging.Log.Info("putting in carrier")
-	err = db.AddEnvelope(e)
-	if err != nil {
-		return
-	}
-	return
+	return kiki.PostMessage(sender, recipients, "post", message, isPublic)
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
@@ -209,5 +150,20 @@ func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	_, err = io.Copy(buf, src)
 	data = buf.Bytes()
+	return
+}
+
+func getIdentity(c *gin.Context) (sender *person.Person, err error) {
+	// get identity
+	file, err := c.FormFile("identity")
+	if err != nil {
+		err = errors.New("could not get identity")
+		return
+	}
+	data, err := readFormFile(file)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(data, &sender)
 	return
 }

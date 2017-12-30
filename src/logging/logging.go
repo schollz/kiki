@@ -17,7 +17,7 @@ func Setup() {
 	Log.Out = os.Stdout
 
 	// Only log the warning severity or above.
-	Log.SetLevel(logrus.InfoLevel)
+	Log.SetLevel(logrus.DebugLevel)
 }
 
 // Debug will switch the verbosity of the database.
