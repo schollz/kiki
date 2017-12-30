@@ -62,8 +62,9 @@ KiKi is written in Go. These is a basic overview of the `struct` classes used fo
 You, the **Person**, are just a pair of keys, the `Personal` key pair.
 
 ```golang
+// Person is just a set of keys
 type Person struct {
-    Personal KeyPair // this is your secret keypair
+    Keys *keypair.KeyPair `json:"keys"`
 }
 ```
 
@@ -91,9 +92,11 @@ The `ToFriends` key pairs are used to ensure privacy for communicating with frie
 The **Envelope** is the public meta data for a sealed **Letter** (see [Letter](#Letter), below) that tells users who the message is from and where it is going and contains the sealed (encrypted) data. 
 
 ```golang
+// Envelope is the sealed letter to be transfered among carriers
 type Envelope struct {
-    Sender     string       // public key of the sender
-    Recipients []string     // secret passphrase encrypted by each recipient public key
+    Sender     string   // public key of the sender
+    Recipients []string // secret passphrase to open SealedContent,
+    // encrypted by each recipient public key
     SealedContent string    // encrypted compressed Letter
     Timestamp     time.Time // time of entry
     ID            string    // hash of SealedContent
@@ -140,9 +143,8 @@ When starting for the first time, you assign yourself a name (initially your nam
 
 ```json
 {
-    "Action":"assign",
-    "Type":"name",
-    "Content":"Zack"
+    "Kind":"name",
+    "Data":"Zack"
 }
 ```
 
@@ -156,9 +158,8 @@ For a regular post, the LetterContent should look like:
 
 ```json
 {
-    "Action":"post",
-    "Type":"text/html",
-    "Content":"This is my first **post**"
+    "Kind":"post",
+    "Data":"This is my first **post**"
 }
 ```
 
@@ -170,9 +171,8 @@ When you follow someone, you emit a Letter that contains the public key of the p
 
 ```json
 {
-    "Action":"assign",
-    "Type":"follow",
-    "Content":"nX2pwIjogIuOBk-OCk-OBq-OBoeOBr"
+    "Kind":"follow",
+    "Data":"nX2pwIjogIuOBk-OCk-OBq-OBoeOBr"
 }
 ```
 
@@ -185,9 +185,8 @@ You can send a Friends key to a friend. This happens automatically when two peop
 
 ```json
 {
-    "Action":"exchange",
-    "Type":"friend",
-    "Content":"JSON-encoded Friends key pair"
+    "Kind":"keys",
+    "Data":"JSON-encoded Friends key pair"
 }
 ```
 
@@ -200,9 +199,8 @@ You can emote on people's posts and pictures. These are also Region messages (ev
 
 ```json
 {
-    "Action":"assign",
-    "Type":"like",
-    "Content":"174d7c78..."
+    "Kind":"like",
+    "Data":"174d7c78..."
 }
 ```
 

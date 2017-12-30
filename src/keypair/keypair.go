@@ -33,6 +33,13 @@ func New() (kp *KeyPair, err error) {
 	return
 }
 
+func (kp *KeyPair) PublicKey() (kpPublic *KeyPair) {
+	kpPublic = new(KeyPair)
+	kpPublic.Public = kp.Public
+	kpPublic.public, _ = keyStringToBytes(kpPublic.Public)
+	return
+}
+
 func NewFromPair(public, private string) (kp *KeyPair, err error) {
 	kp = new(KeyPair)
 	kp.Public, kp.Private = public, private
