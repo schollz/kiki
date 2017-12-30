@@ -238,9 +238,15 @@ Every user is a carrier. Every carrier is a server that can be connected to for 
 3. Get each item that you *do *not have* and that the other *does have* (`GET /envelope/X`) and insert into the database.
 4. Post each time that you *do have* and the other *does not have* (`POST /envelope`).
 
-Efficiency thoughts: If you are missing more than 70% of the files, its better to just download the entire database and synchronization locally.
+### Storage
 
-Spam prevention: There might need to be rate limiting for posting things that you have and the other does not have. Also there should be a limit on the size that you can post.
+Without bars, the carrier will ask for and hold *all envelopes* from *everybody*. This is not practical from a user-standpoint, so there should be some bars for posting things. 
+
+One kind of limitation is to only hold a specified amount of data for each user - say 10MB for friends and 5MB for the public. Once this limitation is reached, then older items would be purged until the limit is no longer exceeded. 
+
+This will prevent spam because someone posting hundreds of 1MB images will only get a few of them onto each computer before they reach their limit. This will also increase efficiency because it will allow computers to sync newer files, and stop synchronization once the limits are exceeded.
+
+
 
 ## Web Interface
 
