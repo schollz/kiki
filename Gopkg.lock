@@ -2,6 +2,18 @@
 
 
 [[projects]]
+  name = "github.com/asdine/storm"
+  packages = [".","codec","codec/json","index","internal","q"]
+  revision = "dbd37722730b6cb703b5bd825c3f142d87358525"
+  version = "v2.0.0"
+
+[[projects]]
+  name = "github.com/coreos/bbolt"
+  packages = ["."]
+  revision = "583e8937c61f1af6513608ccc75c97b6abdf4ff9"
+  version = "v1.3.0"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -46,6 +58,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "321919a8dbe62d3cbe54de81fe6da5b654b78f1eef0fc4e7e537ac29cf2b280a"
+  inputs-digest = "241204428788414c3a208abc28e6c605192f5a291f28ff1305c1704d0414e228"
   solver-name = "gps-cdcl"
   solver-version = 1
