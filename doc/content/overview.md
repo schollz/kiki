@@ -94,19 +94,19 @@ The **Envelope** is the public meta data for a sealed **Letter** (see [Letter](#
 ```golang
 // Envelope is the sealed letter to be transfered among carriers
 type Envelope struct {
-    Sender     string   // public key of the sender
-    Recipients []string // secret passphrase to open SealedContent,
-    // encrypted by each recipient public key
-    SealedContent string    // encrypted compressed Letter
-    Timestamp     time.Time // time of entry
-    ID            string    // hash of SealedContent
+	Sender     *keypair.KeyPair `json:"sender"`     // public key of the sender
+	Recipients []string         `json:"recipients"` // secret passphrase to open SealedContent,
+	// encrypted by each recipient public key
+	SealedContent string    `json:"sealed_content"` // encrypted compressed Letter
+	Timestamp     time.Time `json:"timestamp"`      // time of entry
+	ID            string    `json:"id"`             // hash of SealedContent
+	content       *letter.Letter
 }
 ```
 
 The `ID` is a SHA-256 sum of the `Data` of the LetterContent contained in the Letter. The `SealedContent` contains the marshaled LetterContent encrypted by a unique and random *secret passphrase*. The `Timestamp` records when the Envelope was sent. The `Recipients` is an array the *secret passphrase* encrypted by the public keys of each recipient. 
 
 Each Letter is sealed in an Envelope which requires opening. To open you will need to decrypt the *secret passphrase* which will in turn decrypt the `SealedContent`. To decrypt the *secret passphrase*, you will try your private keys (e.g. your Personal key, your Region key, and all of your acquired Friends keys) against each element in the `Recipients`. If one of the recipients includes you, then one of your private key swill be able to decrypt the *secret passphrase* for unsealing the `SealedContent`. At scale (millions of users), a typical user might require using ~hundreds of private keys against ~tens of recipient ciphers, resulting in thousands of attempts per Letter. For typical computers, this will still only take 50 - 200 ms. (<small>IDEA: Add random amounts of "fake" recipients to obfuscate how many recipients there actually are</small>).
-
 
 All the Envelopes are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/envelopes.db`. This is the file that is synced when connecting to other KiKi instances. The primary key of this database is the ID, which has a unique restraint. Thus, to sync db X with db Y, you will simply try to add each row in X into Y.
 
@@ -116,24 +116,25 @@ All the Envelopes are stored in a [bbolt database](https://github.com/asdine/sto
 The **Letter** is the sealed contents of the envelope, which contains the content of the message and some meta data about how it should be parsed in the feed.
 
 ```golang
+// Letter contains meta data describing the content
 type Letter struct {
-    LatestID string   // hash of sender + data
-    ID       string   // original ID, different than LatestID if overwriting
-    Channels []string // channels for showing the post
-    ReplyTo  string   // hash that Letter is response to
-    Content  LetterContent
+	LatestID string        `json:"latest_id"` // hash of sender + un-encrypted data
+	ID       string        `json:"id"`        // original ID, different than LatestID if overwriting
+	Channels []string      `json:"channels"`  // channels for showing the post
+	ReplyTo  string        `json:"reply_to"`  // hash that Letter is response to
+	Content  LetterContent `json:"content"`
 }
 
+// LetterContent is the actual content of the letter
 type LetterContent struct {
-    Data   string // base64 encoded bytes of data
-    Action string // action verb
-    Kind   string // kind of action
+	Kind string `json:"kind"` // kind of letter content
+	Data string `json:"data"` // base64 encoded bytes of data
 }
 ```
 
 All letters invoke actions. Typically these actions are just to post text/image to the designated recipients. However, there are other actions that help discern who is who and help to transfer identifies and key pairs between people.
 
-All the Letters are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/letters.db`. This file contains unsealed Envelopes, so it will never be shared. To further ensure privacy you can enable `StoreLettersInMemory=true` in the configuration file to keep the database in memory (and rebuild on each startup).
+All the Letters are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/letters.db`. This file contains unsealed Envelopes, so it will never be shared. To further ensure privacy you can enable `StoreLettersInMemory=true` in the configuration file to keep the database in memory (and rebuild on each startup). My [tests](https://gist.github.com/schollz/f08282396a8b184e30dddbe2422ba88a) determine that loading data from files in a database is about 70x faster than find and loading files from a file system.
 
 
 #### Assigning name / profile / profile picture
@@ -206,6 +207,23 @@ You can emote on people's posts and pictures. These are also Region messages (ev
 
 In this case, the `Content` (`174d7c78...`) is the SHA-256 sum of the post that is being assigned the like.
 
+## Synchronization
+
+Every user is a carrier. Every carrier is a server that can be connected to for file synchronization. Anytime kiki sees another kiki instance it attempts to synchronize as follows.
+
+1. Get a list of files from other (`GET /catalog`).
+2. Compare other's list to your list and find which items you do not have.
+3. Get each item that you *do *not have* and that the other *does have* (`GET /envelope/X`) and insert into the database.
+4. Post each time that you *do have* and the other *does not have* (`POST /envelope`).
+
+Efficiency thoughts: If you are missing more than 70% of the files, its better to just download the entire database and synchronization locally.
+
+Spam prevention: There might need to be rate limiting for posting things that you have and the other does not have. Also there should be a limit on the size that you can post.
+
+## Web Interface
+
+The web interface contains all the opened envelopes served from memory.
+
 ## Security
 
 TODO
@@ -237,3 +255,4 @@ There are a number of facets that need work:
 ## High level targets
 
 - [ ] Interactive web-based UI, implementation begun here: https://github.com/schollz/kiki/tree/master/kikiscratch
+
