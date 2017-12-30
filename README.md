@@ -2,6 +2,38 @@
 
 Documentation: [KiKi](https://github.com/schollz/kiki/blob/master/doc/content/overview.md)
 
+## Quickstart
+
+First get the repo:
+
+```
+go get github.com/schollz/kiki
+```
+
+and cd into the folder:
+
+```
+cd $GOPATH/src/github.com/schollz/kiki
+```
+
+### Testing UI
+
+```
+cd $GOPATH/src/github.com/schollz/kiki
+npm install -g browser-sync
+make scratch
+```
+
+### Testing server
+
+```
+go get github.com/pilu/fresh
+make
+```
+
+See [this](https://github.com/schollz/kiki/blob/master/doc/content/testing.md) for the types of requests you can make.
+
+
 ## About the project
 
 KiKi is an experimental project. Here is what it might currently look like:
