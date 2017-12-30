@@ -31,7 +31,6 @@ func Run() {
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
 	})
-	r.GET("/identity", handlerIdentity) // handler for generating new identity
 	r.POST("/letter", handlerLetter)
 	r.POST("/assign", handlerAssign)
 	r.POST("/open", handlerOpen)
@@ -46,27 +45,12 @@ func respondWithJSON(c *gin.Context, message string, err error) {
 	c.JSON(http.StatusOK, gin.H{"success": success, "message": message})
 }
 
-func handlerIdentity(c *gin.Context) {
-	p, err := kiki.NewPerson()
-
-	// return response
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, p)
-	}
-}
-
 func handlerOpen(c *gin.Context) {
 	respondWithJSON(c, "opened envelopes", handleOpen(c))
 }
 
 func handleOpen(c *gin.Context) (err error) {
-	opener, err := getIdentity(c)
-	if err != nil {
-		return
-	}
-	err = kiki.OpenEnvelopes(opener)
+	err = kiki.OpenEnvelopes()
 	if err != nil {
 		return
 	}
@@ -79,18 +63,13 @@ func handlerAssign(c *gin.Context) {
 }
 
 func handleAssign(c *gin.Context) (err error) {
-	sender, err := getIdentity(c)
-	if err != nil {
-		return
-	}
-
 	assignmentType := c.PostForm("assign")
 	assignData := c.PostForm("data")
 	if len(assignData) == 0 {
 		return errors.New("assigned data cannot be empty")
 	}
 
-	return kiki.PostMessage(sender, []*person.Person{sender}, "assign-"+assignmentType, assignData, true)
+	return kiki.PostMessage("assign-"+assignmentType, assignData, true)
 }
 
 func handlerLetter(c *gin.Context) {
@@ -98,11 +77,6 @@ func handlerLetter(c *gin.Context) {
 }
 
 func handleLetter(c *gin.Context) (err error) {
-	sender, err := getIdentity(c)
-	if err != nil {
-		return
-	}
-
 	// get message
 	file, err := c.FormFile("message")
 	if err != nil {
@@ -118,7 +92,7 @@ func handleLetter(c *gin.Context) (err error) {
 	isPublic := c.PostForm("public") == "yes"
 
 	// get recipients
-	recipients := []*person.Person{sender}
+	recipients := []*person.Person{}
 	recipientsString := c.PostForm("recipients")
 	if recipientsString != "" {
 		var recipientPublicKeys []string
@@ -138,7 +112,7 @@ func handleLetter(c *gin.Context) (err error) {
 	if len(message) == 0 {
 		return errors.New("message cannot be empty")
 	}
-	return kiki.PostMessage(sender, recipients, "post", message, isPublic)
+	return kiki.PostMessage("post", message, isPublic, recipients...)
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
@@ -150,20 +124,5 @@ func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	_, err = io.Copy(buf, src)
 	data = buf.Bytes()
-	return
-}
-
-func getIdentity(c *gin.Context) (sender *person.Person, err error) {
-	// get identity
-	file, err := c.FormFile("identity")
-	if err != nil {
-		err = errors.New("could not get identity")
-		return
-	}
-	data, err := readFormFile(file)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(data, &sender)
 	return
 }
