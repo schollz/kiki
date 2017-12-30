@@ -26,12 +26,22 @@ var (
 	DataFolder   = "."
 	DatabaseName = "kiki.db"
 	Port         = "8003"
+	RegionKey    *person.Person
 	db           *database.Database
 )
 
 func Run() {
 	// Setup database
 	db = database.Setup(path.Join(DataFolder, DatabaseName))
+
+	// setup kiki instance
+	var err error
+	RegionKey, err = person.FromPublicPrivateKeys("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
+		"GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q=") // define region key
+	if err != nil {
+		panic(err)
+	}
+	db.Set("AssignedNames", RegionKey.Public(), "Public")
 
 	// Startup server
 	r := gin.Default()
@@ -53,7 +63,28 @@ func respondWithJSON(c *gin.Context, message string, err error) {
 }
 
 func handlerIdentity(c *gin.Context) {
+	// generate a new person
 	p, err := person.New()
+	if err != nil {
+		panic(err)
+	}
+
+	// generate a key for friends
+	myfriends, err := person.New()
+	if err != nil {
+		panic(err)
+	}
+	myfriendsByte, err := json.Marshal(myfriends)
+	// post the key to yourself
+	e, err := envelope.SelfAddress(p, "friends-key", string(myfriendsByte))
+	if err != nil {
+		panic(err)
+	}
+
+	// post the envelope
+	err = db.AddEnvelope(e)
+
+	// return response
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
 	} else {
@@ -84,7 +115,7 @@ func handleOpen(c *gin.Context) (err error) {
 		return
 	}
 	for _, e := range envelopes {
-		ue, err := e.Unseal([]*person.Person{opener})
+		ue, err := e.Unseal([]*person.Person{opener, RegionKey})
 		if err != nil {
 			continue
 		}
@@ -121,8 +152,14 @@ func handleLetter(c *gin.Context) (err error) {
 	}
 	message := string(data)
 
+	// is public
+	isPublic := c.PostForm("public") == "yes"
+
 	// get recipients
 	recipients := []*person.Person{sender}
+	if isPublic {
+		recipients = append(recipients, RegionKey)
+	}
 	recipientsString := c.PostForm("recipients")
 	if recipientsString != "" {
 		var recipientPublicKeys []string
@@ -142,7 +179,7 @@ func handleLetter(c *gin.Context) (err error) {
 
 	// make letter
 	logging.Log.Info("writing letter")
-	l, err := letter.New("post", message, sender.PublicKeyString())
+	l, err := letter.New("post", message, sender.Public())
 	if err != nil {
 		return
 	}

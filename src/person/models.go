@@ -19,12 +19,18 @@ func (p *Person) PublicKey() (p2 *Person) {
 	return
 }
 
-func (p *Person) PublicKeyString() string {
+func (p *Person) Public() string {
 	return p.Keys.Public
 }
 
 func FromPublicKey(publicKey string) (p *Person, err error) {
 	p = new(Person)
 	p.Keys, err = keypair.NewFromPublic(publicKey)
+	return
+}
+
+func FromPublicPrivateKeys(publicKey, privateKey string) (p *Person, err error) {
+	p = new(Person)
+	p.Keys, err = keypair.NewFromPair(publicKey, privateKey)
 	return
 }

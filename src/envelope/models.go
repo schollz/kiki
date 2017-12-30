@@ -34,6 +34,15 @@ type UnsealedEnvelope struct {
 	ID         string             `json:"id",storm:"id"`           // hash of SealedContent
 }
 
+func SelfAddress(sender *person.Person, kind, data string) (e *Envelope, err error) {
+	l, err := letter.New(kind, data, sender.Public())
+	if err != nil {
+		return
+	}
+	e, err = New(l, sender, []*person.Person{sender})
+	return
+}
+
 // New creates an envelope and seals it for the specified recipients
 func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (e *Envelope, err error) {
 	logging.Log.Info("creating letter")

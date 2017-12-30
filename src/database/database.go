@@ -157,30 +157,41 @@ func (d *Database) GetUnsealedEnvelopes() (e []*envelope.UnsealedEnvelope, err e
 }
 
 // EnvelopeCatalog returns a list of the current IDs of all the envelopes.
-func (d *Database) EnvelopeCatalog() (catalog []string, err error) {
+func (d *Database) EnvelopeCatalog() (catalog map[string]struct{}, err error) {
 	err = d.Open()
 	if err != nil {
 		return
 	}
 	defer d.Close()
 
-	// count up catalog
-	count, err := d.db.Count(new(envelope.Envelope))
-	if err != nil {
-		err = errors.Wrap(err, "problem counting")
-		return
-	}
-
-	// pre allocate array
-	catalog = make([]string, count)
-
 	// loop over each element
-	i := 0
+	catalog = make(map[string]struct{})
 	query := d.db.Select()
 	err = query.Each(new(envelope.Envelope), func(record interface{}) error {
 		u := record.(*envelope.Envelope)
-		catalog[i] = u.ID
-		i++
+		catalog[u.ID] = struct{}{}
+		return nil
+	})
+	if err != nil {
+		err = errors.Wrap(err, "problem querying")
+	}
+	return
+}
+
+// UnsealedEnvelopeCatalog returns a list of the current IDs of all the unsealed envelopes.
+func (d *Database) UnsealedEnvelopeCatalog() (catalog map[string]struct{}, err error) {
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
+
+	// loop over each element
+	catalog = make(map[string]struct{})
+	query := d.db.Select()
+	err = query.Each(new(envelope.UnsealedEnvelope), func(record interface{}) error {
+		u := record.(*envelope.UnsealedEnvelope)
+		catalog[u.ID] = struct{}{}
 		return nil
 	})
 	if err != nil {
