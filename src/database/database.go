@@ -1,7 +1,7 @@
 package database
 
 import (
-	"log"
+	"fmt"
 	"sync"
 
 	"github.com/asdine/storm"
@@ -103,13 +103,18 @@ func (d *Database) Catalog() (catalog []string, err error) {
 		return
 	}
 	defer d.Close()
+
+	// count up catalog
 	count, err := d.db.Count(new(envelope.Envelope))
 	if err != nil {
 		err = errors.Wrap(err, "problem counting")
 		return
 	}
-	log.Println(count)
+
+	// pre allocate array
 	catalog = make([]string, count)
+
+	// loop over each element
 	i := 0
 	query := d.db.Select()
 	err = query.Each(new(envelope.Envelope), func(record interface{}) error {
@@ -118,9 +123,46 @@ func (d *Database) Catalog() (catalog []string, err error) {
 		i++
 		return nil
 	})
-	log.Println(catalog)
 	if err != nil {
 		err = errors.Wrap(err, "problem querying")
 	}
+	return
+}
+
+func (d *Database) Set(bucket string, key interface{}, value interface{}) (err error) {
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
+	err = d.db.Set(bucket, key, value)
+	if err != nil {
+		err = errors.Wrap(err, fmt.Sprintf("problem setting '%s' in '%s'", key, bucket))
+	}
+	return
+}
+
+func (d *Database) Get(bucket string, key interface{}, to interface{}) (err error) {
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
+
+	err = d.db.Get(bucket, key, &to)
+	if err != nil {
+		err = errors.Wrap(err, fmt.Sprintf("problem getting '%s' from '%s'", key, bucket))
+	}
+	return
+}
+
+func (d *Database) Delete(bucket string, key interface{}) (err error) {
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
+
+	err = d.db.Delete(bucket, key)
 	return
 }

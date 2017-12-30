@@ -64,3 +64,25 @@ func TestReading(t *testing.T) {
 	assert.Equal(t, "hello world", es[0].Letter.Content.Data)
 	assert.Equal(t, "hello world, again", es[1].Letter.Content.Data)
 }
+
+func TestKeystore(t *testing.T) {
+	os.Remove("test.db")
+	d := Setup("test.db")
+	type Something struct {
+		Name string
+	}
+	s := new(Something)
+	s.Name = "zack"
+	err := d.Set("somethings", 1, &s)
+	assert.Nil(t, err)
+
+	s2 := new(Something)
+	err = d.Get("somethings", 1, s2)
+	assert.Nil(t, err)
+	assert.Equal(t, *s, *s2)
+
+	err = d.Delete("somethings", 1)
+	assert.Nil(t, err)
+	err = d.Get("somethings", 1, s2)
+	assert.NotNil(t, err)
+}
