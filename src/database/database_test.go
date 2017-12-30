@@ -7,11 +7,13 @@ import (
 
 	"github.com/schollz/kiki/src/envelope"
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBasic(t *testing.T) {
+	logging.Debug(false)
 	p, err := person.New()
 	assert.Nil(t, err)
 	l, err := letter.New("post", "hello world", p.Keys.Public)

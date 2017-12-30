@@ -7,6 +7,7 @@ import (
 	"github.com/asdine/storm"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/envelope"
+	"github.com/schollz/kiki/src/logging"
 )
 
 // Database is a thread-safe wrapper to the asdine/storm database that provides functionality as a keystore and to set and get envelopes.
@@ -18,6 +19,7 @@ type Database struct {
 
 // Setup a new database, used once on a global instance.
 func Setup(file string) (d *Database) {
+	logging.Log.Info("starting setup")
 	d = new(Database)
 	d.Lock()
 	defer d.Unlock()

@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
+	"github.com/schollz/kiki/src/logging"
 
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/person"
@@ -34,6 +35,7 @@ type UnsealedEnvelope struct {
 
 // New creates an envelope and seals it for the specified recipients
 func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (e *Envelope, err error) {
+	logging.Log.Info("creating letter")
 	e = new(Envelope)
 	e.ID = l.ID
 	e.Timestamp = time.Now()

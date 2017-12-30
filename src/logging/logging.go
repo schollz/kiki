@@ -3,26 +3,28 @@ package logging
 import (
 	"os"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
-func init() {
+var Log = logrus.New()
+
+func Setup() {
 	// Log as JSON instead of the default ASCII formatter.
 	// log.SetFormatter(&log.JSONFormatter{})
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	log.SetOutput(os.Stdout)
+	Log.Out = os.Stdout
 
 	// Only log the warning severity or above.
-	log.SetLevel(log.InfoLevel)
+	Log.SetLevel(logrus.InfoLevel)
 }
 
 // Debug will switch the verbosity of the database.
 func Debug(t bool) {
 	if t {
-		log.SetLevel(log.InfoLevel)
+		Log.Level = logrus.DebugLevel
 	} else {
-		log.SetLevel(log.WarnLevel)
+		Log.Level = logrus.WarnLevel
 	}
 }
