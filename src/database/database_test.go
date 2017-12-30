@@ -25,7 +25,7 @@ func TestBasic(t *testing.T) {
 	assert.Nil(t, err)
 	err = d.AddEnvelope(e)
 	assert.Nil(t, err)
-	catalog, err := d.Catalog()
+	catalog, err := d.EnvelopeCatalog()
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(catalog))
 

@@ -9,13 +9,14 @@ import (
 	"github.com/schollz/kiki/src/envelope"
 )
 
+// Database is a thread-safe wrapper to the asdine/storm database that provides functionality as a keystore and to set and get envelopes.
 type Database struct {
 	file string
 	db   *storm.DB
 	sync.RWMutex
 }
 
-// Setup a new database
+// Setup a new database, used once on a global instance.
 func Setup(file string) (d *Database) {
 	d = new(Database)
 	d.Lock()
@@ -24,6 +25,21 @@ func Setup(file string) (d *Database) {
 	return
 }
 
+// Open locks and opens database. Must be called everytime you need to interact with the database.
+func (d *Database) Open() (err error) {
+	d.Lock()
+	d.db, err = storm.Open(d.file)
+	return
+}
+
+// Close closes the databases and unlocks the structure.
+func (d *Database) Close() (err error) {
+	err = d.db.Close()
+	d.Unlock()
+	return
+}
+
+// AddEnvelope adds an envelope to the database.
 func (d *Database) AddEnvelope(e *envelope.Envelope) (err error) {
 	d.Lock()
 	defer d.Unlock()
@@ -33,6 +49,7 @@ func (d *Database) AddEnvelope(e *envelope.Envelope) (err error) {
 	return
 }
 
+// AddUnsealedEnvelope adds an unsealed envelope to the database.
 func (d *Database) AddUnsealedEnvelope(e *envelope.UnsealedEnvelope) (err error) {
 	d.Lock()
 	defer d.Unlock()
@@ -42,6 +59,7 @@ func (d *Database) AddUnsealedEnvelope(e *envelope.UnsealedEnvelope) (err error)
 	return
 }
 
+// GetEnvelope allows you to get an enevelope by the id
 func (d *Database) GetEnvelope(id string) (e *envelope.Envelope, err error) {
 	err = d.Open()
 	if err != nil {
@@ -53,18 +71,19 @@ func (d *Database) GetEnvelope(id string) (e *envelope.Envelope, err error) {
 	return
 }
 
-func (d *Database) Open() (err error) {
-	d.Lock()
-	d.db, err = storm.Open(d.file)
+// GetUnsealedEnvelope allows you to get an enevelope by the id
+func (d *Database) GetUnsealedEnvelope(id string) (e *envelope.UnsealedEnvelope, err error) {
+	err = d.Open()
+	if err != nil {
+		return
+	}
+	defer d.Close()
+	e = new(envelope.UnsealedEnvelope)
+	err = d.db.One("ID", id, e)
 	return
 }
 
-func (d *Database) Close() (err error) {
-	err = d.db.Close()
-	d.Unlock()
-	return
-}
-
+// GetUnsealedEnvelopes gets all of the unsealed envelopes
 func (d *Database) GetUnsealedEnvelopes() (e []*envelope.UnsealedEnvelope, err error) {
 	err = d.Open()
 	if err != nil {
@@ -97,7 +116,8 @@ func (d *Database) GetUnsealedEnvelopes() (e []*envelope.UnsealedEnvelope, err e
 	return
 }
 
-func (d *Database) Catalog() (catalog []string, err error) {
+// EnvelopeCatalog returns a list of the current IDs of all the envelopes.
+func (d *Database) EnvelopeCatalog() (catalog []string, err error) {
 	err = d.Open()
 	if err != nil {
 		return
@@ -129,6 +149,7 @@ func (d *Database) Catalog() (catalog []string, err error) {
 	return
 }
 
+// Set stores a value in the keystore
 func (d *Database) Set(bucket string, key interface{}, value interface{}) (err error) {
 	err = d.Open()
 	if err != nil {
@@ -142,6 +163,7 @@ func (d *Database) Set(bucket string, key interface{}, value interface{}) (err e
 	return
 }
 
+// Get returns a value from the key store
 func (d *Database) Get(bucket string, key interface{}, to interface{}) (err error) {
 	err = d.Open()
 	if err != nil {
@@ -156,6 +178,7 @@ func (d *Database) Get(bucket string, key interface{}, to interface{}) (err erro
 	return
 }
 
+// Delete will remove a value from the keystore
 func (d *Database) Delete(bucket string, key interface{}) (err error) {
 	err = d.Open()
 	if err != nil {
