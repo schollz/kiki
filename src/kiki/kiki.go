@@ -84,7 +84,7 @@ func PostMessage(kind, message string, isPublic bool, recipients ...*person.Pers
 
 	// check if recipients is available
 	if len(recipients) == 0 {
-		recipients = []*person.Person{Identity}
+		recipients = []*person.Person{}
 	}
 
 	// make letter
@@ -103,12 +103,9 @@ func PostMessage(kind, message string, isPublic bool, recipients ...*person.Pers
 		recipients = append(recipients, RegionKey)
 	}
 
-	// Add the current identity
-	recipients = append(recipients, Identity)
-
 	// seal envelope
 	logger.Debug("sealing envelope")
-	e, err := envelope.New(l, Identity, recipients)
+	e, err := envelope.New(l, Identity, recipients) // the current sender is automatically added
 	if err != nil {
 		return
 	}

@@ -27,17 +27,17 @@ http localhost:8003/identity > identity.json
 Put in a new envelope:
 
 ```
-http -f POST localhost:8003/letter identity@./identity.json message@./message.txt public=yes recipients='["1CppUCZT1_RBGnl9WrFWHxmV9scuHQykoiNuZayEfAU"]'
+http -f POST localhost:8003/letter message@./message.txt public=yes recipients='["1CppUCZT1_RBGnl9WrFWHxmV9scuHQykoiNuZayEfAU"]'
 ```
 
 Open envelopes (and regenerate feed)
 
 ```
-http -f POST localhost:8003/open identity@./identity.json
+http -f POST localhost:8003/open
 ```
 
 Assign name
 
 ```
-http -f POST localhost:8003/assign identity@./identity.json assign=name data=zack
+http -f POST localhost:8003/assign assign=name data=zack
 ```
