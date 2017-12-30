@@ -1,0 +1,93 @@
+.medium-editor-insert-plugin {
+    outline: 0 solid transparent;
+    &:focus {
+        outline: 0 solid transparent;
+    }
+
+    .clearfix:before, &:before, .clearfix:after, &:after {
+        content: " ";
+        display: table;
+        clear: both;
+    }
+
+    p {
+        margin: 1em 0;
+    }
+
+    progress {
+        display: block;
+        margin: 1em auto;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    &.medium-editor-placeholder:after {
+        padding: 1em 0;
+    }
+
+    .medium-insert-buttons {
+        position: absolute;
+        color: #ddd;
+        font-size: 0.9em;
+        button {
+            display: block;
+            cursor: pointer;
+            color: #ddd;
+            background: #fff;
+            width: 32px;
+            height: 32px;
+            box-sizing: border-box;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            line-height: 30px;
+            text-align: center;
+            padding: 0;
+        }
+
+        .medium-insert-buttons-show {
+            font-size: 25px;
+            transform: rotate(0);
+            transition: transform 100ms;
+            span {
+                display: block;
+                margin-top: -4px;
+            }
+            &.medium-insert-buttons-rotate {
+                transition: transform 250ms;
+                transform: rotate(45deg);
+            }
+        }
+
+        .medium-insert-buttons-addons {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: none;
+            position: relative;
+            z-index: 2;
+            left: 55px;
+            top: -32px;
+            li {
+                display: inline-block;
+                margin: 0 5px;
+                .fa {
+                    font-size: 15px;
+                }
+            }
+        }
+    }
+}
+
+.medium-insert-caption-placeholder {
+    position: relative;
+    &:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        content: attr(data-placeholder);
+    }
+}
