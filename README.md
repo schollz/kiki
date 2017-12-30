@@ -4,7 +4,9 @@ Documentation: [KiKi](https://github.com/schollz/kiki/blob/master/doc/content/ov
 
 ## About the project
 
-KiKi is an experimental project.
+KiKi is an experimental project. Here is what it might currently look like:
+
+![Current image](https://user-images.githubusercontent.com/6550035/34450936-b5dbfb58-ecd5-11e7-839b-fafcbf42edf3.png)
 
 ## Status
 
