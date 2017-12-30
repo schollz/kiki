@@ -2,6 +2,7 @@ package envelope
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -23,17 +24,27 @@ func TestNew(t *testing.T) {
 	_, err = json.Marshal(e)
 	assert.Nil(t, err)
 
-	err = e.Unseal(zack)
+	u, err := e.Unseal([]*person.Person{zack})
 	assert.Nil(t, err)
-	assert.Equal(t, e.content.Content.Data, "hello, bob and jane")
+	assert.Equal(t, u.Letter.Content.Data, "hello, bob and jane")
+	fmt.Println(u)
 
-	err = e.Unseal(bob)
+	u, err = e.Unseal([]*person.Person{bob})
 	assert.Nil(t, err)
-	err = e.Unseal(jane)
+	u, err = e.Unseal([]*person.Person{jane})
 	assert.Nil(t, err)
-	err = e.Unseal(donald)
+	u, err = e.Unseal([]*person.Person{donald})
 	assert.NotNil(t, err)
 
 	bE, _ := json.Marshal(e)
 	ioutil.WriteFile("e.json", bE, 0644)
+
+	myPeople := []*person.Person{donald, bob, jane, zack}
+	u, err = e.Unseal(myPeople)
+	for _, p := range myPeople {
+		fmt.Println(p.Keys.Public)
+	}
+	for _, p := range u.Recipients {
+		fmt.Println(p.Public)
+	}
 }
