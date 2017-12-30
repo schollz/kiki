@@ -15,21 +15,21 @@ import (
 
 // Envelope is the sealed letter to be transfered among carriers
 type Envelope struct {
-	Sender     *keypair.KeyPair `json:"sender"`     // public key of the sender
-	Recipients []string         `json:"recipients"` // secret passphrase to open SealedContent,
+	Sender     *keypair.KeyPair `json:"sender",storm:"index"` // public key of the sender
+	Recipients []string         `json:"recipients"`           // secret passphrase to open SealedContent,
 	// encrypted by each recipient public key
-	SealedContent string    `json:"sealed_content"` // encrypted compressed Letter
-	Timestamp     time.Time `json:"timestamp"`      // time of entry
-	ID            string    `json:"id"`             // hash of SealedContent
+	SealedContent string    `json:"sealed_content"`          // encrypted compressed Letter
+	Timestamp     time.Time `json:"timestamp",storm:"index"` // time of entry
+	ID            string    `json:"id",storm:"id"`           // hash of SealedContent
 }
 
 // UnsealedEnvelope is created when an enveloped is opened
 type UnsealedEnvelope struct {
-	Sender     *keypair.KeyPair   `json:"sender"`    // public key of the sender
-	Recipients []*keypair.KeyPair `json:"recipients` // public key of the determined recipient
-	Letter     *letter.Letter     `json:"letter"`    // the unsealed contents of the letter
-	Timestamp  time.Time          `json:"timestamp"` // time of entry
-	ID         string             `json:"id"`        // hash of SealedContent
+	Sender     *keypair.KeyPair   `json:"sender",storm:"index"`    // public key of the sender
+	Recipients []*keypair.KeyPair `json:"recipients`               // public key of the determined recipient
+	Letter     *letter.Letter     `json:"letter"`                  // the unsealed contents of the letter
+	Timestamp  time.Time          `json:"timestamp",storm:"index"` // time of entry
+	ID         string             `json:"id",storm:"id"`           // hash of SealedContent
 }
 
 // New creates an envelope and seals it for the specified recipients
