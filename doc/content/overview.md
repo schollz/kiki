@@ -268,6 +268,7 @@ There are a number of facets that need work:
 - [ ] Public key loading/parsing
 - [ ] Encryption / decryption
 - [ ] Message bundling (envelopes + letters)
+- [ ] Database operation (bboltdb, keystore, feed objects)
 
 ## Medium level targets
 
