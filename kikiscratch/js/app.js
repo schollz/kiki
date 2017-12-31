@@ -34,6 +34,8 @@ var messages = [
 
 
 var app = {
+    // https://github.com/d3/d3-time-format/blob/master/README.md#timeFormat
+    datetimeFormatter: d3.timeFormat('%I:%M%p %B %e, %Y'),
     userColors: {},
     colorScale: d3.scaleOrdinal(d3['schemeCategory20']),
     // creates and stores colors for every user_id
@@ -45,7 +47,47 @@ var app = {
         var color = this.colorScale(n);
         this.userColors[user_id] = color;
         return color;
+    },
+    getDateTimeDisplay: function(unix_ts) {
+        return $('<span>').addClass('datetime right').append(
+            // $('<i>').addClass('material-icons').append(
+            //     'access_time'
+            // ),
+            // $('<i>').addClass('fa fa-clock-o fa-1'),
+            app.datetimeFormatter(new Date(unix_ts*1000))
+        );
+    },
+    getUserNameDisplay: function(username) {
+        return $('<span>').append(
+            $('<i>').addClass('material-icons').append('face'),
+            '&nbsp;' + username
+        );
+    },
+    getMessageNavBarDisplay: function(data) {
+        return $('<nav>').addClass('nav-wrapper message-navbar').css({backgroundColor: app.getUserColor(data.user_id)}).append(
+            $('<div>').addClass('col s12').append(
+                $('<a>').addClass('breadcrumb').css({color: 'white'}).append(
+                    app.getUserNameDisplay(data.username),
+                    app.getDateTimeDisplay(data.created_at)
+                )
+            )
+        );
+    },
+    getMessageContentsDisplay: function(contents) {
+        return $('<div>').addClass('message').append(
+            (function(){
+                var parts = [];
+                var chunks = contents.split('\n');
+                for (var i=0; i<chunks.length; i++) {
+                    parts.push(
+                        $('<p>').append(chunks[i])
+                    );
+                }
+                return parts;
+            })()
+        );
     }
+
 };
 
 app.Message = Backbone.Model.extend({
@@ -61,46 +103,24 @@ app.Message = Backbone.Model.extend({
 app.MessageView = Backbone.View.extend({
     tagName: 'div',
 
-    // <i class="material-icons">access_time</i>&nbsp;1:31pm December 29th, 2017
-
     template: function(data) {
         return $('<div>').addClass('row').append(
                     $('<div>').addClass('col s12 m12').append(
                         $('<div>').addClass('card').append(
-                            $('<nav>').addClass('nav-wrapper').css({backgroundColor: app.getUserColor(data.user_id)}).append(
-                                $('<div>').addClass('col s12').append(
-                                    $('<a>').addClass('breadcrumb').css({color: 'white'}).append(
-                                        $('<i>').addClass('material-icons').append('face'),
-                                        '&nbsp;' + data.username + ' - ' + new Date(data.created_at*1000).toDateString()
-                                    ),
-                                    $('<a>').append($('<i>').addClass('material-icons right hoverable').append('person_add')),
-                                    $('<a>').append($('<i>').addClass('material-icons right hoverable').append('people')),
-                                    $('<a>').append($('<i>').addClass('material-icons right hoverable').append('favorite'))
-                                )
-                            ),
+                            app.getMessageNavBarDisplay(data),
                             $('<div>').addClass('card-content').append(
                                 // reply button
                                 $('<a>').addClass("btn-floating halfway-fab waves-effect waves-light red").append(
                                     $('<i>').addClass('material-icons').append('reply')
                                 ),
-                                $('<div>').addClass('message').append(
-                                    (function(){
-                                        var parts = [];
-                                        var chunks = data.message.split('\n');
-                                        for (var i=0; i<chunks.length; i++) {
-                                            parts.push(
-                                                $('<p>').append(chunks[i])
-                                            );
-                                        }
-                                        return parts;
-                                    })()
-                                ),
+                                app.getMessageContentsDisplay(data.message),
                                 $('<div>').addClass('replies').append(
                                     $('<div>').append(
-                                        $('<span>').addClass('valign-wrapper').append(
+                                        $('<span>').addClass('valign-wrapper right').append(
                                             $('<i>').addClass("material-icons right").append('favorite'),
                                             '&nbsp;x' + data.replies.length
-                                        )
+                                        ),
+                                        $('<br>')
                                     ),
                                 // message container
                                     (function(){
@@ -109,30 +129,10 @@ app.MessageView = Backbone.View.extend({
                                             var reply = data.replies[i];
                                             replies.push(
                                                 $('<div>').addClass('card').append(
-                                                    $('<nav>').addClass('nav-wrapper').css({backgroundColor: app.getUserColor(reply.user_id)}).append(
-                                                        $('<div>').addClass('col s12').append(
-                                                            $('<a>').addClass('breadcrumb').css({color: 'white'}).append(
-                                                                $('<i>').addClass('material-icons').append('face'),
-                                                                '&nbsp;' + reply.username + ' - ' + new Date(reply.created_at*1000).toDateString()
-                                                            )
-                                                        )
-                                                    ),
-
+                                                    app.getMessageNavBarDisplay(reply),
                                                     $('<div>').addClass('card-content').append(
-                                                        $('<div>').addClass('message').append(
-                                                            (function(){
-                                                                var parts = [];
-                                                                var chunks = reply.message.split('\n');
-                                                                for (var i=0; i<chunks.length; i++) {
-                                                                    parts.push(
-                                                                        $('<p>').append(chunks[i])
-                                                                    );
-                                                                }
-                                                                return parts;
-                                                            })()
-                                                        )
+                                                        app.getMessageContentsDisplay(reply.message)
                                                     ).hide()
-
                                                 )
                                                 .on('click', function() {
                                                     $(this).find('.card-content').toggle();
@@ -145,7 +145,7 @@ app.MessageView = Backbone.View.extend({
                             )
                         )
                     )
-                )
+                );
     },
     render: function(){
         this.$el.html(this.template(this.model.toJSON()));
