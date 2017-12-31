@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/ararog/timeago"
+  packages = ["."]
+  revision = "518814407569bf983ea81e1bf8b550dd4e7b34f3"
+  version = "0.0.1"
+
+[[projects]]
   name = "github.com/asdine/storm"
   packages = [".","codec","codec/json","index","internal","q"]
   revision = "dbd37722730b6cb703b5bd825c3f142d87358525"
@@ -18,6 +24,30 @@
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gin-contrib/sse"
+  packages = ["."]
+  revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
+
+[[projects]]
+  name = "github.com/gin-gonic/gin"
+  packages = [".","binding","render"]
+  revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
+  version = "v1.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
+  version = "v0.0.3"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -45,6 +75,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/ugorji/go"
+  packages = ["codec"]
+  revision = "d41456c8f4e0623f1f158ae45e687fe059ac48c1"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","nacl/box","nacl/secretbox","poly1305","salsa20/salsa","ssh/terminal"]
   revision = "95a4943f35d008beabde8c11e5075a1b714e6419"
@@ -55,9 +91,21 @@
   packages = ["unix","windows"]
   revision = "83801418e1b59fb1880e363299581ee543af32ca"
 
+[[projects]]
+  name = "gopkg.in/go-playground/validator.v8"
+  packages = ["."]
+  revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
+  version = "v8.18.2"
+
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "241204428788414c3a208abc28e6c605192f5a291f28ff1305c1704d0414e228"
+  inputs-digest = "beb8da06f982ea798bc388cafac22e7894e0dcc37929baff0921d47db74e1655"
   solver-name = "gps-cdcl"
   solver-version = 1
