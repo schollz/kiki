@@ -8,6 +8,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
@@ -76,10 +77,15 @@ func handleAssign(c *gin.Context) (err error) {
 
 func handlerLetterHTML(c *gin.Context) {
 	AddCORS(c)
+	fmt.Println(c.Request.RemoteAddr)
 	respondWithJSON(c, "letter added", handleLetterHTML(c))
 }
 
 func handleLetterHTML(c *gin.Context) (err error) {
+	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
+		return errors.New("must be on local host")
+	}
+
 	type Payload struct {
 		Data string `json:"data" binding:"required"`
 		Kind string `json:"kind" binding:"required"`
