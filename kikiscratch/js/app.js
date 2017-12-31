@@ -10,7 +10,7 @@ var messages = [
     {
         message_id: 'uuid4',
         user_id: '_Mr.Prez_',
-        username: 'Barack',
+        username: 'Barack Obama',
         message: 'Have you ever seen a bunny sit near a flower? Well, here you go.\n<img class="materialboxed responsive-img initialized" src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg"/>\nThis is indeed a bunny, sitting near a flower.',
         created_at: 1514600002,
         replies: [
@@ -76,6 +76,7 @@ var app = {
         var n = Object.keys(this.userColors).length;
         var color = this.colorScale(n);
         this.userColors[user_id] = color;
+        this.setSettingsToLocalStorage('colors', this.userColors);
         return color;
     },
     getDateTimeDisplay: function(unix_ts) {
@@ -96,7 +97,7 @@ var app = {
     getMessageNavBarDisplay: function(data) {
         return $('<nav>').addClass('nav-wrapper message-navbar').css({backgroundColor: app.getUserColor(data.user_id)}).append(
             $('<div>').addClass('col s12').append(
-                $('<a>').addClass('breadcrumb').css({color: 'white'}).append(
+                $('<a>').addClass('breadcrumb white-text').append(
                     app.getUserNameDisplay(data.username),
                     app.getDateTimeDisplay(data.created_at)
                 )
@@ -116,8 +117,25 @@ var app = {
                 return parts;
             })()
         );
-    }
+    },
 
+    setSettingsToLocalStorage: function(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    },
+
+    getSettingsFromLocalStorage: function(key) {
+        var data = localStorage.getItem(key);
+        if (!data) {
+            data = {}
+        } else {
+            data = JSON.parse(data);
+        }
+        return data;
+    },
+
+    init: function() {
+        this.userColors = this.getSettingsFromLocalStorage('colors');
+    }
 };
 
 app.Message = Backbone.Model.extend({
@@ -237,6 +255,7 @@ app.AppView = Backbone.View.extend({
 
 
 function initApp() {
+    app.init();
     app.appView = new app.AppView();
     for (var i=0; i<messages.length; i++) {
         var msg = new app.Message(messages[i]);
