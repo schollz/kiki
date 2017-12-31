@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -32,6 +33,7 @@ func Run() {
 		c.String(http.StatusOK, "OK")
 	})
 	r.POST("/letter", handlerLetter)
+	r.POST("/letterhtml", handlerLetterHTML)
 	r.POST("/assign", handlerAssign)
 	r.POST("/open", handlerOpen)
 	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
@@ -70,6 +72,25 @@ func handleAssign(c *gin.Context) (err error) {
 	}
 
 	return feed.PostMessage("assign-"+assignmentType, assignData, true)
+}
+
+func handlerLetterHTML(c *gin.Context) {
+	AddCORS(c)
+	respondWithJSON(c, "letter added", handleLetterHTML(c))
+}
+
+func handleLetterHTML(c *gin.Context) (err error) {
+	type Payload struct {
+		Data string `json:"data" binding:"required"`
+		Kind string `json:"kind" binding:"required"`
+	}
+	var p Payload
+	err = c.BindJSON(&p)
+	if err != nil {
+		return
+	}
+	fmt.Println(p)
+	return
 }
 
 func handlerLetter(c *gin.Context) {
@@ -125,4 +146,12 @@ func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
 	_, err = io.Copy(buf, src)
 	data = buf.Bytes()
 	return
+}
+
+func AddCORS(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "GET")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Max")
+	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 }

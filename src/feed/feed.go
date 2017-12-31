@@ -51,7 +51,7 @@ func Setup() (err error) {
 	db = database.Setup(path.Join(DataFolder, DatabaseName))
 	db.Set("AssignedNames", RegionKey.Public(), "Public")
 
-	// Setup personalKey for this instance
+	// Define personalKey for this instance
 	logger.Debug("setting up personalKey")
 	if IdentityFile == "" {
 		IdentityFile = path.Join(DataFolder, "identity.json")
@@ -80,7 +80,7 @@ func Setup() (err error) {
 		return
 	}
 
-	// Setup settings for this instance
+	// Define settings for this instance
 	logger.Debug("setting up settings")
 	if SettingsFile == "" {
 		SettingsFile = path.Join(DataFolder, "settings.json")
@@ -253,7 +253,7 @@ func RegenerateFeed() (err error) {
 		return
 	}
 	for _, e := range envelopes {
-		errProcess := ProcessLetter(e)
+		errProcess := processLetter(e)
 		if errProcess != nil {
 			return errors.Wrap(errProcess, "problem processing "+e.ID)
 		}
@@ -262,10 +262,10 @@ func RegenerateFeed() (err error) {
 	return
 }
 
-// ProcessLetter will determine what to do with each letter.
-func ProcessLetter(e *envelope.UnsealedEnvelope) (err error) {
+// processLetter will determine what to do with each letter.
+func processLetter(e *envelope.UnsealedEnvelope) (err error) {
 	logger := logging.Log.WithFields(logrus.Fields{
-		"func": "ProcessLetter",
+		"func": "processLetter",
 	})
 
 	switch kind := e.Letter.Content.Kind; kind {
