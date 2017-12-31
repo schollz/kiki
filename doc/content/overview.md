@@ -81,23 +81,7 @@ When kiki loads, it is mainly used to display the *Feed*. The Feed contains all 
 5. Open remaining Envelopes
 6. Use Unsealed Envelopes to discover information (posts, likes, etc.)
 
-Feeds can be completlely reconstructed from the main database, `$HOME/.kiki/kiki.db`. One of the main objects is the `Feed` object, which is stored in the `Keystore` bucket, marshaled into the `feed` key:
-
-```golang
-type Feed struct {
-    RegionKey *keypair.KeyPair // key pair determine by running instance (the "public" public/private key pair)
-    KeysForFriends []*keypair.KeyPair // key pairs that are shared with friends
-    KeysFromFriends []*keypair.KeyPair // key pairs that friends share with you
-    UnsealedEnvelopeCatalog  map[string]struct{} // map of IDs of all unsealed envelopes
-}
-```
-
-The `KeysForFriends` is a list of each public/private key given out to friends. Only the first key is used to send keys to friends. When a friend is blocked, then a new key is *prepended* to this list and that new key is posted to all the remaining friends. The friend that is blocked will not obtain this new key, therefore they will not be able to view any future messages.
-
-The `KeysFromFriends` is the list of public/private keys that can be used to unseal envelopes. If any of these are successful then you know the message is from a friend.
-
-The `UnsealedEnvelopeCatalog` is used to compare with a carrier catalog to determine what they need to synchronize.
-
+Feeds can be completlely reconstructed from the main database, `$HOME/.kiki/kiki.db`. One of the main objects is the `Feed` object, which is stored in the `Keystore` bucket, marshaled into the `feed` key. The `KeysForFriends` is a list of each public/private key given out to friends. Only the first key is used to send keys to friends. When a friend is blocked, then a new key is *prepended* to this list and that new key is posted to all the remaining friends. The friend that is blocked will not obtain this new key, therefore they will not be able to view any future messages. The `KeysFromFriends` is the list of public/private keys that can be used to unseal envelopes. If any of these are successful then you know the message is from a friend.
 
 There are also some things that warrant their own bucket. The `AssignedNames` bucket contains a map of the string of the public key to the display name assigned by that person. `AssignedPhoto` is similar, it contains the public key of a user mapped to the base64 string of the image assigned by that public key.
 
@@ -165,6 +149,7 @@ All letters invoke actions. Typically these actions are just to post text/image 
 
 All the Letters are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/letters.db`. This file contains unsealed Envelopes, so it will never be shared. To further ensure privacy you can enable `StoreLettersInMemory=true` in the configuration file to keep the database in memory (and rebuild on each startup). My [tests](https://gist.github.com/schollz/f08282396a8b184e30dddbe2422ba88a) determine that loading data from files in a database is about 70x faster than find and loading files from a file system.
 
+Letters can have up to 3 "Channels". Channels are hashtags that indicate the group that this message should belong. Channels are determined by the last three hashtags by [using Regex](https://regex101.com/r/voKb2s/1).
 
 #### Assigning name / profile / profile picture
 
@@ -173,7 +158,7 @@ When starting for the first time, you assign yourself a name (initially your nam
 
 ```json
 {
-    "Kind":"name",
+    "Kind":"assign-name",
     "Data":"Zack"
 }
 ```
@@ -182,18 +167,29 @@ This Letter is signed by the Public key for Zack, so it ensures that this is wha
 
 You can also assign profiles and pictures by changing the "Type" to "Profile" or "Picture", respectively.
 
-#### Posting
+## Posting a message
 
 For a regular post, the LetterContent should look like:
 
 ```json
 {
     "Kind":"post",
-    "Data":"This is my first **post**"
+    "Data":"This is my first <em>post</em>"
 }
 ```
 
-Here the `Content` is simply the Markdown of the post.
+Here the `Content` is simply the HTML of the post. There is some server processing done on this data. The server will find all base64 encoded images and re-encode them as JPG/PNG and submit the actual image as a new message:
+
+```json
+{
+    "Kind":".jpg",
+    "Data":"...base64 encoded data of JPG image..."
+}
+```
+
+The server will server these as the `ID+Kind` where the `Kind` is just the extension.
+
+The server will also find all the Channels by finding the last three tags [using Regex](https://regex101.com/r/voKb2s/1).
 
 #### Following
 
