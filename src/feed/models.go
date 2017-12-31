@@ -1,6 +1,8 @@
 package feed
 
 import (
+	"errors"
+
 	"github.com/schollz/kiki/src/envelope"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
@@ -42,10 +44,18 @@ func GenerateSettings() Settings {
 //
 // Assign name:
 // 		kind="assign-name"
-//    data="new name"
+//    data="plaintext of name"
+//
+// Assign public profile:
+// 		kind="assign-profile"
+//    data="HTML of profile"
+//
+// Assign public profile image:
+//		kind="assign-image"
+//		data="base64 of photo data"
 //
 // Send friend key:
-// 		kind="send-friend-key"
+// 		kind="give-key"
 //    recipients=["friend1 public key","friend2 public key"]
 //
 // "like" something:
@@ -55,6 +65,10 @@ func GenerateSettings() Settings {
 // Follow someone:
 //		kind="follow"
 //		recipients=["user ID"]
+//
+// Ghost someone:
+//		kind="ghost"
+//		data=["user ID"]
 //
 type Message struct {
 	Data        string   `json:"data"`
@@ -78,22 +92,49 @@ func (p Message) Post() (err error) {
 	}
 
 	// if post, do some special functions
-	if p.Kind == "post" {
+	switch p.Kind {
+	case "post":
 		// TODO: Capture images from post
 		// update l.Content.Data
+		// post the images as new messages
 		// TODO: Capture channels from post
 		// update l.Channels
 		// Check if its a reply to
 		if p.ReplyTo != "" {
 			l.ReplyTo = p.ReplyTo
 		}
-	} else if p.Kind == "send-friend-key" {
+	case "give-key":
 		// TODO: Put all friends keys into l.Content.Data
-	} else if p.Kind == "assign-name" {
+	case "assign-name":
 		// TODO: Strip HTML
-	} else if p.Kind == "like" {
+		// assigned names are public
+		p.ForPublic = true
+	case "assign-profile":
+		// TODO: Strip images
+		// profiles are public
+		p.ForPublic = true
+	case "assign-image":
+		// profile images are public
+		p.ForPublic = true
+	case ".jpg":
+		// do nothing
+	case ".png":
+		// do nothing
+	case "like":
 		// likes are public
 		p.ForPublic = true
+	case "follow":
+		// follows are public?
+		p.ForPublic = true
+	case "ghost":
+		// blocks are private
+		p.ForPublic = false
+		p.ForFriends = false
+		// TODO: issue new friends key
+		// emit new friends key to all remaining friends
+		// (TODO: in feed, when encountering a ghost in Unsealed Envelopes, remove the public key specified in the data)
+	default:
+		return errors.New("message kind not supported: " + p.Kind)
 	}
 
 	// determine recipients
