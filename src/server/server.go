@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/schollz/kiki/src/kiki"
+	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
 )
@@ -50,11 +50,11 @@ func handlerOpen(c *gin.Context) {
 }
 
 func handleOpen(c *gin.Context) (err error) {
-	err = kiki.OpenEnvelopes()
+	err = feed.OpenEnvelopes()
 	if err != nil {
 		return
 	}
-	err = kiki.RegenerateFeed()
+	err = feed.RegenerateFeed()
 	return
 }
 
@@ -69,7 +69,7 @@ func handleAssign(c *gin.Context) (err error) {
 		return errors.New("assigned data cannot be empty")
 	}
 
-	return kiki.PostMessage("assign-"+assignmentType, assignData, true)
+	return feed.PostMessage("assign-"+assignmentType, assignData, true)
 }
 
 func handlerLetter(c *gin.Context) {
@@ -112,7 +112,7 @@ func handleLetter(c *gin.Context) (err error) {
 	if len(message) == 0 {
 		return errors.New("message cannot be empty")
 	}
-	return kiki.PostMessage("post", message, isPublic, recipients...)
+	return feed.PostMessage("post", message, isPublic, recipients...)
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {

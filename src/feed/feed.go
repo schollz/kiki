@@ -1,4 +1,4 @@
-package kiki
+package feed
 
 import (
 	"encoding/json"
@@ -19,13 +19,18 @@ import (
 )
 
 var (
+	// public variables
 	DataFolder   = "."
 	DatabaseName = "kiki.db"
-	IdentityFile = path.Join(DataFolder, "identity.json")
+	IdentityFile = ""
+	SettingsFile = ""
 	RegionKey    *person.Person
-	Identity     *person.Person
 	Port         = "8003"
-	db           *database.Database
+
+	// private variables
+	settings    Settings
+	personalKey *person.Person
+	db          *database.Database
 )
 
 // Setup initializes the kiki instance
@@ -46,8 +51,11 @@ func Setup() (err error) {
 	db = database.Setup(path.Join(DataFolder, DatabaseName))
 	db.Set("AssignedNames", RegionKey.Public(), "Public")
 
-	// Setup identity for this instance
-	logger.Debug("setting up identity")
+	// Setup personalKey for this instance
+	logger.Debug("setting up personalKey")
+	if IdentityFile == "" {
+		IdentityFile = path.Join(DataFolder, "identity.json")
+	}
 	if _, err := os.Stat(IdentityFile); os.IsNotExist(err) {
 		var err2 error
 		p, err2 := NewPerson()
@@ -67,7 +75,32 @@ func Setup() (err error) {
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(pBytes, &Identity)
+	err = json.Unmarshal(pBytes, &personalKey)
+	if err != nil {
+		return
+	}
+
+	// Setup settings for this instance
+	logger.Debug("setting up settings")
+	if SettingsFile == "" {
+		SettingsFile = path.Join(DataFolder, "settings.json")
+	}
+	if _, err := os.Stat(SettingsFile); os.IsNotExist(err) {
+		s := GenerateSettings()
+		pBytes, err2 := json.Marshal(s)
+		if err2 != nil {
+			return err2
+		}
+		err2 = ioutil.WriteFile(SettingsFile, pBytes, 0644)
+		if err2 != nil {
+			return err2
+		}
+	}
+	pBytes, err = ioutil.ReadFile(SettingsFile)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(pBytes, &settings)
 	if err != nil {
 		return
 	}
@@ -93,7 +126,7 @@ func PostMessage(kind, message string, isPublic bool, recipients ...*person.Pers
 	} else {
 		logger.Debugf("new %s: '%s'", kind, message[:10])
 	}
-	l, err := letter.New(kind, message, Identity.Public())
+	l, err := letter.New(kind, message, personalKey.Public())
 	if err != nil {
 		return
 	}
@@ -105,7 +138,7 @@ func PostMessage(kind, message string, isPublic bool, recipients ...*person.Pers
 
 	// seal envelope
 	logger.Debug("sealing envelope")
-	e, err := envelope.New(l, Identity, recipients) // the current sender is automatically added
+	e, err := envelope.New(l, personalKey, recipients) // the current sender is automatically added
 	if err != nil {
 		return
 	}
@@ -138,7 +171,7 @@ func OpenEnvelopes() (err error) {
 		}
 
 		// unseal
-		ue, err := e.Unseal([]*person.Person{Identity, RegionKey})
+		ue, err := e.Unseal([]*person.Person{personalKey, RegionKey})
 		if err != nil {
 			continue // this letter is not for this person
 		}
@@ -259,7 +292,7 @@ func UpdateFriendsKeys(e *envelope.UnsealedEnvelope) (err error) {
 	err = json.Unmarshal([]byte(e.Letter.Content.Data), &newKey)
 
 	keyBucket := "keysFromFriends"
-	if e.Sender.Public == Identity.Public() {
+	if e.Sender.Public == personalKey.Public() {
 		// key was sent from someone other than you
 		keyBucket = "keysForFriends"
 	}
