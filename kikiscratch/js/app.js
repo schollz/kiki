@@ -29,6 +29,30 @@ var messages = [
                 created_at: 1514796602
             }
         ]
+    },
+    {
+        message_id: 'uuid4',
+        user_id: 'zack_attack',
+        username: 'zack',
+        message: 'This is the coolest app.',
+        created_at: 1514000002,
+        replies: [
+            {
+                message_id: 'yet_another_uuid4',
+                user_id: 'Stefan is a God King',
+                username: 'StefanRocksMySocks',
+                message: 'Fo shizzle',
+                created_at: 1514103382
+            }
+        ]
+    },
+    {
+        message_id: 'uuid4',
+        user_id: 'system',
+        username: 'system',
+        message: 'Welcome!',
+        created_at: 1500000002,
+        replies: []
     }
 ]
 
@@ -37,7 +61,13 @@ var app = {
     // https://github.com/d3/d3-time-format/blob/master/README.md#timeFormat
     datetimeFormatter: d3.timeFormat('%I:%M%p %B %e, %Y'),
     userColors: {},
-    colorScale: d3.scaleOrdinal(d3['schemeCategory20']),
+    // https://github.com/d3/d3-scale/blob/master/README.md#schemeCategory20c
+    // https://github.com/d3/d3-scale-chromatic
+    // colorScale: d3.scaleOrdinal(d3.schemeCategory10),
+    // colorScale: d3.scaleOrdinal(d3.schemeCategory20),
+    // colorScale: d3.scaleOrdinal(d3.schemeCategory20b),
+    // colorScale: d3.scaleOrdinal(d3.schemeCategory20c),
+    colorScale: d3.scaleOrdinal(d3.schemeSet1),
     // creates and stores colors for every user_id
     getUserColor: function(user_id) {
         if (this.userColors[user_id]) {
