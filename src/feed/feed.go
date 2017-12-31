@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/envelope"
-	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
 	"github.com/schollz/kiki/src/utils"
@@ -106,46 +105,6 @@ func Setup() (err error) {
 	}
 
 	err = RegenerateFeed()
-	return
-}
-
-// PostMessage will generate a new letter with a message, seal it, and add it to the database.
-func PostMessage(kind, message string, isPublic bool, recipients ...*person.Person) (err error) {
-	logger := logging.Log.WithFields(logrus.Fields{
-		"func": "PostMessage",
-	})
-
-	// check if recipients is available
-	if len(recipients) == 0 {
-		recipients = []*person.Person{}
-	}
-
-	// make letter
-	if len(message) < 10 {
-		logger.Debugf("new %s: '%s'", kind, message)
-	} else {
-		logger.Debugf("new %s: '%s'", kind, message[:10])
-	}
-	l, err := letter.New(kind, message, personalKey.Public())
-	if err != nil {
-		return
-	}
-
-	// add Region key if it is public
-	if isPublic {
-		recipients = append(recipients, RegionKey)
-	}
-
-	// seal envelope
-	logger.Debug("sealing envelope")
-	e, err := envelope.New(l, personalKey, recipients) // the current sender is automatically added
-	if err != nil {
-		return
-	}
-
-	// add envelope to database
-	logger.Debug("putting in carrier")
-	err = db.AddEnvelope(e)
 	return
 }
 

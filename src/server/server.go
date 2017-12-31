@@ -2,9 +2,7 @@ package server
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -13,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/logging"
-	"github.com/schollz/kiki/src/person"
 )
 
 func init() {
@@ -34,8 +31,6 @@ func Run() {
 		c.String(http.StatusOK, "OK")
 	})
 	r.POST("/letter", handlerLetter)
-	r.POST("/letterhtml", handlerLetterHTML)
-	r.POST("/assign", handlerAssign)
 	r.POST("/open", handlerOpen)
 	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
 }
@@ -75,71 +70,24 @@ func handleAssign(c *gin.Context) (err error) {
 	return feed.PostMessage("assign-"+assignmentType, assignData, true)
 }
 
-func handlerLetterHTML(c *gin.Context) {
-	AddCORS(c)
-	fmt.Println(c.Request.RemoteAddr)
-	respondWithJSON(c, "letter added", handleLetterHTML(c))
-}
-
-func handleLetterHTML(c *gin.Context) (err error) {
-	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
-		return errors.New("must be on local host")
-	}
-
-	type Payload struct {
-		Data string `json:"data" binding:"required"`
-		Kind string `json:"kind" binding:"required"`
-	}
-	var p Payload
-	err = c.BindJSON(&p)
-	if err != nil {
-		return
-	}
-	fmt.Println(p)
-	return
-}
-
 func handlerLetter(c *gin.Context) {
 	respondWithJSON(c, "letter added", handleLetter(c))
 }
 
 func handleLetter(c *gin.Context) (err error) {
-	// get message
-	file, err := c.FormFile("message")
+	AddCORS(c)
+
+	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
+		return errors.New("must be on local host")
+	}
+
+	// bind the payload
+	var p message.Message
+	err = c.BindJSON(&p)
 	if err != nil {
 		return
 	}
-	data, err := readFormFile(file)
-	if err != nil {
-		return
-	}
-	message := string(data)
-
-	// is public
-	isPublic := c.PostForm("public") == "yes"
-
-	// get recipients
-	recipients := []*person.Person{}
-	recipientsString := c.PostForm("recipients")
-	if recipientsString != "" {
-		var recipientPublicKeys []string
-		err = json.Unmarshal([]byte(recipientsString), &recipientPublicKeys)
-		if err != nil {
-			return
-		}
-		for _, recipientPublicKeyString := range recipientPublicKeys {
-			otherRecipient, err := person.FromPublicKey(recipientPublicKeyString)
-			if err != nil {
-				logging.Log.Infof("not a valid public key: '%s'", recipientPublicKeyString)
-				continue
-			}
-			recipients = append(recipients, otherRecipient)
-		}
-	}
-	if len(message) == 0 {
-		return errors.New("message cannot be empty")
-	}
-	return feed.PostMessage("post", message, isPublic, recipients...)
+	return p.Post()
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
