@@ -33,6 +33,15 @@ var messages = [
                         replies: []
                     }
                 ]
+            },
+            {
+                message_id: 'another_uuid4_',
+                user_id: 'tedNugent',
+                username: 'Ted Nugent',
+                message: 'America freedom and stuffs!',
+                created_at: 1514699602,
+                tags: '',
+                replies: []
             }
         ]
     },
@@ -142,19 +151,23 @@ var app = {
                 for (var i=0; i<data.replies.length; i++) {
                     var reply = data.replies[i];
 
-                    var content = $('<div>').addClass('card-content').append(
-                        app.getMessageContentsDisplay(reply.message),
-                        app.getMessageReplieDisplay(reply)
-                    ).hide();
+                    // var content = $('<div>').addClass('card-content').append(
+                    //     app.getMessageContentsDisplay(reply.message),
+                    //     app.getMessageReplieDisplay(reply)
+                    // ).hide();
 
                     replies.push(
                         $('<div>').addClass('card').append(
                             app.getMessageNavBarDisplay(reply),
-                            content
+                            $('<div>').addClass('card-content').append(
+                                app.getMessageContentsDisplay(reply.message),
+                                app.getMessageReplieDisplay(reply)
+                            ).hide()
                         )
                         .on('click', function(event) {
                             event.stopPropagation();
-                            content.toggle();
+                            $($(this).find('.card-content')[0]).toggle();
+                            // debugger;
                         })
                     );
                 }
