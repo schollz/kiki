@@ -159,7 +159,7 @@ var app = {
                     replies.push(
                         $('<div>').addClass('card').append(
                             app.getMessageNavBarDisplay(reply),
-                            $('<div>').addClass('card-content').append(
+                            $('<div>').addClass('card-content message-content').append(
                                 app.getMessageContentsDisplay(reply.message),
                                 app.getMessageReplieDisplay(reply)
                             ).hide()
