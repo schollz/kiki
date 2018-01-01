@@ -13,20 +13,26 @@ var messages = [
         username: 'Barack Obama',
         message: 'Have you ever seen a bunny sit near a flower? Well, here you go.\n<img class="materialboxed responsive-img initialized" src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg"/>\nThis is indeed a bunny, sitting near a flower.',
         created_at: 1514600002,
+        tags: 'rabbit animal',
         replies: [
             {
                 message_id: 'another_uuid4',
                 user_id: 'zack_attack',
                 username: 'zack',
                 message: 'Oh, wow!',
-                created_at: 1514696602
-            },
-            {
-                message_id: 'yet_another_uuid4',
-                user_id: 'Stefan is a God King',
-                username: 'StefanRocksMySocks',
-                message: 'I love bunnies!',
-                created_at: 1514796602
+                created_at: 1514696602,
+                tags: '',
+                replies: [
+                    {
+                        message_id: 'yet_another_uuid4',
+                        user_id: 'Stefan is a God King',
+                        username: 'StefanRocksMySocks',
+                        message: 'I love bunnies!',
+                        created_at: 1514796602,
+                        tags: '',
+                        replies: []
+                    }
+                ]
             }
         ]
     },
@@ -42,7 +48,9 @@ var messages = [
                 user_id: 'Stefan is a God King',
                 username: 'StefanRocksMySocks',
                 message: 'Fo shizzle',
-                created_at: 1514103382
+                created_at: 1514103382,
+                tags: '',
+                replies: []
             }
         ]
     },
@@ -119,6 +127,42 @@ var app = {
         );
     },
 
+    getMessageReplieDisplay: function(data) {
+        return $('<div>').addClass('replies').append(
+            $('<div>').append(
+                $('<span>').addClass('valign-wrapper right').append(
+                    $('<i>').addClass("material-icons right").append('favorite'),
+                    '&nbsp;x' + (data.replies.length || 0)
+                ),
+                $('<br>')
+            ),
+        // message container
+            (function(){
+                var replies = [];
+                for (var i=0; i<data.replies.length; i++) {
+                    var reply = data.replies[i];
+
+                    var content = $('<div>').addClass('card-content').append(
+                        app.getMessageContentsDisplay(reply.message),
+                        app.getMessageReplieDisplay(reply)
+                    ).hide();
+
+                    replies.push(
+                        $('<div>').addClass('card').append(
+                            app.getMessageNavBarDisplay(reply),
+                            content
+                        )
+                        .on('click', function(event) {
+                            event.stopPropagation();
+                            content.toggle();
+                        })
+                    );
+                }
+                return replies;
+            })()
+        );
+    },
+
     setSettingsToLocalStorage: function(key, data) {
         localStorage.setItem(key, JSON.stringify(data));
     },
@@ -154,7 +198,7 @@ app.MessageView = Backbone.View.extend({
     template: function(data) {
         return $('<div>').addClass('row').append(
                     $('<div>').addClass('col s12 m12').append(
-                        $('<div>').addClass('card').append(
+                        $('<div>').addClass('card ').append(
                             app.getMessageNavBarDisplay(data),
                             $('<div>').addClass('card-content').append(
                                 // reply button
@@ -162,34 +206,37 @@ app.MessageView = Backbone.View.extend({
                                     $('<i>').addClass('material-icons').append('reply')
                                 ),
                                 app.getMessageContentsDisplay(data.message),
-                                $('<div>').addClass('replies').append(
-                                    $('<div>').append(
-                                        $('<span>').addClass('valign-wrapper right').append(
-                                            $('<i>').addClass("material-icons right").append('favorite'),
-                                            '&nbsp;x' + data.replies.length
-                                        ),
-                                        $('<br>')
-                                    ),
-                                // message container
-                                    (function(){
-                                        var replies = [];
-                                        for (var i=0; i<data.replies.length; i++) {
-                                            var reply = data.replies[i];
-                                            replies.push(
-                                                $('<div>').addClass('card').append(
-                                                    app.getMessageNavBarDisplay(reply),
-                                                    $('<div>').addClass('card-content').append(
-                                                        app.getMessageContentsDisplay(reply.message)
-                                                    ).hide()
-                                                )
-                                                .on('click', function() {
-                                                    $(this).find('.card-content').toggle();
-                                                })
-                                            );
-                                        }
-                                        return replies;
-                                    })()
-                                )
+
+                                app.getMessageReplieDisplay(data)
+                                // $('<div>').addClass('replies').append(
+                                //     $('<div>').append(
+                                //         $('<span>').addClass('valign-wrapper right').append(
+                                //             $('<i>').addClass("material-icons right").append('favorite'),
+                                //             '&nbsp;x' + data.replies.length
+                                //         ),
+                                //         $('<br>')
+                                //     ),
+                                // // message container
+                                //     (function(){
+                                //         var replies = [];
+                                //         for (var i=0; i<data.replies.length; i++) {
+                                //             var reply = data.replies[i];
+                                //             replies.push(
+                                //                 $('<div>').addClass('card').append(
+                                //                     app.getMessageNavBarDisplay(reply),
+                                //                     $('<div>').addClass('card-content').append(
+                                //                         app.getMessageContentsDisplay(reply.message)
+                                //                     ).hide()
+                                //                 )
+                                //                 .on('click', function() {
+                                //                     $(this).find('.card-content').toggle();
+                                //                 })
+                                //             );
+                                //         }
+                                //         return replies;
+                                //     })()
+                                // )
+
                             )
                         )
                     )
