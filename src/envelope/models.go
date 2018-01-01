@@ -34,7 +34,9 @@ type Envelope struct {
 	Recipients []string `json:"recipients"`
 	// Encrypted compressed letter, represented as base64 string
 	SealedLetter string `json:"sealed_letter,omitempty"`
-	// Letter is the unsealed letter, which is determined after unsealing
+	// Letter is the unsealed letter. Once a Envelope is "unsealed", then this
+	// variable is set and the SealedLetter is set to "" (deleted). This will
+	// then be saved in a bucket for unsealed letters.
 	Letter Letter `json:"letter,omitempty"`
 }
 
