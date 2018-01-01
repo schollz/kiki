@@ -8,6 +8,12 @@ Low level: All the information in the network is stored in **Letters** that are 
 
 Everyone on KiKi also carries Letters addressed to others. This makes KiKi distributed, because everyone is a mailman/mail-woman. Once two people encounter each other on LAN or when connecting to a public server, they will exchange Letters that they carried for each other. This ensures that the network can exist as a mesh, outside of the realm of ISPs. It also ensures that no federated servers are necessary, it will work with a few people that can connect onto a local network.
 
+## Ideas
+
+Assignment allows assesment. Reputation can be evaluated through arbitrary quantification of certain public aspects of the social network. I.e. - posts that are more popular have a certain amount of "likes", more reputable people have more followers, etc.
+
+Contributions create connections. Kiki should be built around providing a frictionless path towards contributing content to be shared, locally, across the network.
+
 ## Access
 
 Each social network has a different way of answering the question: *who can access what?* 
@@ -68,7 +74,7 @@ type Person struct {
 }
 ```
 
-The `Personal` key pair is stores on your computer in `$HOME/.kiki/secret.json`. The `Personal` key pair is for signing messages and encrypting messages that are from you. If you are using multiple computers, make sure to copy this to each machine to ensure you maintain your identity.
+The `Personal` key pair is stores on your computer in `$HOME/.kiki/identity.json`. The `Personal` key pair is for signing messages and encrypting messages that are from you. If you are using multiple computers, make sure to copy this to each machine to ensure you maintain your identity.
 
 ### Feed
 
@@ -93,7 +99,7 @@ The **Envelope** is the public meta data for a sealed **Letter** (see [Letter](#
 ```golang
 // Envelope is the sealed letter to be transfered among carriers
 type Envelope struct {
-	Sender     *keypair.KeyPair `json:"sender"`     // public key of the sender
+    Sender     *keypair.KeyPair `json:"sender"`     // public key of the sender
 	Recipients []string         `json:"recipients"` // secret passphrase to open SealedContent,
 	// encrypted by each recipient public key
 	SealedContent string    `json:"sealed_content"` // encrypted compressed Letter
@@ -236,10 +242,11 @@ In this case, the `Content` (`174d7c78...`) is the SHA-256 sum of the post that 
 
 Every user is a carrier. Every carrier is a server that can be connected to for file synchronization. Anytime kiki sees another kiki instance it attempts to synchronize as follows.
 
-1. Get a list of files from other (`GET /catalog`).
-2. Compare other's list to your list and find which items you do not have.
-3. Get each item that you *do *not have* and that the other *does have* (`GET /envelope/X`) and insert into the database.
-4. Post each time that you *do have* and the other *does not have* (`POST /envelope`).
+1. Get a list of files and the Region Key from other (`GET /catalog`).
+2. Check if Region key matches, if so, continue.
+3. Compare other's list to your list and find which items you do not have.
+4. Get each item that you *do *not have* and that the other *does have* (`GET /envelope/X`) and insert into the database after verifying the signature.
+5. Post each time that you *do have* and the other *does not have* (`POST /envelope`). Note that, when a server recieves a `POST /envelope` it will verify the signature before saving it.
 
 ### Storage
 
@@ -267,6 +274,8 @@ There are some other [similar-minded networks out there](https://github.com/topi
 - diaspora:
 - humhub:
 - scuttlebutt:
+
+Scuttlebutt is an append-only log, that does not allow editing / deleting posts. In *kiki* you can both edit and delete posts through the `Replace` ID of a Envelope.
 
 # Roadmap
 

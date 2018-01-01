@@ -16,21 +16,26 @@ import (
 
 // Envelope is the sealed letter to be transfered among carriers
 type Envelope struct {
-	Sender     *keypair.KeyPair `json:"sender",storm:"index"` // public key of the sender
-	Recipients []string         `json:"recipients"`           // secret passphrase to open SealedContent,
-	// encrypted by each recipient public key
-	SealedContent string    `json:"sealed_content"`          // encrypted compressed Letter
-	Timestamp     time.Time `json:"timestamp",storm:"index"` // time of entry
-	ID            string    `json:"id",storm:"id"`           // hash of SealedContent
-}
-
-// UnsealedEnvelope is created when an enveloped is opened
-type UnsealedEnvelope struct {
-	Sender     *keypair.KeyPair   `json:"sender",storm:"index"`    // public key of the sender
-	Recipients []*keypair.KeyPair `json:"recipients`               // public key of the determined recipient
-	Letter     *letter.Letter     `json:"letter"`                  // the unsealed contents of the letter
-	Timestamp  time.Time          `json:"timestamp",storm:"index"` // time of entry
-	ID         string             `json:"id",storm:"id"`           // hash of SealedContent
+	// ID is the hash of the Marshaled Letter + the Public key of Sender
+	ID string `json:"id",storm:"id"`
+	// Timestamp is the time at which the envelope was created
+	Timestamp time.Time `json:"timestamp",storm:"index"`
+	// Sender is public key of the sender
+	Sender *keypair.KeyPair `json:"sender", storm:"index"`
+	// Signature is the public key of the sender encrypted by
+	// the Sender private key, against the public Region key
+	// to authenticate sender. I.e., Sender == Decrypt(Signature) must be true.
+	// A valid Signature is also used to prevent the Envelope from being deleted.
+	// I.e., if a Region key is not able to decrypt it, then it is meant for another Region
+	// and would be deleted.
+	Signature string `json:"signature"`
+	// Recipients is list of encypted passphrase (used to encrypt the Content)
+	// encrypted against each of the public keys of the recipients.
+	Recipients []string `json:"recipients"`
+	// Encrypted compressed letter, represented as base64 string
+	SealedLetter string `json:"sealed_letter,omitempty"`
+	// Letter is the unsealed letter, which is determined after unsealing
+	Letter Letter `json:"letter,omitempty"`
 }
 
 func SelfAddress(sender *person.Person, kind, data string) (e *Envelope, err error) {
