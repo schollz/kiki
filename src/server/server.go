@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/logging"
+	// "github.com/toorop/gin-logrus"
 )
 
 func init() {
@@ -26,13 +27,19 @@ var (
 func Run() {
 	// Startup server
 	gin.SetMode(gin.ReleaseMode)
+
+	// Standardize logs
+	// r.Use(ginlogrus.Logger(logging), gin.Recovery())
+
 	r := gin.Default()
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
 	})
+	r.GET("/ping", PingHandler)
 	r.POST("/letter", handlerLetter)
 	r.POST("/open", handlerOpen)
 	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
+
 }
 
 func respondWithJSON(c *gin.Context, message string, err error) {
