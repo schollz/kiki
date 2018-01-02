@@ -161,20 +161,20 @@ var app = {
             //     'x' + (data.replies.length || 0)
             // ),
                     $('<div>').append(
-                        $('<a>', {title: 'Reply'})
+                        $('<a>', {'data-position': 'right', 'data-tooltip': 'Reply'})
                             .addClass("waves-effect waves-light btn btn-small right").append(
                                 $('<i>').addClass('material-icons').append('reply')
                             ).on('click', function(event) {
                                 event.stopPropagation();
                                 console.log('reply:', data.message_id);
-                            }),
-                        $('<a>', {title: 'Edit'})
+                            }).tooltip(),
+                        $('<a>', {'data-position': 'right', 'data-tooltip': 'Edit'})
                             .addClass("waves-effect waves-light btn btn-small right").append(
                                 $('<i>').addClass('material-icons').append('edit')
                             ).on('click', function(event) {
                                 event.stopPropagation();
                                 console.log('edit:', data.message_id);
-                            })
+                            }).tooltip()
                     ),
                     $('<br>')
                 );
@@ -198,7 +198,6 @@ var app = {
                                     // $($(this).find('.card-content')[0]).toggle();
                                     $($(this).parent().find('.card-content')[0]).toggle();
                                 }),
-
                             $('<div>').addClass('card-content message-content').append(
                                 $('<div>').addClass('row').append(
                                     $('<div>').addClass('col s10').append(
@@ -208,16 +207,9 @@ var app = {
                                         app.getMessageToolBarDisplay(reply)
                                     )
                                 ),
-                                // app.getMessageContentsDisplay(reply.message),
-                                // app.getMessageToolBarDisplay(reply),
                                 app.getMessageReplyDisplay(reply)
-
                             ).hide()
                         )
-                        // .on('click', function(event) {
-                        //     event.stopPropagation();
-                        //     $($(this).find('.card-content')[0]).toggle();
-                        // })
                     );
                 }
                 return replies;
