@@ -1,0 +1,64 @@
+
+.nav-wrapper {
+    cursor: pointer;
+}
+
+.card {
+    margin: 0px;
+}
+
+.row {
+    margin-bottom: 12px;
+}
+
+.nav-wrapper:hover {}
+
+.datetime {
+    font-size: 12px !important;
+}
+
+.message-navbar {
+    /*height: 56px;
+    line-height: 56px;*/
+    height: 26px;
+    line-height: 26px;
+}
+
+.message-navbar a.breadcrumb {
+    font-size: 16px;
+}
+
+.message-navbar i.material-icons {
+    height: 26px;
+    line-height: 26px;
+}
+
+.message-content {
+    /*padding: 14px !important;*/
+    padding: 4px 4px 2px 14px !important;
+}
+
+.message-content .card {
+    margin-bottom: 6px !important;
+    margin-top: 6px !important;
+}
+
+.message-content .row {
+    margin-bottom: 2px;
+}
+
+.btn-small {
+    height: 20px;
+    line-height: 20px;
+    padding: 0 0.25rem;
+}
+
+.message-toolbar a {
+    margin-left: 2px;
+}
+
+
+/*
+.datetime i {
+    font-size: 14px !important;
+}*/

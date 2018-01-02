@@ -59,7 +59,20 @@ var messages = [
                 message: 'Fo shizzle',
                 created_at: 1514103382,
                 tags: '',
-                replies: []
+                replies: [
+
+                    {
+                        message_id: 'yet_another_uuid4',
+                        user_id: 'Stefan is a God King',
+                        username: 'StefanRocksMySocks',
+                        message: 'Fo shizzle',
+                        created_at: 1514103382,
+                        tags: '',
+                        replies: []
+                    }
+
+
+                ]
             }
         ]
     },
@@ -108,14 +121,19 @@ var app = {
     getUserNameDisplay: function(username) {
         return $('<span>').append(
             $('<i>').addClass('material-icons').append('face'),
-            '&nbsp;' + username
+            '&nbsp;' + username //,
+            // $('<i>').addClass('material-icons right').append('person_add'),
+            // $('<i>').addClass('material-icons right').append('block')
         );
     },
     getMessageNavBarDisplay: function(data) {
         return $('<nav>').addClass('nav-wrapper message-navbar').css({backgroundColor: app.getUserColor(data.user_id)}).append(
             $('<div>').addClass('col s12').append(
                 $('<a>').addClass('breadcrumb white-text').append(
-                    app.getUserNameDisplay(data.username),
+                    app.getUserNameDisplay(data.username).on('click', function(event){
+                        event.stopPropagation();
+                        console.log('Open modal for follow or block user');
+                    }),
                     app.getDateTimeDisplay(data.created_at)
                 )
             )
@@ -136,38 +154,64 @@ var app = {
         );
     },
 
-    getMessageReplieDisplay: function(data) {
+    getMessageToolBarDisplay: function(data) {
+        return $('<div>').addClass('message-toolbar').append(
+            // $('<span>').addClass('valign-wrapper right').append(
+            //     $('<i>').addClass("material-icons right").append('favorite'),
+            //     'x' + (data.replies.length || 0)
+            // ),
+                    $('<div>').append(
+                        $('<a>', {title: 'Reply'})
+                            .addClass("waves-effect waves-light btn btn-small right").append(
+                                $('<i>').addClass('material-icons').append('reply')
+                            ).on('click', function(event) {
+                                event.stopPropagation();
+                                console.log('reply:', data.message_id);
+                            }),
+                        $('<a>', {title: 'Edit'})
+                            .addClass("waves-effect waves-light btn btn-small right").append(
+                                $('<i>').addClass('material-icons').append('edit')
+                            ).on('click', function(event) {
+                                event.stopPropagation();
+                                console.log('edit:', data.message_id);
+                            })
+                    ),
+                    $('<br>')
+                );
+    },
+
+
+
+
+    getMessageReplyDisplay: function(data) {
         return $('<div>').addClass('replies').append(
-            $('<div>').append(
-                $('<span>').addClass('valign-wrapper right').append(
-                    $('<i>').addClass("material-icons right").append('favorite'),
-                    '&nbsp;x' + (data.replies.length || 0)
-                ),
-                $('<br>')
-            ),
         // message container
             (function(){
                 var replies = [];
                 for (var i=0; i<data.replies.length; i++) {
                     var reply = data.replies[i];
-
-                    // var content = $('<div>').addClass('card-content').append(
-                    //     app.getMessageContentsDisplay(reply.message),
-                    //     app.getMessageReplieDisplay(reply)
-                    // ).hide();
-
                     replies.push(
                         $('<div>').addClass('card').append(
                             app.getMessageNavBarDisplay(reply),
+
                             $('<div>').addClass('card-content message-content').append(
-                                app.getMessageContentsDisplay(reply.message),
-                                app.getMessageReplieDisplay(reply)
+                                $('<div>').addClass('row').append(
+                                    $('<div>').addClass('col s10').append(
+                                        app.getMessageContentsDisplay(reply.message),
+                                    ),
+                                    $('<div>').addClass('col s2').append(
+                                        app.getMessageToolBarDisplay(reply)
+                                    )
+                                ),
+                                // app.getMessageContentsDisplay(reply.message),
+                                // app.getMessageToolBarDisplay(reply),
+                                app.getMessageReplyDisplay(reply)
+
                             ).hide()
                         )
                         .on('click', function(event) {
                             event.stopPropagation();
                             $($(this).find('.card-content')[0]).toggle();
-                            // debugger;
                         })
                     );
                 }
@@ -213,43 +257,21 @@ app.MessageView = Backbone.View.extend({
                     $('<div>').addClass('col s12 m12').append(
                         $('<div>').addClass('card ').append(
                             app.getMessageNavBarDisplay(data),
-                            $('<div>').addClass('card-content').append(
-                                // reply button
-                                $('<a>').addClass("btn-floating halfway-fab waves-effect waves-light red").append(
-                                    $('<i>').addClass('material-icons').append('reply')
+                            $('<div>').addClass('card-content message-content').append(
+
+
+                                $('<div>').addClass('row').append(
+                                    $('<div>').addClass('col s10').append(
+                                        app.getMessageContentsDisplay(data.message),
+                                    ),
+                                    $('<div>').addClass('col s2').append(
+                                        app.getMessageToolBarDisplay(data)
+                                    )
                                 ),
-                                app.getMessageContentsDisplay(data.message),
+                                // app.getMessageContentsDisplay(data.message),
+                                // app.getMessageToolBarDisplay(data),
 
-                                app.getMessageReplieDisplay(data)
-                                // $('<div>').addClass('replies').append(
-                                //     $('<div>').append(
-                                //         $('<span>').addClass('valign-wrapper right').append(
-                                //             $('<i>').addClass("material-icons right").append('favorite'),
-                                //             '&nbsp;x' + data.replies.length
-                                //         ),
-                                //         $('<br>')
-                                //     ),
-                                // // message container
-                                //     (function(){
-                                //         var replies = [];
-                                //         for (var i=0; i<data.replies.length; i++) {
-                                //             var reply = data.replies[i];
-                                //             replies.push(
-                                //                 $('<div>').addClass('card').append(
-                                //                     app.getMessageNavBarDisplay(reply),
-                                //                     $('<div>').addClass('card-content').append(
-                                //                         app.getMessageContentsDisplay(reply.message)
-                                //                     ).hide()
-                                //                 )
-                                //                 .on('click', function() {
-                                //                     $(this).find('.card-content').toggle();
-                                //                 })
-                                //             );
-                                //         }
-                                //         return replies;
-                                //     })()
-                                // )
-
+                                app.getMessageReplyDisplay(data)
                             )
                         )
                     )
