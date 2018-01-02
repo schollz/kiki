@@ -1,10 +1,5 @@
 package letter
 
-import (
-	"crypto/sha256"
-	"fmt"
-)
-
 // Letter specifies the content being transfered to the self, or other users.
 // The Letter can contain "posts", images or text. These are content generated
 // a user. They are specified by the Kind "post-image" or "post-text".
@@ -48,26 +43,13 @@ type Letter struct {
 	// channel: Name of channel
 	// follow: ID of person to follow
 	AssignmentValue string `json:"assignment_value",omitempty"`
+
+	// Recipients are the list of recipients, decoded after unsealing a letter
+	Recipients []string `json:"recipients"`
 }
 
-// LetterContent is the actual content of the letter
-type LetterContent struct {
-	Kind string `json:"kind"` // kind of letter content
-	Data string `json:"data"` // base64 encoded bytes of data
-}
-
-func New(kind, data, publicKey string) (l *Letter, err error) {
+func New(kind string) (l *Letter, err error) {
 	l = new(Letter)
-	l.Content = LetterContent{
-		Kind: kind,
-		Data: data,
-	}
-	h := sha256.New()
-	h.Write([]byte(publicKey))
-	h.Write([]byte(data))
-	l.ID = fmt.Sprintf("%x", h.Sum(nil))
-	l.LatestID = l.ID
-	l.Channels = []string{}
-	l.ReplyTo = ""
+	l.Kind = kind
 	return
 }

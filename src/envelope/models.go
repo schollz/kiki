@@ -1,8 +1,10 @@
 package envelope
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -39,26 +41,25 @@ type Envelope struct {
 	// variable is set and the SealedLetter is set to "" (deleted). This will
 	// then be saved in a bucket for unsealed letters. When the letter remains
 	// sealed then this Letter is set to nil.
-	Letter Letter `json:"letter,omitempty"`
+	Letter letter.Letter `json:"letter,omitempty"`
 	// Opened is a variable set to true if the Letter is opened, to make
 	// it easier to index the opened/unopened letters in the database.false
 	Opened bool `json:"opened"`
-}
-
-func SelfAddress(sender *person.Person, kind, data string) (e *Envelope, err error) {
-	l, err := letter.New(kind, data, sender.Public())
-	if err != nil {
-		return
-	}
-	e, err = New(l, sender, []*person.Person{sender})
-	return
 }
 
 // New creates an envelope and seals it for the specified recipients
 func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (e *Envelope, err error) {
 	logging.Log.Info("creating letter")
 	e = new(Envelope)
-	e.ID = l.ID
+	h := sha256.New()
+	h.Write([]byte(sender.Public()))
+	h.Write([]byte(l.Base64Image))
+	h.Write([]byte(l.HTML))
+	h.Write([]byte(l.Plaintext))
+	h.Write([]byte(l.AssignmentValue))
+	h.Write([]byte(l.Replaces))
+	h.Write([]byte(l.ReplyTo))
+	e.ID = fmt.Sprintf("%x", h.Sum(nil))
 	e.Timestamp = time.Now()
 	e.Sender = sender.Keys.PublicKey()
 
@@ -70,7 +71,7 @@ func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (
 	if err != nil {
 		return
 	}
-	e.SealedContent = base64.URLEncoding.EncodeToString(encryptedLetter)
+	e.SealedLetter = base64.URLEncoding.EncodeToString(encryptedLetter)
 
 	recipients = append(recipients, sender) // the sender should always be open their own letter
 	e.Recipients = make([]string, len(recipients))
@@ -86,12 +87,7 @@ func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (
 	return
 }
 
-func (e *Envelope) Unseal(keysToTry []*person.Person) (opened *UnsealedEnvelope, err error) {
-	opened = new(UnsealedEnvelope)
-	opened.Sender = e.Sender
-	opened.Timestamp = e.Timestamp
-	opened.ID = e.ID
-	opened.Recipients = []*keypair.KeyPair{}
+func (e *Envelope) Unseal(keysToTry []*person.Person) (err error) {
 
 	var secretPassphrase [32]byte
 	foundPassphrase := false
