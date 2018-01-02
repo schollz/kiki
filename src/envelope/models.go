@@ -32,12 +32,17 @@ type Envelope struct {
 	// Recipients is list of encypted passphrase (used to encrypt the Content)
 	// encrypted against each of the public keys of the recipients.
 	Recipients []string `json:"recipients"`
-	// Encrypted compressed letter, represented as base64 string
+	// SealedLetter contains the encryoted and compressed letter,
+	// encoded as base64 string
 	SealedLetter string `json:"sealed_letter,omitempty"`
 	// Letter is the unsealed letter. Once a Envelope is "unsealed", then this
 	// variable is set and the SealedLetter is set to "" (deleted). This will
-	// then be saved in a bucket for unsealed letters.
+	// then be saved in a bucket for unsealed letters. When the letter remains
+	// sealed then this Letter is set to nil.
 	Letter Letter `json:"letter,omitempty"`
+	// Opened is a variable set to true if the Letter is opened, to make
+	// it easier to index the opened/unopened letters in the database.false
+	Opened bool `json:"opened"`
 }
 
 func SelfAddress(sender *person.Person, kind, data string) (e *Envelope, err error) {
