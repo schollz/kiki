@@ -192,7 +192,12 @@ var app = {
                     var reply = data.replies[i];
                     replies.push(
                         $('<div>').addClass('card').append(
-                            app.getMessageNavBarDisplay(reply),
+                            app.getMessageNavBarDisplay(reply)
+                                .on('click', function(event) {
+                                    event.stopPropagation();
+                                    // $($(this).find('.card-content')[0]).toggle();
+                                    $($(this).parent().find('.card-content')[0]).toggle();
+                                }),
 
                             $('<div>').addClass('card-content message-content').append(
                                 $('<div>').addClass('row').append(
@@ -209,10 +214,10 @@ var app = {
 
                             ).hide()
                         )
-                        .on('click', function(event) {
-                            event.stopPropagation();
-                            $($(this).find('.card-content')[0]).toggle();
-                        })
+                        // .on('click', function(event) {
+                        //     event.stopPropagation();
+                        //     $($(this).find('.card-content')[0]).toggle();
+                        // })
                     );
                 }
                 return replies;
@@ -258,8 +263,6 @@ app.MessageView = Backbone.View.extend({
                         $('<div>').addClass('card ').append(
                             app.getMessageNavBarDisplay(data),
                             $('<div>').addClass('card-content message-content').append(
-
-
                                 $('<div>').addClass('row').append(
                                     $('<div>').addClass('col s10').append(
                                         app.getMessageContentsDisplay(data.message),
@@ -270,7 +273,6 @@ app.MessageView = Backbone.View.extend({
                                 ),
                                 // app.getMessageContentsDisplay(data.message),
                                 // app.getMessageToolBarDisplay(data),
-
                                 app.getMessageReplyDisplay(data)
                             )
                         )
