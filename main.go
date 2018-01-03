@@ -13,7 +13,7 @@ func main() {
 	debug := flag.Bool("debug", false, "turn on debug mode")
 	flag.Parse()
 	if *debug {
-		logging.Debug(true)
+		logging.Log.Debug(true)
 	}
 	server.Port = *port
 	err := feed.Setup()
