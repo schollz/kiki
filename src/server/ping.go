@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"runtime"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 var startTime time.Time
@@ -16,7 +18,7 @@ func init() {
 // PingHandler provides an api route for server health check
 func PingHandler(c *gin.Context) {
 
-	var data map[string]interface{}
+	// var data map[string]interface{}
 	// data = make(map[string]interface{})
 	// data["status"] = "success"
 	result := make(map[string]interface{})
