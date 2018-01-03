@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/logging"
-	"github.com/toorop/gin-logrus"
+	// "github.com/toorop/gin-logrus"
 )
 
 func init() {
@@ -31,7 +31,7 @@ func Run() {
 
 	r := gin.Default()
 	// Standardize logs
-	r.Use(ginlogrus.Logger(logging), gin.Recovery())
+	// r.Use(ginlogrus.Logger(logging), gin.Recovery())
 
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
