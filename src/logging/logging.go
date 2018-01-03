@@ -18,7 +18,7 @@ func initLogging() {
 	// https://github.com/cihub/seelog/wiki/Log-levels
 	appConfig := `
 <seelog minlevel="` + LogLevel + `">
-    <outputs formatid="common">
+    <outputs formatid="stdout">
         <filter levels="info,debug,trace,critical,error,warn">
             <console formatid="stdout"/>
         </filter>
