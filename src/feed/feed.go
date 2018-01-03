@@ -202,6 +202,7 @@ func ShowMessages() (err error) {
 // by reading through the unsealed envelopes to get keys for friends,
 // keys from friends, assigned names.
 func RegenerateFeed() (err error) {
+	return nil
 	logger := logging.Log.WithFields(logrus.Fields{
 		"func": "RegenerateFeed",
 	})
