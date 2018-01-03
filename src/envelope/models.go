@@ -18,6 +18,8 @@ import (
 
 // Envelope is the sealed letter to be transfered among carriers
 type Envelope struct {
+	// Sealed envelope information
+
 	// ID is the hash of the Marshaled Letter + the Public key of Sender
 	ID string `json:"id",storm:"id"`
 	// Timestamp is the time at which the envelope was created
@@ -37,20 +39,36 @@ type Envelope struct {
 	// SealedLetter contains the encryoted and compressed letter,
 	// encoded as base64 string
 	SealedLetter string `json:"sealed_letter,omitempty"`
+
+	// Unsealed envelope information
+	// When the letter is opened, this variables will be filled. When the
+	// envelope is transfered these variables should be cleared
+
 	// Letter is the unsealed letter. Once a Envelope is "unsealed", then this
 	// variable is set and the SealedLetter is set to "" (deleted). This will
 	// then be saved in a bucket for unsealed letters. When the letter remains
 	// sealed then this Letter is set to nil.
-	Letter letter.Letter `json:"letter,omitempty"`
+	Letter *letter.Letter `json:"letter,omitempty"`
 	// Opened is a variable set to true if the Letter is opened, to make
 	// it easier to index the opened/unopened letters in the database.false
 	Opened bool `json:"opened"`
+	// DeterminedRecipients are the list of recipients, decoded after unsealing a letter
+	DeterminedRecipients []string `json:"determined_recipients,omitempty"`
+}
+
+// Seal will remove any identifying or confidential information
+func (e *Envelope) Seal() {
+	e.Letter, _ = letter.New("")
+	e.Opened = false
+	e.DeterminedRecipients = []string{}
 }
 
 // New creates an envelope and seals it for the specified recipients
 func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (e *Envelope, err error) {
 	logging.Log.Info("creating letter")
 	e = new(Envelope)
+
+	// Create ID (hash of any public key + hash of any content)
 	h := sha256.New()
 	h.Write([]byte(sender.Public()))
 	h.Write([]byte(l.Base64Image))
@@ -73,7 +91,9 @@ func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (
 	}
 	e.SealedLetter = base64.URLEncoding.EncodeToString(encryptedLetter)
 
-	recipients = append(recipients, sender) // the sender should always be open their own letter
+	// the sender should always be open their own letter, so they should
+	// always be a recipient
+	recipients = append(recipients, sender)
 	e.Recipients = make([]string, len(recipients))
 	for i, recipient := range recipients {
 		encryptedSecret, err2 := sender.Keys.Encrypt(secretKey[:], recipient.Keys)
@@ -83,12 +103,20 @@ func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (
 		}
 		e.Recipients[i] = base64.URLEncoding.EncodeToString(encryptedSecret)
 	}
-
+	e.Opened = false
 	return
 }
 
+// Unseal will determine the content of the letter using the identities provided
 func (e *Envelope) Unseal(keysToTry []*person.Person) (err error) {
+	err = e.unseal(keysToTry)
+	if err != nil {
+		e.Seal()
+	}
+	return
+}
 
+func (e *Envelope) unseal(keysToTry []*person.Person) (err error) {
 	var secretPassphrase [32]byte
 	foundPassphrase := false
 	for _, keyToTry := range keysToTry {
@@ -103,7 +131,7 @@ func (e *Envelope) Unseal(keysToTry []*person.Person) (err error) {
 			if err == nil {
 				foundPassphrase = true
 				// add the known recipient to the list
-				opened.Recipients = append(opened.Recipients, keyToTry.Keys.PublicKey())
+				e.DeterminedRecipients = append(e.DeterminedRecipients, keyToTry.Public())
 				copy(secretPassphrase[:], decryptedSecretPassphrase[:32])
 			}
 		}
@@ -113,7 +141,7 @@ func (e *Envelope) Unseal(keysToTry []*person.Person) (err error) {
 		return
 	}
 
-	encryptedContent, err := base64.URLEncoding.DecodeString(e.SealedContent)
+	encryptedContent, err := base64.URLEncoding.DecodeString(e.SealedLetter)
 	if err != nil {
 		err = errors.Wrap(err, "content is corrupted")
 		return
@@ -123,10 +151,13 @@ func (e *Envelope) Unseal(keysToTry []*person.Person) (err error) {
 		err = errors.Wrap(err, "content is not decryptable, corrupted?")
 		return
 	}
-	err = json.Unmarshal(decrypted, &opened.Letter)
+	err = json.Unmarshal(decrypted, &e.Letter)
 	if err != nil {
 		err = errors.Wrap(err, "problem with letter unmarshaling")
 		return
 	}
+
+	e.Opened = true
+
 	return
 }

@@ -43,9 +43,6 @@ type Letter struct {
 	// channel: Name of channel
 	// follow: ID of person to follow
 	AssignmentValue string `json:"assignment_value",omitempty"`
-
-	// Recipients are the list of recipients, decoded after unsealing a letter
-	Recipients []string `json:"recipients"`
 }
 
 func New(kind string) (l *Letter, err error) {
