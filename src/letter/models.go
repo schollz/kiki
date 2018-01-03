@@ -20,9 +20,7 @@ type Letter struct {
 	// ReplyTo is the ID of the post being responded to
 	ReplyTo string `json:"reply_to,omitempty"`
 	// HTML is processed by stripping images and re-posting them as their own
-	HTML string `json:"html,omitempty"`
-	// Plaintext is processed to strip tags
-	Plaintext string `json:"plaintext,omitempty"`
+	Text string `json:"text,omitempty"`
 
 	// for "post-image"
 	// Extension for an image is either "jpg" or "png" ("gif" not supported)
@@ -45,8 +43,39 @@ type Letter struct {
 	AssignmentValue string `json:"assignment_value",omitempty"`
 }
 
-func New(kind string) (l *Letter, err error) {
+func (l *Letter) RepliesTo(replyTo string) {
+	l.ReplyTo = replyTo
+}
+
+func (l *Letter) AddChannel(channel string) {
+	l.Channels = append(l.Channels, channel)
+}
+
+func (l *Letter) Replace(ID string) {
+	l.Replaces = ID
+}
+
+func NewAssignment(assignmentType, assignmentValue string) (l *Letter) {
 	l = new(Letter)
-	l.Kind = kind
+	l.Channels = []string{}
+	l.Kind = "assign-" + assignmentType
+	l.Text = assignmentValue
+	return
+}
+
+func NewText(text string) (l *Letter) {
+	l = new(Letter)
+	l.Channels = []string{}
+	l.Kind = "post-text"
+	l.Text = text
+	return
+}
+
+func NewImage(base64image string, extension string) (l *Letter) {
+	l = new(Letter)
+	l.Channels = []string{}
+	l.Kind = "post-image"
+	l.Base64Image = base64image
+	l.Extension = extension
 	return
 }

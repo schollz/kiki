@@ -58,7 +58,7 @@ type Envelope struct {
 
 // Seal will remove any identifying or confidential information
 func (e *Envelope) Seal() {
-	e.Letter, _ = letter.New("")
+	e.Letter = new(letter.Letter)
 	e.Opened = false
 	e.DeterminedRecipients = []string{}
 }
@@ -72,8 +72,7 @@ func New(l *letter.Letter, sender *person.Person, recipients []*person.Person) (
 	h := sha256.New()
 	h.Write([]byte(sender.Public()))
 	h.Write([]byte(l.Base64Image))
-	h.Write([]byte(l.HTML))
-	h.Write([]byte(l.Plaintext))
+	h.Write([]byte(l.Text))
 	h.Write([]byte(l.AssignmentValue))
 	h.Write([]byte(l.Replaces))
 	h.Write([]byte(l.ReplyTo))

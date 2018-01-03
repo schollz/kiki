@@ -17,34 +17,33 @@ func TestNew(t *testing.T) {
 	jane, _ := person.New()
 	donald, _ := person.New()
 
-	l, _ := letter.New("post", "hello, bob and jane", zack.Keys.Public)
+	l := letter.NewText("hello, bob and jane")
 	e, err := New(l, zack, []*person.Person{bob, jane})
 	assert.Nil(t, err)
 
 	_, err = json.Marshal(e)
 	assert.Nil(t, err)
 
-	u, err := e.Unseal([]*person.Person{zack})
+	err = e.Unseal([]*person.Person{zack})
 	assert.Nil(t, err)
-	assert.Equal(t, u.Letter.Content.Data, "hello, bob and jane")
-	fmt.Println(u)
+	assert.Equal(t, e.Letter.Text, "hello, bob and jane")
 
-	u, err = e.Unseal([]*person.Person{bob})
+	err = e.Unseal([]*person.Person{bob})
 	assert.Nil(t, err)
-	u, err = e.Unseal([]*person.Person{jane})
+	err = e.Unseal([]*person.Person{jane})
 	assert.Nil(t, err)
-	u, err = e.Unseal([]*person.Person{donald})
+	err = e.Unseal([]*person.Person{donald})
 	assert.NotNil(t, err)
 
 	bE, _ := json.Marshal(e)
 	ioutil.WriteFile("e.json", bE, 0644)
 
 	myPeople := []*person.Person{donald, bob, jane, zack}
-	u, err = e.Unseal(myPeople)
+	err = e.Unseal(myPeople)
 	for _, p := range myPeople {
 		fmt.Println(p.Keys.Public)
 	}
-	for _, p := range u.Recipients {
-		fmt.Println(p.Public)
+	for _, p := range e.DeterminedRecipients {
+		fmt.Println(p)
 	}
 }
