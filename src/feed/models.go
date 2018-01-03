@@ -6,7 +6,10 @@ import (
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
-	"github.com/sirupsen/logrus"
+)
+
+var (
+	log = logging.Log
 )
 
 type Settings struct {
@@ -80,11 +83,7 @@ type Message struct {
 
 // Post will generate a new letter with a message, seal it, and add it to the database.
 func (p Message) Post() (err error) {
-	logger := logging.Log.WithFields(logrus.Fields{
-		"func": "message.Post",
-	})
-
-	logger.Infof("posting %v", p)
+	log.Infof("posting %v", p)
 
 	// make letter
 	l := new(letter.Letter)
