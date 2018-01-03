@@ -74,7 +74,8 @@ func handleAssign(c *gin.Context) (err error) {
 		return errors.New("assigned data cannot be empty")
 	}
 
-	return feed.PostMessage("assign-"+assignmentType, assignData, true)
+	// TODO:  feed.PostMessage("assign-"+assignmentType, assignData, true)
+	return nil
 }
 
 func handlerLetter(c *gin.Context) {
@@ -89,7 +90,7 @@ func handleLetter(c *gin.Context) (err error) {
 	}
 
 	// bind the payload
-	var p message.Message
+	var p feed.Message
 	err = c.BindJSON(&p)
 	if err != nil {
 		return

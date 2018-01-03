@@ -68,41 +68,8 @@ func (d *Database) GetEnvelope(id string) (e *envelope.Envelope, err error) {
 	return
 }
 
-// GetUnopenedEnvelopes gets all of the sealed envelopes
-func (d *Database) GetUnopenedEnvelopes() (e []*envelope.Envelope, err error) {
-	err = d.Open()
-	if err != nil {
-		return
-	}
-	defer d.Close()
-
-	// get count
-	query := d.db.Select(q.Eq("Opened", false)).OrderBy("Timestamp")
-	count, err := d.db.Count(new(envelope.Envelope))
-	if err != nil {
-		err = errors.Wrap(err, "problem counting")
-		return
-	}
-	// pre make array
-	e = make([]*envelope.Envelope, count)
-
-	// collect all of them
-	i := 0
-	query = d.db.Select().OrderBy("Timestamp")
-	err = query.Each(new(envelope.Envelope), func(record interface{}) error {
-		u := record.(*envelope.Envelope)
-		e[i] = u
-		i++
-		return nil
-	})
-	if err != nil {
-		err = errors.Wrap(err, "problem querying")
-	}
-	return
-}
-
 // GetEnvelopes gets all of the sealed envelopes
-func (d *Database) GetEnvelopes() (e []*envelope.Envelope, err error) {
+func (d *Database) GetEnvelopes(opened bool) (e []*envelope.Envelope, err error) {
 	err = d.Open()
 	if err != nil {
 		return
@@ -110,7 +77,7 @@ func (d *Database) GetEnvelopes() (e []*envelope.Envelope, err error) {
 	defer d.Close()
 
 	// get count
-	query := d.db.Select().OrderBy("Timestamp")
+	query := d.db.Select(q.Eq("Opened", opened)).OrderBy("Timestamp")
 	count, err := d.db.Count(new(envelope.Envelope))
 	if err != nil {
 		err = errors.Wrap(err, "problem counting")

@@ -3,7 +3,6 @@ package feed
 import (
 	"errors"
 
-	"github.com/schollz/kiki/src/envelope"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
@@ -85,24 +84,20 @@ func (p Message) Post() (err error) {
 		"func": "message.Post",
 	})
 
+	logger.Infof("posting %v", p)
+
 	// make letter
-	l, err := letter.New(p.Kind, p.Data, personalKey.Public())
-	if err != nil {
-		return
-	}
+	l := new(letter.Letter)
 
 	// if post, do some special functions
 	switch p.Kind {
-	case "post":
+	case "post-text":
 		// TODO: Capture images from post
 		// update l.Content.Data
 		// post the images as new messages
 		// TODO: Capture channels from post
 		// update l.Channels
 		// Check if its a reply to
-		if p.ReplyTo != "" {
-			l.ReplyTo = p.ReplyTo
-		}
 	case "give-key":
 		// TODO: Put all friends keys into l.Content.Data
 	case "assign-name":
@@ -137,6 +132,10 @@ func (p Message) Post() (err error) {
 		return errors.New("message kind not supported: " + p.Kind)
 	}
 
+	if p.ReplyTo != "" {
+		l.RepliesTo(p.ReplyTo)
+	}
+
 	// determine recipients
 	// _Note:_ the current sender is automatically added when sealing the envelope.
 	recipients := []*person.Person{}
@@ -156,15 +155,8 @@ func (p Message) Post() (err error) {
 		recipients = append(recipients, otherRecipient)
 	}
 
-	// seal envelope
-	logger.Debug("sealing envelope")
-	e, err := envelope.New(l, personalKey, recipients)
-	if err != nil {
-		return
-	}
+	// TODO: seal envelope
 
-	// add envelope to database
-	logger.Debug("putting in carrier")
-	err = db.AddEnvelope(e)
+	// TODO: add envelope to database
 	return
 }

@@ -8,6 +8,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/schollz/kiki/src/letter"
+
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/envelope"
@@ -115,8 +117,10 @@ func OpenEnvelopes() (err error) {
 		"func": "OpenEnvelopes",
 	})
 
-	// get all the envelopes
-	envelopes, err := db.GetUnopenedEnvelopes()
+	logger.Info("opening envelopes")
+
+	// get all the unopened envelopes, to be opened
+	envelopes, err := db.GetEnvelopes(false)
 	if err != nil {
 		return
 	}
@@ -154,7 +158,8 @@ func NewPerson() (p *person.Person, err error) {
 	myfriendsByte, err := json.Marshal(myfriends)
 
 	// post the key to yourself
-	e, err := envelope.SelfAddress(p, "friends-key", string(myfriendsByte))
+	l := letter.NewAssignment("assign-friend", string(myfriendsByte))
+	e, err := envelope.New(l, p, []*person.Person{}, RegionKey)
 	if err != nil {
 		return
 	}
@@ -165,18 +170,19 @@ func NewPerson() (p *person.Person, err error) {
 }
 
 func ShowMessages() (err error) {
-	envelopes, err := db.GetUnsealedEnvelopes()
+	// get the opened envelopes
+	envelopes, err := db.GetEnvelopes(true)
 	if err != nil {
 		return
 	}
 	for _, e := range envelopes {
-		if e.Letter.Content.Kind == "post" {
+		if strings.Contains("post-", e.Letter.Kind) {
 			var userName string
 			db.Get("AssignedNames", e.Sender.Public, &userName)
 			recipientNames := make([]string, len(e.Recipients))
-			for i, recipient := range e.Recipients {
+			for i, recipient := range e.DeterminedRecipients {
 				var name string
-				db.Get("AssignedNames", recipient.Public, &name)
+				db.Get("AssignedNames", recipient, &name)
 				if name == "" {
 					name = "?"
 				}
@@ -186,7 +192,7 @@ func ShowMessages() (err error) {
 %s[%s] -> %s (%s)
 			
 %s
-`, userName, e.Sender.Public, strings.Join(recipientNames, ","), utils.TimeAgo(e.Timestamp), e.Letter.Content.Data)
+`, userName, e.Sender.Public(), strings.Join(recipientNames, ","), utils.TimeAgo(e.Timestamp), e.Letter.Text)
 		}
 	}
 	return
@@ -200,7 +206,8 @@ func RegenerateFeed() (err error) {
 		"func": "RegenerateFeed",
 	})
 	logger.Debug("starting")
-	envelopes, err := db.GetUnsealedEnvelopes()
+	// get all the opened envelopes
+	envelopes, err := db.GetEnvelopes(true)
 	if err != nil {
 		return
 	}
@@ -215,12 +222,12 @@ func RegenerateFeed() (err error) {
 }
 
 // processLetter will determine what to do with each letter.
-func processLetter(e *envelope.UnsealedEnvelope) (err error) {
+func processLetter(e *envelope.Envelope) (err error) {
 	logger := logging.Log.WithFields(logrus.Fields{
 		"func": "processLetter",
 	})
 
-	switch kind := e.Letter.Content.Kind; kind {
+	switch kind := e.Letter.Kind; kind {
 	case "friends-key":
 		return UpdateFriendsKeys(e)
 	case "assign-name":
@@ -235,16 +242,16 @@ func processLetter(e *envelope.UnsealedEnvelope) (err error) {
 
 // UpdateFriendsKeys will prepend the Friends key determine from envelopes, if
 // is not already added.
-func UpdateFriendsKeys(e *envelope.UnsealedEnvelope) (err error) {
+func UpdateFriendsKeys(e *envelope.Envelope) (err error) {
 	logger := logging.Log.WithFields(logrus.Fields{
 		"func": "UpdateFriendsKeys",
 	})
 
 	var newKey *person.Person
-	err = json.Unmarshal([]byte(e.Letter.Content.Data), &newKey)
+	err = json.Unmarshal([]byte(e.Letter.Text), &newKey)
 
 	keyBucket := "keysFromFriends"
-	if e.Sender.Public == personalKey.Public() {
+	if e.Sender.Public() == personalKey.Public() {
 		// key was sent from someone other than you
 		keyBucket = "keysForFriends"
 	}
@@ -267,15 +274,15 @@ func UpdateFriendsKeys(e *envelope.UnsealedEnvelope) (err error) {
 
 // UpdateNames will prepend the Friends key determine from envelopes, if
 // is not already added.
-func UpdateNames(e *envelope.UnsealedEnvelope) (err error) {
+func UpdateNames(e *envelope.Envelope) (err error) {
 	logger := logging.Log.WithFields(logrus.Fields{
 		"func": "UpdateNames",
 	})
 
-	err = db.Set("AssignedNames", e.Sender.Public, e.Letter.Content.Data)
+	err = db.Set("AssignedNames", e.Sender.Public(), e.Letter.Text)
 	if err != nil {
 		return
 	}
-	logger.Debugf("public name '%s' -> '%s' (%s)", e.Sender.Public[:8], e.Letter.Content.Data, utils.TimeAgo(e.Timestamp))
+	logger.Debugf("public name '%s' -> '%s' (%s)", e.Sender.Public()[:8], e.Letter.Text, utils.TimeAgo(e.Timestamp))
 	return
 }
