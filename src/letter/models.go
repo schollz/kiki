@@ -11,8 +11,8 @@ type Letter struct {
 	// Kind specifies the kind of letter. Currently the kinds are:
 	// "assign-X" - used to assign public data for reputation purposes (likes, follows, channel subscriptions, settting profile images and text and names)
 	// "post-X" - used to post either text or images
-	Kind     string `json:"kind"` // kind of letter
-	Replaces string `json:"replaces"`
+	Kind     string `json:"kind"` // this is the only thing that should be in EVERY letter
+	Replaces string `json:"replaces,omitempty"`
 
 	// "post-text"
 	// Channels is a list of the channels to put the letter in
@@ -24,9 +24,9 @@ type Letter struct {
 
 	// for "post-image"
 	// Extension for an image is either "jpg" or "png" ("gif" not supported)
-	Extension string `json:"extension",omitempty`
+	Extension string `json:"extension,omitempty"`
 	// Base64Image is a base64 encoded data of image
-	Base64Image string `json:"base64_image",omitempty"`
+	Base64Image string `json:"base64_image,omitempty""`
 
 	// for "assign-X"
 	// AssignmentValue is the value going to be inserted for the assignment.
@@ -40,7 +40,7 @@ type Letter struct {
 	// like: ID of post
 	// channel: Name of channel
 	// follow: ID of person to follow
-	AssignmentValue string `json:"assignment_value",omitempty"`
+	AssignmentValue string `json:"assignment_value,omitempty"`
 }
 
 func (l *Letter) RepliesTo(replyTo string) {

@@ -13,8 +13,8 @@ import (
 )
 
 type KeyPair struct {
-	Public  string
-	Private string
+	Public  string `json:"public"`
+	Private string `json:"private,omitempty"`
 	private *[32]byte
 	public  *[32]byte
 }
