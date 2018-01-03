@@ -48,9 +48,10 @@ func Run() {
 	r.GET("/ping", PingHandler)
 	r.POST("/letter", handlerLetter)
 	r.POST("/open", handlerOpen)
+
+	log.Info("Listening to port: " + Port)
 	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
 
-	log.Info("Server is listening to port: " + Port)
 }
 
 func respondWithJSON(c *gin.Context, message string, err error) {
