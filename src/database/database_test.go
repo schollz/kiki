@@ -15,10 +15,11 @@ import (
 func TestBasic(t *testing.T) {
 	logging.Debug(false)
 	p, err := person.New()
+	regionkey, _ := person.New()
 	assert.Nil(t, err)
-	l, err := letter.New("post", "hello world", p.Keys.Public)
+	l := letter.NewText("hello, world")
 	assert.Nil(t, err)
-	e, err := envelope.New(l, p, []*person.Person{p})
+	e, err := envelope.New(l, p, []*person.Person{p}, regionkey)
 	assert.Nil(t, err)
 
 	os.Remove("test.db")
@@ -36,35 +37,18 @@ func TestBasic(t *testing.T) {
 	fmt.Println(e2.ID)
 	assert.Equal(t, *e.Sender, *e2.Sender)
 	assert.Equal(t, e.Recipients, e2.Recipients)
-}
 
-func TestReading(t *testing.T) {
-	p, err := person.New()
+	// test updating an envelope
+	assert.Equal(t, false, e2.Opened)
+	err = e2.Unseal([]*person.Person{p}, regionkey)
 	assert.Nil(t, err)
-	l, err := letter.New("post", "hello world", p.Keys.Public)
+	assert.Equal(t, "hello, world", e2.Letter.Text)
+	assert.Equal(t, true, e2.Opened)
+	err = d.AddEnvelope(e2)
 	assert.Nil(t, err)
-	e, err := envelope.New(l, p, []*person.Person{p})
-	assert.Nil(t, err)
-	u, err := e.Unseal([]*person.Person{p})
-	assert.Nil(t, err)
-
-	os.Remove("test.db")
-	d := Setup("test.db")
-	err = d.AddUnsealedEnvelope(u)
-	assert.Nil(t, err)
-
-	l, err = letter.New("post", "hello world, again", p.Keys.Public)
-	assert.Nil(t, err)
-	e, err = envelope.New(l, p, []*person.Person{p})
-	u, err = e.Unseal([]*person.Person{p})
-	assert.Nil(t, err)
-	err = d.AddUnsealedEnvelope(u)
-	assert.Nil(t, err)
-
-	es, err := d.GetUnsealedEnvelopes()
-	assert.Nil(t, err)
-	assert.Equal(t, "hello world", es[0].Letter.Content.Data)
-	assert.Equal(t, "hello world, again", es[1].Letter.Content.Data)
+	e3, err := d.GetEnvelope(e.ID)
+	assert.Equal(t, e2, e3)
+	assert.NotEqual(t, e, e3)
 }
 
 func TestKeystore(t *testing.T) {

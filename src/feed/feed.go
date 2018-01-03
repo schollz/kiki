@@ -116,27 +116,20 @@ func OpenEnvelopes() (err error) {
 	})
 
 	// get all the envelopes
-	envelopes, err := db.GetEnvelopes()
+	envelopes, err := db.GetUnopenedEnvelopes()
 	if err != nil {
 		return
 	}
-	logging.Log.Debugf("found %d envelopes", len(envelopes))
+	logging.Log.Debugf("found %d unopened envelopes", len(envelopes))
 	for _, e := range envelopes {
-		// see if its already been done
-		_, errGet := db.GetUnsealedEnvelope(e.ID)
-		if errGet == nil {
-			logger.Debugf("skipping '%s..', already opened", e.ID[:6])
-			continue
-		}
-
 		// unseal
-		ue, err := e.Unseal([]*person.Person{personalKey, RegionKey})
+		err := e.Unseal([]*person.Person{personalKey, RegionKey}, RegionKey)
 		if err != nil {
 			continue // this letter is not for this person
 		}
 
 		// add unsealed letter to database
-		errAdd := db.AddUnsealedEnvelope(ue)
+		errAdd := db.AddEnvelope(e)
 		if errAdd != nil {
 			return errors.Wrap(errAdd, "problem opening")
 		}
