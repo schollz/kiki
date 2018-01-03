@@ -21,18 +21,14 @@ func initLogging() {
     <outputs formatid="common">
         <filter levels="info,debug,trace,critical,error,warn">
             <console formatid="stdout"/>
-            <file path="` + LogDirectory + `/app.log" formatid="common"/>
         </filter>
     </outputs>
     <formats>
-        <format id="common"   format="%Date %Time [%LEVEL] %RelFile %FuncShort:%Line %Msg %n" />
         <format id="stdout"   format="%Date %Time [%LEVEL] %RelFile %FuncShort:%Line %Msg %n" />
     </formats>
 </seelog>
 `
-
-	//         <format id="common"   format="%Date %Time [%LEVEL] %RelFile %FuncShort:%Line %Msg %n" />
-	// <format id="stdout"   format="%Date %Time [%LEVEL] %RelFile %FuncShort:%Line %Msg %n" />
+	// <format id="common"   format="%Date %Time [%LEVEL] %File %FuncShort:%Line %Msg %n" />
 
 	logger, err := seelog.LoggerFromConfigAsBytes([]byte(appConfig))
 	if err != nil {
