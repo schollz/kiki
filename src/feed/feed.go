@@ -134,7 +134,7 @@ func ProcessLetter(l letter.Letter) (err error) {
 
 // UnsealLetters
 func UnsealLetters() (err error) {
-
+	return
 }
 
 // NewPerson will generate a new person, and a friends key.
