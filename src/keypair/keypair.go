@@ -19,29 +19,30 @@ type KeyPair struct {
 	public  *[32]byte
 }
 
-func New() (kp *KeyPair, err error) {
-	kp = new(KeyPair)
+func New() (kp KeyPair) {
+	var err error
+	kp = KeyPair{}
 	kp.Public, kp.Private = GenerateKeys()
 	kp.public, err = keyStringToBytes(kp.Public)
 	if err != nil {
-		return
+		panic(err)
 	}
 	kp.private, err = keyStringToBytes(kp.Private)
 	if err != nil {
-		return
+		panic(err)
 	}
 	return
 }
 
-func (kp *KeyPair) PublicKey() (kpPublic *KeyPair) {
-	kpPublic = new(KeyPair)
+func (kp KeyPair) PublicKey() (kpPublic KeyPair) {
+	kpPublic = KeyPair{}
 	kpPublic.Public = kp.Public
 	kpPublic.public, _ = keyStringToBytes(kpPublic.Public)
 	return
 }
 
-func NewFromPair(public, private string) (kp *KeyPair, err error) {
-	kp = new(KeyPair)
+func FromPair(public, private string) (kp KeyPair, err error) {
+	kp = KeyPair{}
 	kp.Public, kp.Private = public, private
 	kp.public, err = keyStringToBytes(kp.Public)
 	if err != nil {
@@ -54,9 +55,9 @@ func NewFromPair(public, private string) (kp *KeyPair, err error) {
 	return
 }
 
-// NewFromPublic generates a half-key pair
-func NewFromPublic(public string) (kp *KeyPair, err error) {
-	kp = new(KeyPair)
+// FromPublic generates a half-key pair
+func FromPublic(public string) (kp KeyPair, err error) {
+	kp = KeyPair{}
 	kp.Public = public
 	kp.public, err = keyStringToBytes(kp.Public)
 	if err != nil {
@@ -67,8 +68,12 @@ func NewFromPublic(public string) (kp *KeyPair, err error) {
 
 func (kp KeyPair) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString("{")
-	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", "public", kp.Public))
-	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\"", "private", kp.Private))
+	if kp.Private == "" {
+		buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\"", "public", kp.Public))
+	} else {
+		buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", "public", kp.Public))
+		buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\"", "private", kp.Private))
+	}
 	buffer.WriteString("}")
 	return buffer.Bytes(), nil
 }
@@ -101,12 +106,12 @@ func (kp *KeyPair) UnmarshalJSON(b []byte) (err error) {
 	return
 }
 
-func (kp *KeyPair) Encrypt(msg []byte, recipient *KeyPair) (encrypted []byte, err error) {
+func (kp KeyPair) Encrypt(msg []byte, recipient KeyPair) (encrypted []byte, err error) {
 	encrypted, err = encryptWithKeyPair(msg, kp.private, recipient.public)
 	return
 }
 
-func (kp *KeyPair) Decrypt(encrypted []byte, sender *KeyPair) (msg []byte, err error) {
+func (kp KeyPair) Decrypt(encrypted []byte, sender KeyPair) (msg []byte, err error) {
 	msg, err = decryptWithKeyPair(encrypted, sender.public, kp.private)
 	return
 }

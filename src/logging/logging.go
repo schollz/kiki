@@ -2,6 +2,7 @@ package logging
 
 import (
 	"fmt"
+
 	seelog "github.com/cihub/seelog"
 )
 

@@ -77,10 +77,13 @@ func TestMarshaling(t *testing.T) {
 	var kp2 *KeyPair
 	err = json.Unmarshal(kpMarshaled, &kp2)
 	assert.Nil(t, err)
-	assert.Equal(t, kp, kp2)
+	assert.Equal(t, kp.private, kp2.private)
+	assert.Equal(t, kp.public, kp2.public)
+	assert.Equal(t, kp.Public, kp2.Public)
+	assert.Equal(t, kp.Private, kp2.Private)
 
 	// test just having a public key
-	kp3, err := NewFromPublic(kp.Public)
+	kp3, err := FromPublic(kp.Public)
 	assert.Nil(t, err)
 	kpMarshaled, err = json.Marshal(kp3)
 	assert.Nil(t, err)
@@ -88,5 +91,5 @@ func TestMarshaling(t *testing.T) {
 	var kp4 *KeyPair
 	err = json.Unmarshal(kpMarshaled, &kp4)
 	assert.Nil(t, err)
-	assert.Equal(t, kp3, kp4)
+	assert.Equal(t, kp3.Public, kp4.Public)
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/purpose"
 
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/database"
@@ -16,6 +17,7 @@ import (
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/person"
 	"github.com/schollz/kiki/src/utils"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -31,11 +33,14 @@ var (
 	settings    Settings
 	personalKey *person.Person
 	db          *database.Database
-	logger      = logging.Log
 )
 
 // Setup initializes the kiki instance
 func Setup() (err error) {
+	logger := logging.Log.WithFields(logrus.Fields{
+		"func": "kiki-Setup()",
+	})
+
 	// define region key
 	RegionKey, err = person.FromPublicPrivateKeys("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
 		"GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q=") // define region key
@@ -106,9 +111,36 @@ func Setup() (err error) {
 	return
 }
 
+// ProcessLetter will determine where to put the letter
+func (l Letter) ProcessLetter(l Letter) (err error) {
+	if !purpose.Valid(l.Purpose) {
+		err = errors.New("invalid purpose")
+		return
+	}
+
+	// rewrite the letter.To array so that it contains
+	// public keys
+	newTo := []string{}
+	for _, to := range l.To {
+		switch to {
+		case "public":
+			newTo = append(newTo, RegionKey)
+
+		}
+	}
+	if l.To == "public" {
+
+	}
+	return
+}
+
 // OpenEnvelopes will process a JSON marshaled byte of a person
 // to open any of the sealed envelopes that have not been opened.
 func OpenEnvelopes() (err error) {
+	logger := logging.Log.WithFields(logrus.Fields{
+		"func": "OpenEnvelopes",
+	})
+
 	logger.Info("opening envelopes")
 
 	// get all the unopened envelopes, to be opened
@@ -182,7 +214,7 @@ func ShowMessages() (err error) {
 			}
 			fmt.Printf(`-----------------
 %s[%s] -> %s (%s)
-
+			
 %s
 `, userName, e.Sender.Public(), strings.Join(recipientNames, ","), utils.TimeAgo(e.Timestamp), e.Letter.Text)
 		}
@@ -195,6 +227,9 @@ func ShowMessages() (err error) {
 // keys from friends, assigned names.
 func RegenerateFeed() (err error) {
 	return nil
+	logger := logging.Log.WithFields(logrus.Fields{
+		"func": "RegenerateFeed",
+	})
 	logger.Debug("starting")
 	// get all the opened envelopes
 	envelopes, err := db.GetEnvelopes(true)
@@ -213,6 +248,10 @@ func RegenerateFeed() (err error) {
 
 // processLetter will determine what to do with each letter.
 func processLetter(e *envelope.Envelope) (err error) {
+	logger := logging.Log.WithFields(logrus.Fields{
+		"func": "processLetter",
+	})
+
 	switch kind := e.Letter.Kind; kind {
 	case "friends-key":
 		return UpdateFriendsKeys(e)
@@ -229,6 +268,10 @@ func processLetter(e *envelope.Envelope) (err error) {
 // UpdateFriendsKeys will prepend the Friends key determine from envelopes, if
 // is not already added.
 func UpdateFriendsKeys(e *envelope.Envelope) (err error) {
+	logger := logging.Log.WithFields(logrus.Fields{
+		"func": "UpdateFriendsKeys",
+	})
+
 	var newKey *person.Person
 	err = json.Unmarshal([]byte(e.Letter.Text), &newKey)
 
@@ -257,6 +300,10 @@ func UpdateFriendsKeys(e *envelope.Envelope) (err error) {
 // UpdateNames will prepend the Friends key determine from envelopes, if
 // is not already added.
 func UpdateNames(e *envelope.Envelope) (err error) {
+	logger := logging.Log.WithFields(logrus.Fields{
+		"func": "UpdateNames",
+	})
+
 	err = db.Set("AssignedNames", e.Sender.Public(), e.Letter.Text)
 	if err != nil {
 		return

@@ -11,36 +11,28 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
+	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
+	// "github.com/toorop/gin-logrus"
 )
+
+func init() {
+	logging.Setup()
+}
 
 var (
 	// Port defines what port the carrier should listen on
 	Port = "8003"
-
-	log = logging.Log
 )
-
-func MiddleWareHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Log request
-		log.Debug(fmt.Sprintf("%v %v %v", c.Request.RemoteAddr, c.Request.Method, c.Request.URL))
-		// Add base headers
-		AddCORS(c)
-		// Run next function
-		c.Next()
-	}
-}
 
 // Run will start the server listening
 func Run() {
 	// Startup server
 	gin.SetMode(gin.ReleaseMode)
 
-	// r := gin.Default()
-	r := gin.New()
+	r := gin.Default()
 	// Standardize logs
-	r.Use(MiddleWareHandler(), gin.Recovery())
+	// r.Use(ginlogrus.Logger(logging), gin.Recovery())
 
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
@@ -48,8 +40,6 @@ func Run() {
 	r.GET("/ping", PingHandler)
 	r.POST("/letter", handlerLetter)
 	r.POST("/open", handlerOpen)
-
-	log.Info("Listening to port: " + Port)
 	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
 
 }
@@ -97,19 +87,20 @@ func handlerLetter(c *gin.Context) {
 }
 
 func handleLetter(c *gin.Context) (err error) {
-	// AddCORS(c)
+	AddCORS(c)
 
 	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
 		return errors.New("must be on local host")
 	}
 
 	// bind the payload
-	var p feed.Message
+	var p letter.Letter
 	err = c.BindJSON(&p)
 	if err != nil {
 		return
 	}
-	return p.Post()
+	err = letter.Process()
+	return
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
@@ -127,9 +118,7 @@ func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
 func AddCORS(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-	// This should be assigned via the route
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "GET")
-	//.end
 	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Max")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 }
