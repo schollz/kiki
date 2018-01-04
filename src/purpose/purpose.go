@@ -6,10 +6,11 @@ var (
 	SharePNG     = "share-image/png"
 	ShareJPG     = "share-image/jpg"
 	AssignFollow = "assign-follow"
+	AssignFriend = "assign-friend"
 )
 
 func Valid(purpose string) bool {
-	for _, p := range []string{ShareJPG, SharePNG, ShareText, AssignFollow} {
+	for _, p := range []string{ShareJPG, SharePNG, ShareText, AssignFollow, AssignFriend} {
 		if purpose == p {
 			return true
 		}
