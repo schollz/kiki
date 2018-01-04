@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -16,14 +17,25 @@ var (
 	log  = logging.Log
 )
 
+func MiddleWareHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Log request
+		log.Debug(fmt.Sprintf("%v %v %v", c.Request.RemoteAddr, c.Request.Method, c.Request.URL))
+		// Add base headers
+		AddCORS(c)
+		// Run next function
+		c.Next()
+	}
+}
+
 // Run will start the server listening
 func Run() {
 	// Startup server
 	gin.SetMode(gin.ReleaseMode)
 
-	r := gin.Default()
+	r := gin.New()
 	// Standardize logs
-	// r.Use(ginlogrus.Logger(logging), gin.Recovery())
+	r.Use(MiddleWareHandler(), gin.Recovery())
 
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
