@@ -153,7 +153,7 @@ func NewPerson() (p keypair.KeyPair, err error) {
 		Purpose: purpose.AssignFriend,
 		Content: string(myfriendsByte),
 	}
-	e, err := l.Seal(personalKey, RegionKey)
+	e, err := l.Seal(p, RegionKey)
 	if err != nil {
 		return
 	}
