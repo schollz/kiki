@@ -49,15 +49,12 @@ func TestAddGetLetter(t *testing.T) {
 	e, err := l.Seal(sender, region)
 	assert.Nil(t, err)
 
-	db, err := Open()
+	err = AddEnvelope(e)
 	assert.Nil(t, err)
-	defer db.Close()
-	err = db.AddEnvelope(e)
-	assert.Nil(t, err)
-	err = db.AddEnvelope(e)
+	err = AddEnvelope(e)
 	assert.Nil(t, err)
 
-	e2, err := db.GetEnvelopeFromID(e.ID)
+	e2, err := GetEnvelopeFromID(e.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, e.ID, e2.ID)
 	assert.Equal(t, e.Letter.Content, e2.Letter.Content)

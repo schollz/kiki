@@ -226,27 +226,6 @@ func (d *Database) addEnvelope(e letter.Envelope) (err error) {
 	return
 }
 
-// GetEnvelopeFromID returns a single envelope from its ID
-func (d *Database) GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
-	var es []letter.Envelope
-	es, err = d.getAllFromPreparedQuery("SELECT * FROM letters WHERE id = ?", id)
-	if err != nil {
-		err = errors.Wrap(err, "GetEnvelopeFromID("+id+")")
-	} else {
-		e = es[0]
-	}
-	return
-}
-
-// GetAllEnvelopes returns all envelopes determined by whether they are opened
-func (d *Database) GetAllEnvelopes(opened bool) (e []letter.Envelope, err error) {
-	if opened {
-		return d.getAllFromQuery("SELECT * FROM letters WHERE opened == 1")
-	} else {
-		return d.getAllFromQuery("SELECT * FROM letters WHERE opened == 0")
-	}
-}
-
 func (d *Database) getAllFromQuery(query string) (s []letter.Envelope, err error) {
 	log.Debug(query)
 	rows, err := d.db.Query(query)

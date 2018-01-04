@@ -9,6 +9,7 @@ import (
 	"github.com/schollz/kiki/src/letter"
 )
 
+// POST /letter
 func handleLetter(c *gin.Context) (err error) {
 	AddCORS(c)
 

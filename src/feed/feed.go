@@ -132,6 +132,11 @@ func ProcessLetter(l letter.Letter) (err error) {
 	return
 }
 
+// UnsealLetters
+func UnsealLetters() (err error) {
+
+}
+
 // NewPerson will generate a new person, and a friends key.
 // It will automatically post the new friends key to your feed.
 func NewPerson() (p keypair.KeyPair, err error) {
