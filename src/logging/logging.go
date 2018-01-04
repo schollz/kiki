@@ -2,34 +2,69 @@ package logging
 
 import (
 	"fmt"
-
 	seelog "github.com/cihub/seelog"
+	"os"
 )
 
 var (
-	Verbose      bool = false
-	Log          seelog.LoggerInterface
-	LogDirectory string = "log"
-	LogLevel     string = "trace"
+	Verbose  bool = false
+	Log      seelog.LoggerInterface
+	LogLevel string = "debug"
 )
 
+// const (
+// 	nocolor = 0
+// 	red     = 31 // error critical
+// 	green   = 32
+// 	yellow  = 33 // warn
+// 	blue    = 36 // info
+// 	grey    = 37 // debug
+// )
+
+// https://github.com/cihub/seelog/wiki/Custom-formatters
+func pidLogFormatter(params string) seelog.FormatterFunc {
+	return func(message string, level seelog.LogLevel, context seelog.LogContextInterface) interface{} {
+		var pid = os.Getpid()
+		return fmt.Sprintf("%v", pid)
+	}
+}
+
 func initLogging() {
+	if Verbose {
+		LogLevel = "trace"
+	}
+
 	Log = seelog.Disabled
 
+	// https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
 	// https://github.com/cihub/seelog/wiki/Log-levels
 	appConfig := `
 <seelog minlevel="` + LogLevel + `">
     <outputs formatid="stdout">
-        <filter levels="info,debug,trace,critical,error,warn">
-            <console formatid="stdout"/>
-        </filter>
+	<filter levels="debug,trace">
+		<console formatid="debug"/>
+	</filter>
+    <filter levels="info">
+        <console formatid="info"/>
+    </filter>
+	<filter levels="critical,error">
+        <console formatid="error"/>
+    </filter>
+	<filter levels="warn">
+        <console formatid="warn"/>
+    </filter>
     </outputs>
     <formats>
-        <format id="stdout"   format="%Date %Time [%LEVEL] %RelFile %FuncShort:%Line %Msg %n" />
-    </formats>
+		<format id="stdout"   format="%Date %Time [%LEVEL] [PID-%pidLogFormatter] %File %FuncShort:%Line %Msg %n" />
+
+		<format id="debug"   format="%Date %Time %EscM(37)[%LEVEL]%EscM(0) [PID-%pidLogFormatter] %File %FuncShort:%Line %Msg %n" />
+		<format id="info"    format="%Date %Time %EscM(36)[%LEVEL]%EscM(0) [PID-%pidLogFormatter] %File %FuncShort:%Line %Msg %n" />
+		<format id="warn"    format="%Date %Time %EscM(33)[%LEVEL]%EscM(0) [PID-%pidLogFormatter] %File %FuncShort:%Line %Msg %n" />
+		<format id="error"   format="%Date %Time %EscM(31)[%LEVEL]%EscM(0) [PID-%pidLogFormatter] %File %FuncShort:%Line %Msg %n" />
+
+	</formats>
 </seelog>
 `
-	// <format id="common"   format="%Date %Time [%LEVEL] %File %FuncShort:%Line %Msg %n" />
 
 	logger, err := seelog.LoggerFromConfigAsBytes([]byte(appConfig))
 	if err != nil {
@@ -37,9 +72,19 @@ func initLogging() {
 		return
 	}
 	Log = logger
+
+	// Logger.Trace("trace")
+	// Logger.Debug("debug")
+	// Logger.Info("info")
+	// Logger.Warn("warn")
+	// Logger.Error("error")
+	// Logger.Critical("critical")
+
 }
 
 func init() {
+	seelog.RegisterCustomFormatter("pidLogFormatter", pidLogFormatter)
+	// seelog.RegisterCustomFormatter("LLogFormatter", LLogFormatter)
 	initLogging()
 }
 
@@ -51,45 +96,3 @@ func Debug(t bool) {
 	}
 	initLogging()
 }
-
-// package logging
-//
-// import (
-// 	"fmt"
-// 	"github.com/sirupsen/logrus"
-// 	"os"
-// )
-//
-// var Log = logrus.New()
-//
-// type KikiFormatter struct{}
-//
-// func (self *KikiFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-// 	fmt.Println(entry)
-// 	msg := fmt.Sprintf("%v [%v] %v %v", entry.Time, entry.Level, entry.Message, entry.Data)
-// 	// fmt.Println(entry.String())
-// 	return []byte(msg + "\n"), nil
-// }
-//
-// func Setup() {
-// 	// Log as JSON instead of the default ASCII formatter.
-// 	// log.SetFormatter(&log.JSONFormatter{})
-// 	logrus.SetFormatter(new(KikiFormatter))
-// 	logrus.Info("TEST")
-//
-// 	// Output to stdout instead of the default stderr
-// 	// Can be any io.Writer, see below for File example
-// 	Log.Out = os.Stdout
-//
-// 	// Only log the warning severity or above.
-// 	Log.SetLevel(logrus.DebugLevel)
-// }
-//
-// // Debug will switch the verbosity of the database.
-// func Debug(t bool) {
-// 	if t {
-// 		Log.Level = logrus.DebugLevel
-// 	} else {
-// 		Log.Level = logrus.WarnLevel
-// 	}
-// }
