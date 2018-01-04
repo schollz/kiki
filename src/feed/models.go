@@ -1,14 +1,5 @@
 package feed
 
-import (
-	"errors"
-
-	"github.com/schollz/kiki/src/letter"
-	"github.com/schollz/kiki/src/logging"
-	"github.com/schollz/kiki/src/person"
-	"github.com/sirupsen/logrus"
-)
-
 type Settings struct {
 	StoragePerPublicPerson int64 // maximum size in bytes to store of public messages. Once exceeded, old messages are purged
 	FriendsOfFriends       bool  // whether you want to share your friends friend keys with new friends, effectively making a new friend friends with all your friends. This also means that when you make a new friend, that friends key is emitted to all your current friends. (default: true)
@@ -78,173 +69,173 @@ type Message struct {
 	ReplyTo     string   `json:"reply_to"`
 }
 
-type LetterPost struct {
-	Letter     *letter.Letter
-	Recipients []string
-	ForFriends bool
-	ForPublic  bool
-}
+// type LetterPost struct {
+// 	Letter     *letter.Letter
+// 	Recipients []string
+// 	ForFriends bool
+// 	ForPublic  bool
+// }
 
-func (p LetterPost) Post() (err error) {
-	logger := logging.Log.WithFields(logrus.Fields{
-		"func": "message.Post",
-	})
+// func (p LetterPost) Post() (err error) {
+// 	logger := logging.Log.WithFields(logrus.Fields{
+// 		"func": "message.Post",
+// 	})
 
-	logger.Infof("posting %v", p)
+// 	logger.Infof("posting %v", p)
 
-	// make letter
-	l := new(letter.Letter)
+// 	// make letter
+// 	l := new(letter.Letter)
 
-	// if post, do some special functions
-	switch p.Letter.Kind {
-	case "post-text":
-		// TODO: Capture images from post
-		// update l.Content.Data
-		// post the images as new messages
-		// TODO: Capture channels from post
-		// update l.Channels
-		// Check if its a reply to
-	case "give-key":
-		// TODO: Put all friends keys into l.Content.Data
-	case "assign-name":
-		// TODO: Strip HTML
-		// assigned names are public
-		p.ForPublic = true
-	case "assign-profile":
-		// TODO: Strip images
-		// profiles are public
-		p.ForPublic = true
-	case "assign-image":
-		// profile images are public
-		p.ForPublic = true
-	case ".jpg":
-		// do nothing
-	case ".png":
-		// do nothing
-	case "like":
-		// likes are public
-		p.ForPublic = true
-	case "follow":
-		// follows are public?
-		p.ForPublic = true
-	case "ghost":
-		// blocks are private
-		p.ForPublic = false
-		p.ForFriends = false
-		// TODO: issue new friends key
-		// emit new friends key to all remaining friends
-		// (TODO: in feed, when encountering a ghost in Unsealed Envelopes, remove the public key specified in the data)
-	default:
-		return errors.New("message kind not supported: " + p.Kind)
-	}
+// 	// if post, do some special functions
+// 	switch p.Letter.Kind {
+// 	case "post-text":
+// 		// TODO: Capture images from post
+// 		// update l.Content.Data
+// 		// post the images as new messages
+// 		// TODO: Capture channels from post
+// 		// update l.Channels
+// 		// Check if its a reply to
+// 	case "give-key":
+// 		// TODO: Put all friends keys into l.Content.Data
+// 	case "assign-name":
+// 		// TODO: Strip HTML
+// 		// assigned names are public
+// 		p.ForPublic = true
+// 	case "assign-profile":
+// 		// TODO: Strip images
+// 		// profiles are public
+// 		p.ForPublic = true
+// 	case "assign-image":
+// 		// profile images are public
+// 		p.ForPublic = true
+// 	case ".jpg":
+// 		// do nothing
+// 	case ".png":
+// 		// do nothing
+// 	case "like":
+// 		// likes are public
+// 		p.ForPublic = true
+// 	case "follow":
+// 		// follows are public?
+// 		p.ForPublic = true
+// 	case "ghost":
+// 		// blocks are private
+// 		p.ForPublic = false
+// 		p.ForFriends = false
+// 		// TODO: issue new friends key
+// 		// emit new friends key to all remaining friends
+// 		// (TODO: in feed, when encountering a ghost in Unsealed Envelopes, remove the public key specified in the data)
+// 	default:
+// 		return errors.New("message kind not supported: " + p.Kind)
+// 	}
 
-	if p.ReplyTo != "" {
-		l.RepliesTo(p.ReplyTo)
-	}
+// 	if p.ReplyTo != "" {
+// 		l.RepliesTo(p.ReplyTo)
+// 	}
 
-	// determine recipients
-	// _Note:_ the current sender is automatically added when sealing the envelope.
-	recipients := []*person.Person{}
-	if p.ForPublic {
-		//  Add public key
-		recipients = append(recipients, RegionKey)
-	}
-	if p.ForFriends {
-		// TODO: Add friends key
-	}
-	for _, pubString := range p.ForSpecific {
-		otherRecipient, err := person.FromPublicKey(pubString)
-		if err != nil {
-			logging.Log.Infof("not a valid public key: '%s'", pubString)
-			continue
-		}
-		recipients = append(recipients, otherRecipient)
-	}
+// 	// determine recipients
+// 	// _Note:_ the current sender is automatically added when sealing the envelope.
+// 	recipients := []*person.Person{}
+// 	if p.ForPublic {
+// 		//  Add public key
+// 		recipients = append(recipients, RegionKey)
+// 	}
+// 	if p.ForFriends {
+// 		// TODO: Add friends key
+// 	}
+// 	for _, pubString := range p.ForSpecific {
+// 		otherRecipient, err := person.FromPublicKey(pubString)
+// 		if err != nil {
+// 			logging.Log.Infof("not a valid public key: '%s'", pubString)
+// 			continue
+// 		}
+// 		recipients = append(recipients, otherRecipient)
+// 	}
 
-	// TODO: seal envelope
+// 	// TODO: seal envelope
 
-	// TODO: add envelope to database
-}
+// 	// TODO: add envelope to database
+// }
 
-// Post will generate a new letter with a message, seal it, and add it to the database.
-func (p Message) Post() (err error) {
-	logger := logging.Log.WithFields(logrus.Fields{
-		"func": "message.Post",
-	})
+// // Post will generate a new letter with a message, seal it, and add it to the database.
+// func (p Message) Post() (err error) {
+// 	logger := logging.Log.WithFields(logrus.Fields{
+// 		"func": "message.Post",
+// 	})
 
-	logger.Infof("posting %v", p)
+// 	logger.Infof("posting %v", p)
 
-	// make letter
-	l := new(letter.Letter)
+// 	// make letter
+// 	l := new(letter.Letter)
 
-	// if post, do some special functions
-	switch p.Kind {
-	case "post-text":
-		// TODO: Capture images from post
-		// update l.Content.Data
-		// post the images as new messages
-		// TODO: Capture channels from post
-		// update l.Channels
-		// Check if its a reply to
-	case "give-key":
-		// TODO: Put all friends keys into l.Content.Data
-	case "assign-name":
-		// TODO: Strip HTML
-		// assigned names are public
-		p.ForPublic = true
-	case "assign-profile":
-		// TODO: Strip images
-		// profiles are public
-		p.ForPublic = true
-	case "assign-image":
-		// profile images are public
-		p.ForPublic = true
-	case ".jpg":
-		// do nothing
-	case ".png":
-		// do nothing
-	case "like":
-		// likes are public
-		p.ForPublic = true
-	case "follow":
-		// follows are public?
-		p.ForPublic = true
-	case "ghost":
-		// blocks are private
-		p.ForPublic = false
-		p.ForFriends = false
-		// TODO: issue new friends key
-		// emit new friends key to all remaining friends
-		// (TODO: in feed, when encountering a ghost in Unsealed Envelopes, remove the public key specified in the data)
-	default:
-		return errors.New("message kind not supported: " + p.Kind)
-	}
+// 	// if post, do some special functions
+// 	switch p.Kind {
+// 	case "post-text":
+// 		// TODO: Capture images from post
+// 		// update l.Content.Data
+// 		// post the images as new messages
+// 		// TODO: Capture channels from post
+// 		// update l.Channels
+// 		// Check if its a reply to
+// 	case "give-key":
+// 		// TODO: Put all friends keys into l.Content.Data
+// 	case "assign-name":
+// 		// TODO: Strip HTML
+// 		// assigned names are public
+// 		p.ForPublic = true
+// 	case "assign-profile":
+// 		// TODO: Strip images
+// 		// profiles are public
+// 		p.ForPublic = true
+// 	case "assign-image":
+// 		// profile images are public
+// 		p.ForPublic = true
+// 	case ".jpg":
+// 		// do nothing
+// 	case ".png":
+// 		// do nothing
+// 	case "like":
+// 		// likes are public
+// 		p.ForPublic = true
+// 	case "follow":
+// 		// follows are public?
+// 		p.ForPublic = true
+// 	case "ghost":
+// 		// blocks are private
+// 		p.ForPublic = false
+// 		p.ForFriends = false
+// 		// TODO: issue new friends key
+// 		// emit new friends key to all remaining friends
+// 		// (TODO: in feed, when encountering a ghost in Unsealed Envelopes, remove the public key specified in the data)
+// 	default:
+// 		return errors.New("message kind not supported: " + p.Kind)
+// 	}
 
-	if p.ReplyTo != "" {
-		l.RepliesTo(p.ReplyTo)
-	}
+// 	if p.ReplyTo != "" {
+// 		l.RepliesTo(p.ReplyTo)
+// 	}
 
-	// determine recipients
-	// _Note:_ the current sender is automatically added when sealing the envelope.
-	recipients := []*person.Person{}
-	if p.ForPublic {
-		//  Add public key
-		recipients = append(recipients, RegionKey)
-	}
-	if p.ForFriends {
-		// TODO: Add friends key
-	}
-	for _, pubString := range p.ForSpecific {
-		otherRecipient, err := person.FromPublicKey(pubString)
-		if err != nil {
-			logging.Log.Infof("not a valid public key: '%s'", pubString)
-			continue
-		}
-		recipients = append(recipients, otherRecipient)
-	}
+// 	// determine recipients
+// 	// _Note:_ the current sender is automatically added when sealing the envelope.
+// 	recipients := []*person.Person{}
+// 	if p.ForPublic {
+// 		//  Add public key
+// 		recipients = append(recipients, RegionKey)
+// 	}
+// 	if p.ForFriends {
+// 		// TODO: Add friends key
+// 	}
+// 	for _, pubString := range p.ForSpecific {
+// 		otherRecipient, err := person.FromPublicKey(pubString)
+// 		if err != nil {
+// 			logging.Log.Infof("not a valid public key: '%s'", pubString)
+// 			continue
+// 		}
+// 		recipients = append(recipients, otherRecipient)
+// 	}
 
-	// TODO: seal envelope
+// 	// TODO: seal envelope
 
-	// TODO: add envelope to database
-	return
-}
+// 	// TODO: add envelope to database
+// 	return
+// }

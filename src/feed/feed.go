@@ -6,14 +6,13 @@ import (
 	"os"
 	"path"
 
+	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/purpose"
-	"github.com/schollz/kiki2/src/envelope"
 
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/logging"
-	"github.com/schollz/kiki/src/person"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,12 +22,12 @@ var (
 	DatabaseName = "kiki.db"
 	IdentityFile = ""
 	SettingsFile = ""
-	RegionKey    *person.Person
+	RegionKey    keypair.KeyPair
 	Port         = "8003"
 
 	// private variables
 	settings    Settings
-	personalKey *person.Person
+	personalKey keypair.KeyPair
 	db          *database.Database
 )
 
@@ -39,7 +38,7 @@ func Setup() (err error) {
 	})
 
 	// define region key
-	RegionKey, err = person.FromPublicPrivateKeys("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
+	RegionKey, err = keypair.FromPair("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
 		"GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q=") // define region key
 	if err != nil {
 		return
@@ -109,7 +108,7 @@ func Setup() (err error) {
 }
 
 // ProcessLetter will determine where to put the letter
-func (l Letter) ProcessLetter(l Letter) (err error) {
+func (l letter.Letter) ProcessLetter(l letter.Letter) (err error) {
 	if !purpose.Valid(l.Purpose) {
 		err = errors.New("invalid purpose")
 		return
@@ -131,33 +130,33 @@ func (l Letter) ProcessLetter(l Letter) (err error) {
 	return
 }
 
-// NewPerson will generate a new person, and a friends key.
-// It will automatically post the new friends key to your feed.
-func NewPerson() (p *person.Person, err error) {
-	// generate a new person
-	p, err = person.New()
-	if err != nil {
-		return
-	}
+// // NewPerson will generate a new person, and a friends key.
+// // It will automatically post the new friends key to your feed.
+// func NewPerson() (p *person.Person, err error) {
+// 	// generate a new person
+// 	p, err = person.New()
+// 	if err != nil {
+// 		return
+// 	}
 
-	// generate a key for friends
-	myfriends, err := person.New()
-	if err != nil {
-		return
-	}
-	myfriendsByte, err := json.Marshal(myfriends)
+// 	// generate a key for friends
+// 	myfriends, err := person.New()
+// 	if err != nil {
+// 		return
+// 	}
+// 	myfriendsByte, err := json.Marshal(myfriends)
 
-	// post the key to yourself
-	l := letter.NewAssignment("assign-friend", string(myfriendsByte))
-	e, err := envelope.New(l, p, []*person.Person{}, RegionKey)
-	if err != nil {
-		return
-	}
+// 	// post the key to yourself
+// 	l := letter.NewAssignment("assign-friend", string(myfriendsByte))
+// 	e, err := envelope.New(l, p, []*person.Person{}, RegionKey)
+// 	if err != nil {
+// 		return
+// 	}
 
-	// post the envelope
-	err = db.AddEnvelope(e)
-	return
-}
+// 	// post the envelope
+// 	err = db.AddEnvelope(e)
+// 	return
+// }
 
 // func ShowMessages() (err error) {
 // 	// get the opened envelopes
@@ -212,24 +211,24 @@ func RegenerateFeed() (err error) {
 	return
 }
 
-// processLetter will determine what to do with each letter.
-func processLetter(e *envelope.Envelope) (err error) {
-	logger := logging.Log.WithFields(logrus.Fields{
-		"func": "processLetter",
-	})
+// // processLetter will determine what to do with each letter.
+// func processLetter(e *envelope.Envelope) (err error) {
+// 	logger := logging.Log.WithFields(logrus.Fields{
+// 		"func": "processLetter",
+// 	})
 
-	switch kind := e.Letter.Kind; kind {
-	case "friends-key":
-		return UpdateFriendsKeys(e)
-	case "assign-name":
-		return UpdateNames(e)
-	case "post":
-		return nil
-	default:
-		logger.Warnf("unknown kind: '%s'", kind)
-	}
-	return
-}
+// 	switch kind := e.Letter.Kind; kind {
+// 	case "friends-key":
+// 		return UpdateFriendsKeys(e)
+// 	case "assign-name":
+// 		return UpdateNames(e)
+// 	case "post":
+// 		return nil
+// 	default:
+// 		logger.Warnf("unknown kind: '%s'", kind)
+// 	}
+// 	return
+// }
 
 // // UpdateFriendsKeys will prepend the Friends key determine from envelopes, if
 // // is not already added.
