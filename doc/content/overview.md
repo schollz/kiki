@@ -240,6 +240,7 @@ In this case, the `Content` (`174d7c78...`) is the SHA-256 sum of the post that 
 
 ## Synchronization
 
+
 Every user is a carrier. Every carrier is a server that can be connected to for file synchronization. Anytime kiki sees another kiki instance it attempts to synchronize as follows.
 
 1. Get a list of files and the Region Key from other (`GET /catalog`).
@@ -247,6 +248,12 @@ Every user is a carrier. Every carrier is a server that can be connected to for 
 3. Compare other's list to your list and find which items you do not have.
 4. Get each item that you *do *not have* and that the other *does have* (`GET /envelope/X`) and insert into the database after verifying the signature.
 5. Post each time that you *do have* and the other *does not have* (`POST /envelope`). Note that, when a server recieves a `POST /envelope` it will verify the signature before saving it.
+
+Blocking someone should purge their messages and disallow syncing. When syncing, send a list of blocked public keys and then the other servers will remove those.
+
+When making a release add the my public key encrypted by my private key and ensure they are same before doing any synchronization. Synchronize by just sending sql dumps?
+
+Check size of a user on disk by adding up length of each column when querying all their rows, to make sure synchornization doesn't overflow the specified amount of data to save per person.
 
 ### Storage
 
