@@ -115,10 +115,25 @@ func (d *Database) MakeTables() (err error) {
 		err = errors.Wrap(err, "MakeTables")
 		return
 	}
-	sqlStmt = `create table letters (id text not null primary key, time TIMESTAMP, sender text, signature text, sealed_recipients text, sealed_letter text, opened integer, letter_purpose text, letter_to text, letter_content text, letter_replaces text, letter_channels text, letter_replyto text, unique(id));`
+	// The "letters" table contains all the envelopes (opened and unopened) and their respective inforamtion in the letters.
+	sqlStmt = `create table letters (id text not null primary key, time TIMESTAMP, sender text, signature text, sealed_recipients text, sealed_letter text, opened integer, letter_purpose text, letter_to text, letter_content text, letter_replaces text, letter_replyto text, unique(id));`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
-		err = errors.Wrap(err, "MakeTables")
+		err = errors.Wrap(err, "MakeTables, letters")
+		return
+	}
+	// The "persons" table fills with public information about the people on the network with how they relate to you (following/follower/blocking) and how they prsent themselves (profile, name, image). All this information is determined by reading letters, but as letters determine these properties dynamically and chronologically, this table will ensure that the latest version is determined.
+	sqlStmt = `CREATE TABLE persons (id INTEGER PRIMARY KEY, public_key TEXT, name TEXT, profile TEXT, image TEXT, following INTEGER, follower INTEGER, blocking INTEGER);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables, persons")
+		return
+	}
+	// The "keypairs" table fills with all the keys provided for friends, as well as keys from friends. When encrypting for friends it will only use keys for friends. When encrypting for friends of friends it will use all the keys. For decrypting, it will try every keypair.
+	sqlStmt = `CREATE TABLE keypairs (id INTEGER PRIMARY KEY, persons_id integer, time TIMESTAMP, keypair TEXT);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables, keypairs")
 		return
 	}
 	return
@@ -182,7 +197,7 @@ func (d *Database) addEnvelope(e letter.Envelope) (err error) {
 	}
 	var opened int
 	// marshaled things
-	var mSender, mSealedRecipients, mTo, mChannels string
+	var mSender, mSealedRecipients, mTo string
 	if e.Opened {
 		opened = 1
 	} else {
@@ -207,18 +222,12 @@ func (d *Database) addEnvelope(e letter.Envelope) (err error) {
 	}
 	mTo = string(b)
 
-	b, err = json.Marshal(e.Letter.Channels)
-	if err != nil {
-		return errors.Wrap(err, "problem marshaling Channels")
-	}
-	mChannels = string(b)
-
-	stmt, err := tx.Prepare("insert or replace into letters(id,time,sender,signature,sealed_recipients,sealed_letter,opened,letter_purpose,letter_to,letter_content,letter_replaces,letter_channels,letter_replyto) values(?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	stmt, err := tx.Prepare("insert or replace into letters(id,time,sender,signature,sealed_recipients,sealed_letter,opened,letter_purpose,letter_to,letter_content,letter_replaces,letter_replyto) values(?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(e.ID, e.Timestamp, mSender, e.Signature, mSealedRecipients, e.SealedLetter, opened, e.Letter.Purpose, mTo, e.Letter.Content, e.Letter.Replaces, mChannels, e.Letter.ReplyTo)
+	_, err = stmt.Exec(e.ID, e.Timestamp, mSender, e.Signature, mSealedRecipients, e.SealedLetter, opened, e.Letter.Purpose, mTo, e.Letter.Content, e.Letter.Replaces, e.Letter.ReplyTo)
 	if err != nil {
 		return
 	}
@@ -274,12 +283,11 @@ func (d *Database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 		e.Letter = letter.Letter{}
 		var opened int
 		// marshaled things
-		var mSender, mSealedRecipients, mTo, mChannels string
-		err = rows.Scan(&e.ID, &e.Timestamp, &mSender, &e.Signature, &mSealedRecipients, &e.SealedLetter, &opened, &e.Letter.Purpose, &mTo, &e.Letter.Content, &e.Letter.Replaces, &mChannels, &e.Letter.ReplyTo)
+		var mSender, mSealedRecipients, mTo string
+		err = rows.Scan(&e.ID, &e.Timestamp, &mSender, &e.Signature, &mSealedRecipients, &e.SealedLetter, &opened, &e.Letter.Purpose, &mTo, &e.Letter.Content, &e.Letter.Replaces, &e.Letter.ReplyTo)
 		json.Unmarshal([]byte(mSender), &e.Sender)
 		json.Unmarshal([]byte(mSealedRecipients), &e.SealedRecipients)
 		json.Unmarshal([]byte(mTo), &e.Letter.To)
-		json.Unmarshal([]byte(mChannels), &e.Letter.Channels)
 
 		e.Opened = opened == 1
 		if err != nil {

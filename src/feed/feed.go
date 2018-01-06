@@ -119,6 +119,7 @@ func ProcessLetter(l letter.Letter) (err error) {
 		switch to {
 		case "public":
 			newTo = append(newTo, RegionKey.Public)
+		case "friends":
 			// TODO: Add case for "friends"
 		}
 	}
