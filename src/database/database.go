@@ -122,6 +122,9 @@ func (d *Database) MakeTables() (err error) {
 		err = errors.Wrap(err, "MakeTables, letters")
 		return
 	}
+
+	// The following tables are for organizing the letter data to make it more easily (and quickly) parsed. These tables are filled in when regenerating the feed.
+
 	// The "persons" table fills with public information about the people on the network with how they relate to you (following/follower/blocking) and how they prsent themselves (profile, name, image). All this information is determined by reading letters, but as letters determine these properties dynamically and chronologically, this table will ensure that the latest version is determined.
 	sqlStmt = `CREATE TABLE persons (id INTEGER PRIMARY KEY, public_key TEXT, name TEXT, profile TEXT, image TEXT, following INTEGER, follower INTEGER, blocking INTEGER);`
 	_, err = d.db.Exec(sqlStmt)
@@ -130,6 +133,7 @@ func (d *Database) MakeTables() (err error) {
 		return
 	}
 	// The "keypairs" table fills with all the keys provided for friends, as well as keys from friends. When encrypting for friends it will only use keys for friends. When encrypting for friends of friends it will use all the keys. For decrypting, it will try every keypair.
+	// This table is filled in dynamically, inserting each keypair found into the table.
 	sqlStmt = `CREATE TABLE keypairs (id INTEGER PRIMARY KEY, persons_id integer, time TIMESTAMP, keypair TEXT);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
