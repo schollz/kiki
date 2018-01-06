@@ -6,15 +6,6 @@ import (
 	"github.com/schollz/kiki/src/letter"
 )
 
-func AddEnvelope(e letter.Envelope) (err error) {
-	db, err := Open()
-	if err != nil {
-		return
-	}
-	defer db.Close()
-	return db.addEnvelope(e)
-}
-
 func Set(bucket, key string, value interface{}) (err error) {
 	db, err := Open()
 	if err != nil {
@@ -22,6 +13,24 @@ func Set(bucket, key string, value interface{}) (err error) {
 	}
 	defer db.Close()
 	return db.Set(bucket, key, value)
+}
+
+func Get(bucket, key string, value interface{}) (err error) {
+	db, err := Open()
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.Get(bucket, key, value)
+}
+
+func AddEnvelope(e letter.Envelope) (err error) {
+	db, err := Open()
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.addEnvelope(e)
 }
 
 // GetEnvelopeFromID returns a single envelope from its ID
