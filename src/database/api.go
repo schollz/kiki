@@ -3,6 +3,7 @@ package database
 import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
+	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 )
 
@@ -62,4 +63,43 @@ func GetAllEnvelopes(opened bool) (e []letter.Envelope, err error) {
 	} else {
 		return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 0")
 	}
+}
+
+func (d *Database) getKeys() (s []keypair.KeyPair, err error) {
+	// prepare statement
+	query := "SELECT keypair FROM keypairs ORDER BY time DESC"
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "GetKeys")
+		return
+	}
+	defer rows.Close()
+
+	// parse rows
+	s = make([]keypair.KeyPair, 100000)
+	sI := 0
+	// loop through rows
+	for rows.Next() {
+		var mKeyPair string
+		err = rows.Scan(&mKeyPair)
+		if err != nil {
+			err = errors.Wrap(err, "getRows")
+			return
+		}
+
+		kp, err := keypair.FromPublic(mKeyPair)
+		if err != nil {
+			log.Warn(err)
+			continue
+		}
+		s[sI] = kp
+		sI++
+	}
+	s = s[:sI]
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getRows")
+	}
+	return
 }

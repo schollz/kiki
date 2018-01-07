@@ -120,9 +120,11 @@ func ProcessLetter(l letter.Letter) (err error) {
 		case "public":
 			newTo = append(newTo, RegionKey.Public)
 		case "friends":
-			// TODO: Add case for "friends"
+			var friendKeys []string
+			// TODO: Add case for "friends" key
 		}
 	}
+	l.To = newTo
 
 	// seal the letter
 	e, err := l.Seal(personalKey, RegionKey)
