@@ -52,16 +52,20 @@ func GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
 }
 
 // GetAllEnvelopes returns all envelopes determined by whether they are opened
-func GetAllEnvelopes(opened bool) (e []letter.Envelope, err error) {
+func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 	db, err := Open()
 	if err != nil {
 		return
 	}
 	defer db.Close()
-	if opened {
-		return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 1")
+	if len(opened) > 0 {
+		if opened[0] {
+			return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 1")
+		} else {
+			return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 0")
+		}
 	} else {
-		return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 0")
+		return db.getAllFromQuery("SELECT * FROM letters")
 	}
 }
 
