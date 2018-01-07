@@ -127,6 +127,13 @@ func ProcessLetter(l letter.Letter) (err error) {
 			for _, friendsKeyPair := range friendsKeyPairs {
 				newTo = append(newTo, friendsKeyPair.Public)
 			}
+		default:
+			_, err2 := keypair.FromPublic(to)
+			if err2 != nil {
+				log.Infof("Not a valid public key: '%s'", to)
+			} else {
+				newTo = append(newTo, to)
+			}
 		}
 	}
 	l.To = newTo
