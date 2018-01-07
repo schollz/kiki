@@ -76,6 +76,21 @@ type Envelope struct {
 // Seal creates an envelope and seals it for the specified recipients
 func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envelope, err error) {
 	logging.Log.Info("creating letter")
+
+	// generate a list of keypairs for each public key of the recipients in letter.To
+	newTo := make([]string, len(l.To)+1)
+	recipients := make([]keypair.KeyPair, len(l.To)+1)
+	recipients[0] = sender
+	newTo[0] = sender.Public
+	for i, publicKeyOfRecipient := range l.To {
+		recipients[i+1], err = keypair.FromPublic(publicKeyOfRecipient)
+		newTo[i+1] = publicKeyOfRecipient
+		if err != nil {
+			return
+		}
+	}
+	l.To = newTo
+
 	e = Envelope{}
 
 	e.Timestamp = time.Now()
@@ -97,16 +112,6 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 		return
 	}
 	e.SealedLetter = base64.URLEncoding.EncodeToString(encryptedLetter)
-
-	// generate a list of keypairs for each public key of the recipients in letter.To
-	recipients := make([]keypair.KeyPair, len(l.To)+1)
-	recipients[0] = sender
-	for i, publicKeyOfRecipient := range l.To {
-		recipients[i+1], err = keypair.FromPublic(publicKeyOfRecipient)
-		if err != nil {
-			return
-		}
-	}
 
 	// For each recipient, generate a key-encrypted passphrase
 	e.SealedRecipients = make([]string, len(recipients))

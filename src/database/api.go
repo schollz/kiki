@@ -1,10 +1,13 @@
 package database
 
 import (
+	"encoding/json"
+
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/purpose"
 )
 
 func Set(bucket, key string, value interface{}) (err error) {
@@ -69,9 +72,10 @@ func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 	}
 }
 
-func (d *Database) getKeys() (s []keypair.KeyPair, err error) {
+// GetKeys returns all the keys shared with you in the database
+func (d *Database) GetKeys() (s []keypair.KeyPair, err error) {
 	// prepare statement
-	query := "SELECT keypair FROM keypairs ORDER BY time DESC"
+	query := "SELECT sender,letter_content FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ShareKey + "' ORDER BY time DESC;"
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -92,10 +96,10 @@ func (d *Database) getKeys() (s []keypair.KeyPair, err error) {
 			return
 		}
 
-		kp, err := keypair.FromPublic(mKeyPair)
+		var kp keypair.KeyPair
+		err = json.Unmarshal([]byte(mKeyPair), &kp)
 		if err != nil {
-			log.Warn(err)
-			continue
+			return
 		}
 		s[sI] = kp
 		sI++

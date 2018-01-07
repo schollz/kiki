@@ -180,9 +180,9 @@ func NewPerson() (p keypair.KeyPair, err error) {
 	}
 	myfriendsByte, err := json.Marshal(myfriends)
 
-	// post the key to yourself
+	// share the friends key with yourself
 	l := letter.Letter{
-		Purpose: purpose.AssignFriend,
+		Purpose: purpose.ShareKey,
 		Content: string(myfriendsByte),
 	}
 	e, err := l.Seal(p, RegionKey)
