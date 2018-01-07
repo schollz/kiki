@@ -1,13 +1,10 @@
 package database
 
 import (
-	"encoding/json"
-
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
-	"github.com/schollz/kiki/src/purpose"
 )
 
 func Set(bucket, key string, value interface{}) (err error) {
@@ -72,42 +69,20 @@ func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 	}
 }
 
-// GetKeys returns all the keys shared with you in the database
-func (d *Database) GetKeys() (s []keypair.KeyPair, err error) {
-	// prepare statement
-	query := "SELECT sender,letter_content FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ShareKey + "' ORDER BY time DESC;"
-	log.Debug(query)
-	rows, err := d.db.Query(query)
+func GetKeys() (s []keypair.KeyPair, err error) {
+	db, err := Open()
 	if err != nil {
-		err = errors.Wrap(err, "GetKeys")
 		return
 	}
-	defer rows.Close()
+	defer db.Close()
+	return db.getKeys()
+}
 
-	// parse rows
-	s = make([]keypair.KeyPair, 100000)
-	sI := 0
-	// loop through rows
-	for rows.Next() {
-		var mKeyPair string
-		err = rows.Scan(&mKeyPair)
-		if err != nil {
-			err = errors.Wrap(err, "getRows")
-			return
-		}
-
-		var kp keypair.KeyPair
-		err = json.Unmarshal([]byte(mKeyPair), &kp)
-		if err != nil {
-			return
-		}
-		s[sI] = kp
-		sI++
-	}
-	s = s[:sI]
-	err = rows.Err()
+func GetKeysFromSender(sender string) (s []keypair.KeyPair, err error) {
+	db, err := Open()
 	if err != nil {
-		err = errors.Wrap(err, "getRows")
+		return
 	}
-	return
+	defer db.Close()
+	return db.getKeys(sender)
 }

@@ -9,8 +9,10 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
+	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
+	"github.com/schollz/kiki/src/purpose"
 	flock "github.com/theckman/go-flock"
 )
 
@@ -300,6 +302,50 @@ func (d *Database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 		}
 
 		s[sI] = e
+		sI++
+	}
+	s = s[:sI]
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getRows")
+	}
+	return
+}
+
+// getKeys returns all the keys shared with you in the database, which can be queried by the sender
+func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
+	var query string
+	if len(sender) > 0 {
+		query = fmt.Sprintf("SELECT sender,letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ShareKey, sender[0])
+	} else {
+		query = fmt.Sprintf("SELECT sender,letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' ORDER BY time DESC;", purpose.ShareKey)
+	}
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "GetKeys")
+		return
+	}
+	defer rows.Close()
+
+	// parse rows
+	s = make([]keypair.KeyPair, 100000)
+	sI := 0
+	// loop through rows
+	for rows.Next() {
+		var mKeyPair string
+		err = rows.Scan(&mKeyPair)
+		if err != nil {
+			err = errors.Wrap(err, "getRows")
+			return
+		}
+
+		var kp keypair.KeyPair
+		err = json.Unmarshal([]byte(mKeyPair), &kp)
+		if err != nil {
+			return
+		}
+		s[sI] = kp
 		sI++
 	}
 	s = s[:sI]
