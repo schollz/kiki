@@ -133,11 +133,34 @@ func ProcessLetter(l letter.Letter) (err error) {
 	}
 
 	err = database.AddEnvelope(e)
+	if err != nil {
+		return
+	}
+
+	err = UnsealLetters()
 	return
 }
 
-// UnsealLetters
+// UnsealLetters will go through unopened envelopes and open them
+// and then add them to the database.
 func UnsealLetters() (err error) {
+	envelopes, err := database.GetAllEnvelopes(false)
+	if err != nil {
+		return err
+	}
+	keysToTry := []keypair.KeyPair{personalKey, RegionKey}
+	for _, envelope := range envelopes {
+		ue, err := envelope.Unseal(keysToTry, RegionKey)
+		if err != nil {
+			log.Debug(err)
+			continue
+		}
+		log.Debug(ue.Letter)
+		err = database.AddEnvelope(ue)
+		if err != nil {
+			return err
+		}
+	}
 	return
 }
 

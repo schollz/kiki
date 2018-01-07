@@ -78,15 +78,14 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	logging.Log.Info("creating letter")
 	e = Envelope{}
 
-	// Create ID (hash of any public key + hash of any content)
+	e.Timestamp = time.Now()
+	e.Sender = sender.PublicKey()
+	// Create ID (hash of any public key + hash of any content + timestamp)
 	h := sha256.New()
 	h.Write([]byte(sender.Public))
 	h.Write([]byte(l.Content))
-	h.Write([]byte(l.Replaces))
-	h.Write([]byte(l.ReplyTo))
+	h.Write([]byte(e.Timestamp.String()))
 	e.ID = fmt.Sprintf("%x", h.Sum(nil))
-	e.Timestamp = time.Now()
-	e.Sender = sender.PublicKey()
 
 	// Generate a passphrase to encrypt the letter
 	contentBytes, err := json.Marshal(l)

@@ -140,7 +140,7 @@ func (d *Database) MakeTables() (err error) {
 	// 	err = errors.Wrap(err, "MakeTables, keypairs")
 	// 	return
 	// }
-	// return
+	return
 }
 
 // Get will retrieve the value associated with a key.
