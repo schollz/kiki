@@ -120,8 +120,13 @@ func ProcessLetter(l letter.Letter) (err error) {
 		case "public":
 			newTo = append(newTo, RegionKey.Public)
 		case "friends":
-			// var friendKeys []string
-			// TODO: Add case for "friends" key
+			friendsKeyPairs, err2 := database.GetKeysFromSender(personalKey.Public)
+			if err2 != nil {
+				return err2
+			}
+			for _, friendsKeyPair := range friendsKeyPairs {
+				newTo = append(newTo, friendsKeyPair.Public)
+			}
 		}
 	}
 	l.To = newTo
