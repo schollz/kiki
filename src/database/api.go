@@ -69,6 +69,7 @@ func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 	}
 }
 
+// GetKeys will return all the keys
 func GetKeys() (s []keypair.KeyPair, err error) {
 	db, err := Open()
 	if err != nil {
@@ -78,6 +79,7 @@ func GetKeys() (s []keypair.KeyPair, err error) {
 	return db.getKeys()
 }
 
+// GetKeysFromSender will return all the keys from a certain sender
 func GetKeysFromSender(sender string) (s []keypair.KeyPair, err error) {
 	db, err := Open()
 	if err != nil {
@@ -85,4 +87,14 @@ func GetKeysFromSender(sender string) (s []keypair.KeyPair, err error) {
 	}
 	defer db.Close()
 	return db.getKeys(sender)
+}
+
+// GetName will return the assigned name for the public key of a sender
+func GetName(publicKey string) (name string, err error) {
+	db, err := Open()
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.getName(publicKey)
 }

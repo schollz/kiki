@@ -316,9 +316,9 @@ func (d *Database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	var query string
 	if len(sender) > 0 {
-		query = fmt.Sprintf("SELECT sender,letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ShareKey, sender[0])
+		query = fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ShareKey, sender[0])
 	} else {
-		query = fmt.Sprintf("SELECT sender,letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' ORDER BY time DESC;", purpose.ShareKey)
+		query = fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' ORDER BY time DESC;", purpose.ShareKey)
 	}
 	log.Debug(query)
 	rows, err := d.db.Query(query)
@@ -352,6 +352,34 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getRows")
+	}
+	return
+}
+
+// getName returns the name of a person
+func (d *Database) getName(person string) (name string, err error) {
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignName, person)
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "getName")
+		return
+	}
+	defer rows.Close()
+
+	// loop through rows
+	for rows.Next() {
+		err = rows.Scan(&name)
+		if err != nil {
+			err = errors.Wrap(err, "getName")
+			return
+		}
+		break
+	}
+
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getName")
 	}
 	return
 }

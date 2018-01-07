@@ -8,10 +8,11 @@ var (
 	// ShareKey is for sharing keypairs with friends, or with self
 	ShareKey     = "share-key"
 	AssignFollow = "assign-follow"
+	AssignName   = "assign-name"
 )
 
 func Valid(purpose string) bool {
-	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, AssignFollow} {
+	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, AssignFollow, AssignName} {
 		if purpose == p {
 			return true
 		}

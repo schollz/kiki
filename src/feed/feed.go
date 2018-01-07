@@ -113,7 +113,7 @@ func ProcessLetter(l letter.Letter) (err error) {
 	}
 
 	// rewrite the letter.To array so that it contains
-	// public keys
+	// public keys that are valid
 	newTo := []string{}
 	for _, to := range l.To {
 		switch to {
