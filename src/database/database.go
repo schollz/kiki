@@ -132,15 +132,15 @@ func (d *Database) MakeTables() (err error) {
 		err = errors.Wrap(err, "MakeTables, persons")
 		return
 	}
-	// The "keypairs" table fills with all the keys provided for friends, as well as keys from friends. When encrypting for friends it will only use keys for friends. When encrypting for friends of friends it will use all the keys. For decrypting, it will try every keypair.
-	// This table is filled in dynamically, inserting each keypair found into the table.
-	sqlStmt = `CREATE TABLE keypairs (id INTEGER PRIMARY KEY, persons_id integer, time TIMESTAMP, keypair TEXT);`
-	_, err = d.db.Exec(sqlStmt)
-	if err != nil {
-		err = errors.Wrap(err, "MakeTables, keypairs")
-		return
-	}
-	return
+	// // The "keypairs" table fills with all the keys provided for friends, as well as keys from friends. When encrypting for friends it will only use keys for friends. When encrypting for friends of friends it will use all the keys. For decrypting, it will try every keypair.
+	// // This table is filled in dynamically, inserting each keypair found into the table.
+	// sqlStmt = `CREATE TABLE keypairs (id INTEGER PRIMARY KEY, persons_id integer, time TIMESTAMP, keypair TEXT);`
+	// _, err = d.db.Exec(sqlStmt)
+	// if err != nil {
+	// 	err = errors.Wrap(err, "MakeTables, keypairs")
+	// 	return
+	// }
+	// return
 }
 
 // Get will retrieve the value associated with a key.
