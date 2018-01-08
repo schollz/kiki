@@ -323,7 +323,7 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
-		err = errors.Wrap(err, "GetKeys")
+		err = errors.Wrap(err, "getKeys")
 		return
 	}
 	defer rows.Close()
@@ -336,7 +336,7 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 		var mKeyPair string
 		err = rows.Scan(&mKeyPair)
 		if err != nil {
-			err = errors.Wrap(err, "getRows")
+			err = errors.Wrap(err, "getKeys")
 			return
 		}
 
@@ -351,7 +351,7 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	s = s[:sI]
 	err = rows.Err()
 	if err != nil {
-		err = errors.Wrap(err, "getRows")
+		err = errors.Wrap(err, "getKeys")
 	}
 	return
 }

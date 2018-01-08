@@ -57,15 +57,19 @@ func Setup() (err error) {
 	}
 	if _, err := os.Stat(IdentityFile); os.IsNotExist(err) {
 		var err2 error
-		p, err2 := NewPerson()
-		if err2 != nil {
-			return err2
-		}
-		pBytes, err2 := json.Marshal(p)
+		// generate a new personal key
+		personalKey = keypair.New()
+		pBytes, err2 := json.Marshal(personalKey)
 		if err2 != nil {
 			return err2
 		}
 		err2 = ioutil.WriteFile(IdentityFile, pBytes, 0644)
+		if err2 != nil {
+			return err2
+		}
+
+		// add the friends key
+		err2 = AddFriendsKey()
 		if err2 != nil {
 			return err2
 		}
@@ -178,84 +182,6 @@ func UnsealLetters() (err error) {
 	return
 }
 
-// NewPerson will generate a new person, and a friends key.
-// It will automatically post the new friends key to your feed.
-func NewPerson() (p keypair.KeyPair, err error) {
-	// generate a new person
-	p = keypair.New()
-	if err != nil {
-		return
-	}
-
-	// generate a key for friends
-	myfriends := keypair.New()
-	if err != nil {
-		return
-	}
-	myfriendsByte, err := json.Marshal(myfriends)
-
-	// share the friends key with yourself
-	l := letter.Letter{
-		Purpose: purpose.ShareKey,
-		Content: string(myfriendsByte),
-	}
-	e, err := l.Seal(p, RegionKey)
-	if err != nil {
-		return
-	}
-
-	// post the envelope
-	err = database.AddEnvelope(e)
-	return
-}
-
-// // UpdateFriendsKeys will prepend the Friends key determine from envelopes, if
-// // is not already added.
-// func UpdateFriendsKeys(e *envelope.Envelope) (err error) {
-// 	logger := logging.Log.WithFields(logrus.Fields{
-// 		"func": "UpdateFriendsKeys",
-// 	})
-
-// 	var newKey *person.Person
-// 	err = json.Unmarshal([]byte(e.Letter.Text), &newKey)
-
-// 	keyBucket := "keysFromFriends"
-// 	if e.Sender.Public() == personalKey.Public() {
-// 		// key was sent from someone other than you
-// 		keyBucket = "keysForFriends"
-// 	}
-
-// 	var friendKeys []*person.Person
-// 	err = db.Get("keystore", keyBucket, friendKeys)
-// 	if err != nil {
-// 		friendKeys = []*person.Person{}
-// 	}
-// 	for _, key := range friendKeys {
-// 		if key == newKey {
-// 			return nil
-// 		}
-// 	}
-// 	friendKeys = append([]*person.Person{newKey}, friendKeys...)
-// 	err = db.Set("keystore", keyBucket, friendKeys)
-// 	log.Debugf("new %s: '%s' sent %v", keyBucket, newKey.Public(), utils.TimeAgo(e.Timestamp))
-// 	return
-// }
-
-// // UpdateNames will prepend the Friends key determine from envelopes, if
-// // is not already added.
-// func UpdateNames(e *envelope.Envelope) (err error) {
-// 	logger := logging.Log.WithFields(logrus.Fields{
-// 		"func": "UpdateNames",
-// 	})
-
-// 	err = db.Set("AssignedNames", e.Sender.Public(), e.Letter.Text)
-// 	if err != nil {
-// 		return
-// 	}
-// 	log.Debugf("public name '%s' -> '%s' (%s)", e.Sender.Public()[:8], e.Letter.Text, utils.TimeAgo(e.Timestamp))
-// 	return
-// }
-
 func ShowFeed() (err error) {
 	envelopes, err := database.GetAllEnvelopes(true)
 	if err != nil {
@@ -273,6 +199,34 @@ func ShowFeed() (err error) {
 		}
 		fmt.Printf("%s (%s) [%s]:\n%s\n\n", senderName, e.Sender.Public, utils.TimeAgo(e.Timestamp), e.Letter.Content)
 
+	}
+	return
+}
+
+func AddFriendsKey() (err error) {
+	// generate a key for friends
+	myfriends := keypair.New()
+	if err != nil {
+		err = errors.Wrap(err, "AddFriendsKey")
+		return
+	}
+	myfriendsByte, err := json.Marshal(myfriends)
+
+	// share the friends key with yourself
+	l := letter.Letter{
+		Purpose: purpose.ShareKey,
+		Content: string(myfriendsByte),
+	}
+	e, err := l.Seal(personalKey, RegionKey)
+	if err != nil {
+		err = errors.Wrap(err, "AddFriendsKey")
+		return
+	}
+
+	// post the envelope
+	err = database.AddEnvelope(e)
+	if err != nil {
+		err = errors.Wrap(err, "AddFriendsKey")
 	}
 	return
 }
