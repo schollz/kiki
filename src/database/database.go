@@ -86,15 +86,12 @@ func (d *Database) Close() (err error) {
 		log.Error(err)
 	} else {
 		os.Remove(d.name + ".lock")
-		log.Info(err)
 	}
 	// close database
 	err2 := d.db.Close()
 	if err2 != nil {
 		err = err2
 		log.Error(err)
-	} else {
-		log.Info("closed database")
 	}
 	return
 }
@@ -203,18 +200,13 @@ func (d *Database) addEnvelope(e letter.Envelope) (err error) {
 	}
 	var opened int
 	// marshaled things
-	var mSender, mSealedRecipients, mTo string
+	var mSealedRecipients, mTo string
 	if e.Opened {
 		opened = 1
 	} else {
 		opened = 0
 	}
 	var b []byte
-	b, err = json.Marshal(e.Sender)
-	if err != nil {
-		return errors.Wrap(err, "problem marshaling Sender")
-	}
-	mSender = string(b)
 
 	b, err = json.Marshal(e.SealedRecipients)
 	if err != nil {
@@ -233,7 +225,7 @@ func (d *Database) addEnvelope(e letter.Envelope) (err error) {
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(e.ID, e.Timestamp, mSender, e.Signature, mSealedRecipients, e.SealedLetter, opened, e.Letter.Purpose, mTo, e.Letter.Content, e.Letter.Replaces, e.Letter.ReplyTo)
+	_, err = stmt.Exec(e.ID, e.Timestamp, e.Sender.Public, e.Signature, mSealedRecipients, e.SealedLetter, opened, e.Letter.Purpose, mTo, e.Letter.Content, e.Letter.Replaces, e.Letter.ReplyTo)
 	if err != nil {
 		return
 	}
@@ -291,7 +283,7 @@ func (d *Database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 		// marshaled things
 		var mSender, mSealedRecipients, mTo string
 		err = rows.Scan(&e.ID, &e.Timestamp, &mSender, &e.Signature, &mSealedRecipients, &e.SealedLetter, &opened, &e.Letter.Purpose, &mTo, &e.Letter.Content, &e.Letter.Replaces, &e.Letter.ReplyTo)
-		json.Unmarshal([]byte(mSender), &e.Sender)
+		e.Sender, err = keypair.FromPublic(mSender)
 		json.Unmarshal([]byte(mSealedRecipients), &e.SealedRecipients)
 		json.Unmarshal([]byte(mTo), &e.Letter.To)
 
@@ -358,7 +350,7 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 
 // getName returns the name of a person
 func (d *Database) getName(person string) (name string, err error) {
-	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '{\"public\":\"%s\"}' ORDER BY time DESC;", purpose.AssignName, person)
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignName, person)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {

@@ -73,6 +73,17 @@ func Setup() (err error) {
 		if err2 != nil {
 			return err2
 		}
+
+		// block the region public key from being used as a sender, ever
+		err2 = ProcessLetter(letter.Letter{
+			To:      []string{"public"},
+			Purpose: purpose.AssignBlock,
+			Content: RegionKey.Public,
+		})
+		if err2 != nil {
+			err2 = errors.Wrap(err2, "setup")
+			return err2
+		}
 	}
 	pBytes, err := ioutil.ReadFile(IdentityFile)
 	if err != nil {
@@ -125,6 +136,9 @@ func ProcessLetter(l letter.Letter) (err error) {
 		switch to {
 		case "public":
 			newTo = append(newTo, RegionKey.Public)
+		case "self":
+			// automatically done when adding any letter
+			// this just put here for pedantic reasons
 		case "friends":
 			friendsKeyPairs, err2 := database.GetKeysFromSender(personalKey.Public)
 			if err2 != nil {
@@ -228,20 +242,26 @@ func AddFriendsKey() (err error) {
 	myfriendsByte, err := json.Marshal(myfriends)
 
 	// share the friends key with yourself
-	l := letter.Letter{
+	err = ProcessLetter(letter.Letter{
+		To:      []string{"self"},
 		Purpose: purpose.ShareKey,
 		Content: string(myfriendsByte),
-	}
-	e, err := l.Seal(personalKey, RegionKey)
+	})
 	if err != nil {
 		err = errors.Wrap(err, "AddFriendsKey")
 		return
 	}
 
-	// post the envelope
-	err = database.AddEnvelope(e)
+	// block the friends public key from being used as a sender, ever
+	err = ProcessLetter(letter.Letter{
+		To:      []string{"public"},
+		Purpose: purpose.AssignBlock,
+		Content: myfriends.Public,
+	})
 	if err != nil {
 		err = errors.Wrap(err, "AddFriendsKey")
+		return
 	}
+
 	return
 }
