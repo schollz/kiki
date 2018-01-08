@@ -55,7 +55,7 @@ func Open(locationToFeed string) (f Feed, err error) {
 }
 
 // init initializes the kiki instance
-func (f Feed) init() (err error) {
+func (f *Feed) init() (err error) {
 	if f.RegionKey.Public == "" {
 		// define region key
 		f.RegionKey, err = keypair.FromPair("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
@@ -108,6 +108,10 @@ func (f Feed) init() (err error) {
 	}
 	err = json.Unmarshal(pBytes, &f.personalKey)
 	if err != nil {
+		return
+	}
+	if f.personalKey.Public == "" {
+		err = errors.New("problem creating personal key")
 		return
 	}
 

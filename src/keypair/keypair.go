@@ -35,9 +35,16 @@ func New() (kp KeyPair) {
 }
 
 func (kp KeyPair) PublicKey() (kpPublic KeyPair) {
+	var err error
+	if kp.Public == "" {
+		panic(errors.New("has blank key!"))
+	}
 	kpPublic = KeyPair{}
 	kpPublic.Public = kp.Public
-	kpPublic.public, _ = keyStringToBytes(kpPublic.Public)
+	kpPublic.public, err = keyStringToBytes(kpPublic.Public)
+	if err != nil {
+		panic(err)
+	}
 	return
 }
 
