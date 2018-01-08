@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/letter"
 )
 
@@ -23,6 +22,6 @@ func handleLetter(c *gin.Context) (err error) {
 	if err != nil {
 		return
 	}
-	err = feed.ProcessLetter(p)
+	err = f.ProcessLetter(p)
 	return
 }

@@ -15,6 +15,7 @@ import (
 var (
 	// Port defines what port the carrier should listen on
 	Port = "8003"
+	f    feed.Feed
 	log  = logging.Log
 )
 
@@ -31,6 +32,17 @@ func MiddleWareHandler() gin.HandlerFunc {
 
 // Run will start the server listening
 func Run() {
+	// Startup feed
+	var err error
+	f, err = feed.Open(".")
+	if err != nil {
+		var err2 error
+		f, err2 = feed.New()
+		if err2 != nil {
+			panic(err)
+		}
+	}
+
 	// Startup server
 	gin.SetMode(gin.ReleaseMode)
 
@@ -45,7 +57,7 @@ func Run() {
 	r.POST("/letter", handlerLetter)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
-		err := feed.ShowFeed()
+		err := f.ShowFeed()
 		if err != nil {
 			message = err.Error()
 		}
