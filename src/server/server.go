@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/logging"
 )
 
@@ -42,6 +43,14 @@ func Run() {
 	})
 	r.GET("/ping", PingHandler)
 	r.POST("/letter", handlerLetter)
+	r.GET("/test", func(c *gin.Context) {
+		message := ""
+		err := feed.ShowFeed()
+		if err != nil {
+			message = err.Error()
+		}
+		c.JSON(http.StatusOK, gin.H{"success": err == nil, "message": message})
+	})
 	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
 
 }

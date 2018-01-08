@@ -2,6 +2,7 @@ package feed
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -13,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/logging"
+	"github.com/schollz/kiki/src/utils"
 )
 
 var (
@@ -253,3 +255,24 @@ func NewPerson() (p keypair.KeyPair, err error) {
 // 	log.Debugf("public name '%s' -> '%s' (%s)", e.Sender.Public()[:8], e.Letter.Text, utils.TimeAgo(e.Timestamp))
 // 	return
 // }
+
+func ShowFeed() (err error) {
+	envelopes, err := database.GetAllEnvelopes(true)
+	if err != nil {
+		return
+	}
+	log.Debugf("Found %d envelopes", len(envelopes))
+	for _, e := range envelopes {
+		if e.Letter.Purpose != purpose.ShareText {
+			continue
+		}
+		senderName, err2 := database.GetName(e.Sender.Public)
+		if err2 != nil {
+			log.Warn(err2)
+			senderName = e.Sender.Public
+		}
+		fmt.Printf("%s (%s) [%s]:\n%s\n\n", senderName, e.Sender.Public, utils.TimeAgo(e.Timestamp), e.Letter.Content)
+
+	}
+	return
+}

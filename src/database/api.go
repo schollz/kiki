@@ -60,12 +60,12 @@ func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 	defer db.Close()
 	if len(opened) > 0 {
 		if opened[0] {
-			return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 1")
+			return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 1 ORDER BY time DESC")
 		} else {
-			return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 0")
+			return db.getAllFromQuery("SELECT * FROM letters WHERE opened == 0 ORDER BY time DESC")
 		}
 	} else {
-		return db.getAllFromQuery("SELECT * FROM letters")
+		return db.getAllFromQuery("SELECT * FROM letters ORDER BY time DESC")
 	}
 }
 

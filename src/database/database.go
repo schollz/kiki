@@ -358,7 +358,7 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 
 // getName returns the name of a person
 func (d *Database) getName(person string) (name string, err error) {
-	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignName, person)
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '{\"public\":\"%s\"}' ORDER BY time DESC;", purpose.AssignName, person)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
