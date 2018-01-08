@@ -145,6 +145,10 @@ func ProcessLetter(l letter.Letter) (err error) {
 	l.To = newTo
 
 	// seal the letter
+	if personalKey == RegionKey {
+		err = errors.New("cannot post with region key")
+		return
+	}
 	e, err := l.Seal(personalKey, RegionKey)
 	if err != nil {
 		return
@@ -159,15 +163,19 @@ func ProcessLetter(l letter.Letter) (err error) {
 	return
 }
 
-// UnsealLetters will go through unopened envelopes and open them
-// and then add them to the database.
+// UnsealLetters will go through unopened envelopes and open them and then add them to the database. Also go through and purge bad letters (invalidated letters)
 func UnsealLetters() (err error) {
+	lettersToPurge := []string{}
 	envelopes, err := database.GetAllEnvelopes(false)
 	if err != nil {
 		return err
 	}
 	keysToTry := []keypair.KeyPair{personalKey, RegionKey}
 	for _, envelope := range envelopes {
+		if err := envelope.Validate(RegionKey); err != nil {
+			// add to purge
+			lettersToPurge = append(lettersToPurge, envelope.ID)
+		}
 		ue, err := envelope.Unseal(keysToTry, RegionKey)
 		if err != nil {
 			log.Debug(err)
@@ -176,8 +184,14 @@ func UnsealLetters() (err error) {
 		log.Debug(ue.Letter)
 		err = database.AddEnvelope(ue)
 		if err != nil {
-			return err
+			log.Debug(err)
+			continue
 		}
+	}
+
+	// purge invalid letters
+	if len(lettersToPurge) > 0 {
+		err = database.RemoveLetters(lettersToPurge)
 	}
 	return
 }

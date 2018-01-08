@@ -383,3 +383,30 @@ func (d *Database) getName(person string) (name string, err error) {
 	}
 	return
 }
+
+// deleteLetterFromID will delete a letter with the pertaining ID.
+func (d *Database) deleteLetterFromID(id string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteLetterFromID")
+	}
+	query := fmt.Sprintf("DELETE FROM letters WHERE id == '%s'", id)
+	log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteLetterFromID")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return errors.Wrap(err, "deleteLetterFromID")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteLetterFromID")
+	}
+
+	return
+}

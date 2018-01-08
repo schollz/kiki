@@ -98,3 +98,19 @@ func GetName(publicKey string) (name string, err error) {
 	defer db.Close()
 	return db.getName(publicKey)
 }
+
+// RemoveLetters will delete the letter containing that ID
+func RemoveLetters(ids []string) (err error) {
+	db, err := Open()
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	for _, id := range ids {
+		err2 := db.deleteLetterFromID(id)
+		if err2 != nil {
+			log.Warn(err2)
+		}
+	}
+	return
+}

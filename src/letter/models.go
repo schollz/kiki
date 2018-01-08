@@ -201,6 +201,9 @@ func (e2 Envelope) unseal(keysToTry []keypair.KeyPair, regionKey keypair.KeyPair
 }
 
 func (e Envelope) Validate(regionKey keypair.KeyPair) (err error) {
+	if e.Sender.Public == regionKey.Public {
+		return errors.New("sender cannot be region")
+	}
 	encryptedPublicKey, err := base64.URLEncoding.DecodeString(e.Signature)
 	if err != nil {
 		return
