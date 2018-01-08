@@ -95,11 +95,12 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 
 	e.Timestamp = time.Now()
 	e.Sender = sender.PublicKey()
-	// Create ID (hash of any public key + hash of any content + timestamp)
+	// Create blockchain ID (hash of any public key + hash of any content + replaces)
 	h := sha256.New()
 	h.Write([]byte(sender.Public))
 	h.Write([]byte(l.Content))
-	h.Write([]byte(e.Timestamp.String()))
+	h.Write([]byte(l.Replaces))
+	h.Write([]byte(l.ReplyTo))
 	e.ID = fmt.Sprintf("%x", h.Sum(nil))
 
 	// Generate a passphrase to encrypt the letter

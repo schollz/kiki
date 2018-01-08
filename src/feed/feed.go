@@ -203,6 +203,7 @@ func ShowFeed() (err error) {
 	return
 }
 
+// AddFriendsKey will generate a new friends key and post it to the feed
 func AddFriendsKey() (err error) {
 	// generate a key for friends
 	myfriends := keypair.New()
