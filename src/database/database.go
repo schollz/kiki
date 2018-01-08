@@ -17,31 +17,24 @@ import (
 )
 
 var (
-	log          = logging.Log
-	DatabaseFile = "kiki.sqlite3.db"
+	log = logging.Log
 )
 
-type Database struct {
+type database struct {
 	name     string
 	db       *sql.DB
 	fileLock *flock.Flock
 }
 
-func Setup(locationToDatabase string) {
-	DatabaseFile = locationToDatabase
-}
-
-// Open will open the database for transactions by first aquiring a filelock.
-func Open(readOnly ...bool) (d *Database, err error) {
-	d = new(Database)
-	name := "kiki"
-
+// open will open the database for transactions by first aquiring a filelock.
+func open(fileName string, readOnly ...bool) (d *database, err error) {
+	d = new(database)
 	// convert the name to base64 for file writing
-	d.name = DatabaseFile
+	d.name = fileName
 
 	// if read-only, make sure the database exists
 	if _, err = os.Stat(d.name); err != nil && len(readOnly) > 0 && readOnly[0] {
-		err = errors.New(fmt.Sprintf("group '%s' does not exist", name))
+		err = errors.New(fmt.Sprintf("database '%s' does not exist", d.name))
 		return
 	}
 
@@ -79,7 +72,7 @@ func Open(readOnly ...bool) (d *Database, err error) {
 }
 
 // Close will close the database connection and remove the filelock.
-func (d *Database) Close() (err error) {
+func (d *database) Close() (err error) {
 	// close filelock
 	err = d.fileLock.Unlock()
 	if err != nil {
@@ -101,7 +94,7 @@ func (d *Database) Close() (err error) {
 // 	BUCKET_KEY (TEXT)	VALUE (TEXT)
 //
 // and also a `letters`:
-func (d *Database) MakeTables() (err error) {
+func (d *database) MakeTables() (err error) {
 	sqlStmt := `create table keystore (bucket_key text not null primary key, value text);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
@@ -143,7 +136,7 @@ func (d *Database) MakeTables() (err error) {
 }
 
 // Get will retrieve the value associated with a key.
-func (d *Database) Get(bucket, key string, v interface{}) (err error) {
+func (d *database) Get(bucket, key string, v interface{}) (err error) {
 	stmt, err := d.db.Prepare("select value from keystore where bucket_key = ?")
 	if err != nil {
 		return errors.Wrap(err, "problem preparing SQL")
@@ -163,7 +156,7 @@ func (d *Database) Get(bucket, key string, v interface{}) (err error) {
 }
 
 // Set will set a value in the database, when using it like a keystore.
-func (d *Database) Set(bucket, key string, value interface{}) (err error) {
+func (d *database) Set(bucket, key string, value interface{}) (err error) {
 	var b []byte
 	b, err = json.Marshal(value)
 	if err != nil {
@@ -193,7 +186,7 @@ func (d *Database) Set(bucket, key string, value interface{}) (err error) {
 }
 
 // addEnvelope will add or replace an envelope
-func (d *Database) addEnvelope(e letter.Envelope) (err error) {
+func (d *database) addEnvelope(e letter.Envelope) (err error) {
 	tx, err := d.db.Begin()
 	if err != nil {
 		return
@@ -233,7 +226,7 @@ func (d *Database) addEnvelope(e letter.Envelope) (err error) {
 	return
 }
 
-func (d *Database) getAllFromQuery(query string) (s []letter.Envelope, err error) {
+func (d *database) getAllFromQuery(query string) (s []letter.Envelope, err error) {
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -251,7 +244,7 @@ func (d *Database) getAllFromQuery(query string) (s []letter.Envelope, err error
 }
 
 // getAllFromPreparedQuery
-func (d *Database) getAllFromPreparedQuery(query string, args ...interface{}) (s []letter.Envelope, err error) {
+func (d *database) getAllFromPreparedQuery(query string, args ...interface{}) (s []letter.Envelope, err error) {
 	// prepare statement
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -272,7 +265,7 @@ func (d *Database) getAllFromPreparedQuery(query string, args ...interface{}) (s
 	return
 }
 
-func (d *Database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
+func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 	s = make([]letter.Envelope, 100000)
 	sI := 0
 	// loop through rows
@@ -305,7 +298,7 @@ func (d *Database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 }
 
 // getKeys returns all the keys shared with you in the database, which can be queried by the sender
-func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
+func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	var query string
 	if len(sender) > 0 {
 		query = fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ShareKey, sender[0])
@@ -349,7 +342,7 @@ func (d *Database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 }
 
 // getName returns the name of a person
-func (d *Database) getName(person string) (name string, err error) {
+func (d *database) getName(person string) (name string, err error) {
 	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignName, person)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
@@ -377,7 +370,7 @@ func (d *Database) getName(person string) (name string, err error) {
 }
 
 // deleteLetterFromID will delete a letter with the pertaining ID.
-func (d *Database) deleteLetterFromID(id string) (err error) {
+func (d *database) deleteLetterFromID(id string) (err error) {
 	tx, err := d.db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "deleteLetterFromID")

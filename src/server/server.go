@@ -39,7 +39,7 @@ func Run() {
 		var err2 error
 		f, err2 = feed.New()
 		if err2 != nil {
-			panic(err)
+			panic(err2)
 		}
 	}
 

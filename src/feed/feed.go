@@ -8,13 +8,12 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/pkg/errors"
+	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/purpose"
-
-	"github.com/pkg/errors"
-	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/utils"
 )
 
@@ -30,7 +29,7 @@ func New(location ...string) (f Feed, err error) {
 		return
 	}
 	f = Feed{
-		StoragePath: path.Base(locationToSaveData),
+		StoragePath: locationToSaveData,
 		Settings:    GenerateSettings(),
 	}
 
@@ -39,6 +38,7 @@ func New(location ...string) (f Feed, err error) {
 	return
 }
 
+// Open will load a feed from the specified location
 func Open(locationToFeed string) (f Feed, err error) {
 	bFeed, err := ioutil.ReadFile(path.Join(locationToFeed, "feed.json"))
 	if err != nil {
@@ -48,6 +48,7 @@ func Open(locationToFeed string) (f Feed, err error) {
 	if err != nil {
 		return
 	}
+
 	// initialize
 	err = f.init()
 	return
@@ -65,10 +66,8 @@ func (f Feed) init() (err error) {
 	}
 
 	f.log = logging.Log
-
-	// Setup database
-	f.log.Debug("setting up database")
-	database.Setup(path.Join(f.StoragePath, "kiki.db"))
+	f.log.Info(f.StoragePath)
+	f.db = database.Setup(f.StoragePath)
 
 	// Setup identity file
 	f.log.Debug("setting up personalKey")
@@ -139,7 +138,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 			// automatically done when adding any letter
 			// this just put here for pedantic reasons
 		case "friends":
-			friendsKeyPairs, err2 := database.GetKeysFromSender(f.personalKey.Public)
+			friendsKeyPairs, err2 := f.db.GetKeysFromSender(f.personalKey.Public)
 			if err2 != nil {
 				return err2
 			}
@@ -167,7 +166,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		return
 	}
 
-	err = database.AddEnvelope(e)
+	err = f.db.AddEnvelope(e)
 	if err != nil {
 		return
 	}
@@ -176,10 +175,10 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	return
 }
 
-// UnsealLetters will go through unopened envelopes and open them and then add them to the database. Also go through and purge bad letters (invalidated letters)
+// UnsealLetters will go through unopened envelopes and open them and then add them to the f.db. Also go through and purge bad letters (invalidated letters)
 func (f Feed) UnsealLetters() (err error) {
 	lettersToPurge := []string{}
-	envelopes, err := database.GetAllEnvelopes(false)
+	envelopes, err := f.db.GetAllEnvelopes(false)
 	if err != nil {
 		return err
 	}
@@ -195,7 +194,7 @@ func (f Feed) UnsealLetters() (err error) {
 			continue
 		}
 		f.log.Debug(ue.Letter)
-		err = database.AddEnvelope(ue)
+		err = f.db.AddEnvelope(ue)
 		if err != nil {
 			f.log.Debug(err)
 			continue
@@ -204,13 +203,13 @@ func (f Feed) UnsealLetters() (err error) {
 
 	// purge invalid letters
 	if len(lettersToPurge) > 0 {
-		err = database.RemoveLetters(lettersToPurge)
+		err = f.db.RemoveLetters(lettersToPurge)
 	}
 	return
 }
 
 func (f Feed) ShowFeed() (err error) {
-	envelopes, err := database.GetAllEnvelopes(true)
+	envelopes, err := f.db.GetAllEnvelopes(true)
 	if err != nil {
 		return
 	}
@@ -219,7 +218,7 @@ func (f Feed) ShowFeed() (err error) {
 		if e.Letter.Purpose != purpose.ShareText {
 			continue
 		}
-		senderName, err2 := database.GetName(e.Sender.Public)
+		senderName, err2 := f.db.GetName(e.Sender.Public)
 		if err2 != nil {
 			f.log.Warn(err2)
 			senderName = e.Sender.Public

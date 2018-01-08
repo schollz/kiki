@@ -1,14 +1,27 @@
 package database
 
 import (
+	"path"
+
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 )
 
-func Set(bucket, key string, value interface{}) (err error) {
-	db, err := Open()
+// Publicly acessible database routines
+type DatabaseAPI struct {
+	FileName string
+}
+
+func Setup(locationToDatabase string) (api DatabaseAPI) {
+	return DatabaseAPI{
+		FileName: path.Join(locationToDatabase, "kiki.sqlite3.db"),
+	}
+}
+
+func (api DatabaseAPI) Set(bucket, key string, value interface{}) (err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -16,8 +29,8 @@ func Set(bucket, key string, value interface{}) (err error) {
 	return db.Set(bucket, key, value)
 }
 
-func Get(bucket, key string, value interface{}) (err error) {
-	db, err := Open()
+func (api DatabaseAPI) Get(bucket, key string, value interface{}) (err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -25,8 +38,8 @@ func Get(bucket, key string, value interface{}) (err error) {
 	return db.Get(bucket, key, value)
 }
 
-func AddEnvelope(e letter.Envelope) (err error) {
-	db, err := Open()
+func (api DatabaseAPI) AddEnvelope(e letter.Envelope) (err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -35,8 +48,8 @@ func AddEnvelope(e letter.Envelope) (err error) {
 }
 
 // GetEnvelopeFromID returns a single envelope from its ID
-func GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
-	db, err := Open()
+func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -52,8 +65,8 @@ func GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
 }
 
 // GetAllEnvelopes returns all envelopes determined by whether they are opened
-func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
-	db, err := Open()
+func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -70,8 +83,8 @@ func GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 }
 
 // GetKeys will return all the keys
-func GetKeys() (s []keypair.KeyPair, err error) {
-	db, err := Open()
+func (api DatabaseAPI) GetKeys() (s []keypair.KeyPair, err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -80,8 +93,8 @@ func GetKeys() (s []keypair.KeyPair, err error) {
 }
 
 // GetKeysFromSender will return all the keys from a certain sender
-func GetKeysFromSender(sender string) (s []keypair.KeyPair, err error) {
-	db, err := Open()
+func (api DatabaseAPI) GetKeysFromSender(sender string) (s []keypair.KeyPair, err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -90,8 +103,8 @@ func GetKeysFromSender(sender string) (s []keypair.KeyPair, err error) {
 }
 
 // GetName will return the assigned name for the public key of a sender
-func GetName(publicKey string) (name string, err error) {
-	db, err := Open()
+func (api DatabaseAPI) GetName(publicKey string) (name string, err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
@@ -100,8 +113,8 @@ func GetName(publicKey string) (name string, err error) {
 }
 
 // RemoveLetters will delete the letter containing that ID
-func RemoveLetters(ids []string) (err error) {
-	db, err := Open()
+func (api DatabaseAPI) RemoveLetters(ids []string) (err error) {
+	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}

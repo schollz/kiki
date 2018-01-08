@@ -11,7 +11,7 @@ type Feed struct {
 	RegionKey   keypair.KeyPair `json:"region_key"`
 	Settings    Settings        `json:"settings"`
 	personalKey keypair.KeyPair
-	db          *database.Database
+	db          database.DatabaseAPI
 	log         seelog.LoggerInterface
 }
 
