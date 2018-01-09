@@ -1,117 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
-    <title>Off Canvas Template for Bootstrap</title>
+
+    <title>Blog Template for Bootstrap</title>
+
     <!-- Bootstrap core CSS -->
-    <link href="bootstrap-material-design.min.css" rel="stylesheet">
+    <link href="bootstrap.min.css" rel="stylesheet">
+
     <!-- Custom styles for this template -->
-    <link href="offcanvas.css" rel="stylesheet">
-    <link href="custom.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
-    <link rel="stylesheet" href="http://npmcdn.com/tachyons-font-family@4.2.5/css/tachyons-font-family.min.css" />
-    <style>
+    <link href="blog.css" rel="stylesheet">
+  </head>
 
+  <body>
 
-p {
-  line-height: 1.5;
-}
-  </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">kiki</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home
-            <span class="sr-only">(current)</span>
-          </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                    <div class="dropdown-menu" aria-labelledby="dropdown01">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
+    <header>
+      <div class="blog-masthead">
+        <div class="container">
+          <nav class="nav">
+            <a class="nav-link active" href="#">Home</a>
+            <a class="nav-link" href="#">New features</a>
+            <a class="nav-link" href="#">Press</a>
+            <a class="nav-link" href="#">New hires</a>
+            <a class="nav-link" href="#">About</a>
+          </nav>
         </div>
-    </nav>
-    <div class="container">
-        <div class="row row-offcanvas row-offcanvas-right">
-            <div class="col-12 col-md-9">
-                <p class="float-right d-md-none">
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="offcanvas">Toggle nav</button>
-                </p>
-<br>
-                <!-- post begin -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-success mb-12">
-                            <div class="card-header bg-transparent border-success">
-                                <div class="row ">
-                                    <div class="col-5 clearfix">
-                                        <img data-holder-rendered="true" src="https://vignette.wikia.nocookie.net/muppetmania/images/9/92/Bunsen.jpg/revision/latest?cb=20130325185619" style="height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle rounded">
-                                        <span class="align-middle h3">&nbsp;Zack</span> &nbsp;
-                                        <button type="button" class="align-bottom btn btn-danger bmd-btn-fab bmd-btn-fab-sm">
-                                            <i class="material-icons">person_add</i>
-                                        </button>
-                                    </div>
-                                    <div class="col-7">
-                                        <span class="h5" style="position: absolute;
-                    top: 50%;
-                    right: 10px;
-                    transform: translateY(-50%);">
-                      December 31st, 2017 12:02PM
-                    </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title">Success card title</h4>
-                                <p class="card-text">
-                                    <p class="f3-l f4-m f5-s">Have you ever seen a bunny sit near a flower? Well, here you go. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </p>
-                                    <p>
-                                        <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg" alt="Some image" class="img-fluid" />
-                                    </p>
-                                    <p>This is indeed a bunny, sitting near a flower.</p>
-                                </p>
-                            </div>
-                            <div class="card-body clearfix">
-                                <button type="button" class="btn btn-danger bmd-btn-fab bmd-btn-fab-sm float-right">
-                                    <i class="material-icons">grade</i>
-                                </button>
-                                <button type="button" class="btn btn-danger bmd-btn-fab bmd-btn-fab-sm float-right" data-toggle="modal" data-target="#exampleModal">
-                                    <i class="material-icons">reply</i>
-                                </button>
-                                <p class="align-middle">
-                                    #bunnies #photos
-                                </p>
-                            </div>
-                            <div class="card-footer bg-transparent border-success">
-                                <!--comments begin -->
+      </div>
+
+      <div class="blog-header">
+        <div class="container">
+          <h1 class="blog-title">The Bootstrap Blog</h1>
+          <p class="lead blog-description">An example blog template built with Bootstrap.</p>
+        </div>
+      </div>
+    </header>
+
+    <main role="main" class="container">
+
+      <div class="row">
+
+        <div class="col-sm-9 blog-main">
+<div class="card" >
+  <div class="card-body">
+          <div class="blog-post">
+            <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a></p>
+            <hr>
+
+            <p>This blog post shows a few different types of content that's supported and styled with Bootstrap. Basic typography, images, and code are all supported.</p>
+            <hr>
+            <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+             <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg" alt="Some image" class="img-fluid" />
+            <blockquote>
+              <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+            </blockquote>
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+            <h2>Heading</h2>
+            <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+            <h3>Sub-heading</h3>
+            <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+            <pre><code>Example code block</code></pre>
+            <p>Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
+            <h3>Sub-heading</h3>
+            <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+            <ul>
+              <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
+              <li>Donec id elit non mi porta gravida at eget metus.</li>
+              <li>Nulla vitae elit libero, a pharetra augue.</li>
+            </ul>
+            <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
+            <ol>
+              <li>Vestibulum id ligula porta felis euismod semper.</li>
+              <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+              <li>Maecenas sed diam eget risus varius blandit sit amet non magna.</li>
+            </ol>
+            <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
+
+
+
+
+
+<!--comments begin -->
                                 <div data-children=".item">
                                     <!-- <div id="exampleAccordion" data-children=".item"> THIS VERSION COLLAPSES OTHERS WHEN OPENING A NEW ONE-->
                                     <div class="item">
@@ -218,101 +190,92 @@ p {
                                     </div>
                                 </div>
                                 <!-- comments end -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--/row-->
-                <!-- post end -->
-            </div>
-            <!--/span-->
-            <div class="col-6 col-md-3 sidebar-offcanvas" id="sidebar">
-              <br>
-                <div class="card">
-                    <img class="card-img-top img-thumbnail" src="https://vignette.wikia.nocookie.net/muppetmania/images/9/92/Bunsen.jpg/revision/latest?cb=20130325185619" alt="Card image cap">
-                    <div class="card-body">
-                        <h4 class="card-title">Zack</h4>
-                        <p class="card-text">Likes rabbits and flowers and pictures of rabbits with flowers.</p>
-                    </div>
-                </div>
-                <br>
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Friends</h4>
-                        <p class="card-text">
-                            <div class="dropdown show">
-                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Obama
-              </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="#">Filter</a>
-                                    <a class="dropdown-item" href="#">Message</a>
-                                    <a class="dropdown-item" href="#">Unfriend</a>
-                                </div>
-                            </div>
-                            <div class="dropdown show">
-                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Maurice
-                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="#">Filter</a>
-                                    <a class="dropdown-item" href="#">Message</a>
-                                    <a class="dropdown-item" href="#">Unfriend</a>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-            </div>
-            <!--/span-->
+            
+          </div><!-- /.blog-post -->
         </div>
-        <!--/row-->
-        <hr>
-        <footer>
-            <p>&copy; Company 2017</p>
-        </footer>
-        <!-- begin medium modal -->
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <h1>MediumEditor</h1>
-                        <div class="editable">
-                            <p>My father’s family name being
-                                <a href="https://en.wikipedia.org/wiki/Pip_(Great_Expectations)">Pirrip</a>, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called Pip.</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="submit-post">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- end medium modal -->
-    </div>
-    <!--/.container-->
+      </div>
+
+          <div class="blog-post">
+            <h2 class="blog-post-title">Another blog post</h2>
+            <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
+
+            <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+            <blockquote>
+              <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+            </blockquote>
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+            <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+          </div><!-- /.blog-post -->
+
+          <div class="blog-post">
+            <h2 class="blog-post-title">New feature</h2>
+            <p class="blog-post-meta">December 14, 2013 by <a href="#">Chris</a></p>
+
+            <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+            <ul>
+              <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
+              <li>Donec id elit non mi porta gravida at eget metus.</li>
+              <li>Nulla vitae elit libero, a pharetra augue.</li>
+            </ul>
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+            <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
+          </div><!-- /.blog-post -->
+
+          <nav class="blog-pagination">
+            <a class="btn btn-outline-primary" href="#">Older</a>
+            <a class="btn btn-outline-secondary disabled" href="#">Newer</a>
+          </nav>
+
+        </div><!-- /.blog-main -->
+
+        <aside class="col-sm-3 ml-sm-auto blog-sidebar">
+          <div class="sidebar-module sidebar-module-inset">
+            <h4>About</h4>
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+          </div>
+          <div class="sidebar-module">
+            <h4>Archives</h4>
+            <ol class="list-unstyled">
+              <li><a href="#">March 2014</a></li>
+              <li><a href="#">February 2014</a></li>
+              <li><a href="#">January 2014</a></li>
+              <li><a href="#">December 2013</a></li>
+              <li><a href="#">November 2013</a></li>
+              <li><a href="#">October 2013</a></li>
+              <li><a href="#">September 2013</a></li>
+              <li><a href="#">August 2013</a></li>
+              <li><a href="#">July 2013</a></li>
+              <li><a href="#">June 2013</a></li>
+              <li><a href="#">May 2013</a></li>
+              <li><a href="#">April 2013</a></li>
+            </ol>
+          </div>
+          <div class="sidebar-module">
+            <h4>Elsewhere</h4>
+            <ol class="list-unstyled">
+              <li><a href="#">GitHub</a></li>
+              <li><a href="#">Twitter</a></li>
+              <li><a href="#">Facebook</a></li>
+            </ol>
+          </div>
+        </aside><!-- /.blog-sidebar -->
+
+      </div><!-- /.row -->
+
+    </main><!-- /.container -->
+
+    <footer class="blog-footer">
+      <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+      <p>
+        <a href="#">Back to top</a>
+      </p>
+    </footer>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-    <script src="popper.min.js"></script>
-    <script src="https://cdn.rawgit.com/FezVrasta/snackbarjs/1.1.0/dist/snackbar.min.js"></script>
-    <script src="bootstrap-material-design.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="ie10-viewport-bug-workaround.js"></script>
-    <script src="offcanvas.js"></script>
-    <script src="custom.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
-    <script>
-    var editor = new MediumEditor('.editable');
-    </script>
-</body>
-
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="\popper.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+  </body>
 </html>

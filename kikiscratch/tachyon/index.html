@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<title>Women Who Design</title>
+		<meta name="author" content="Jules Forrest">
+		<meta name="description" content="A Twitter profile directory of inspiring women in the design industry.">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" href="./favicon.png" sizes="16x16 32x32" type="image/png">
+		<meta property="og:title" content="Women Who Design" />
+		<meta property="og:description" content="A Twitter profile directory of inspiring women in the design industry." />
+		<meta property="og:url" content="https://womenwho.design/">
+		<meta property="og:image" content="https://womenwho.design/womenwhodesign_opengraph.png">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:site" content="@womenwhodesign">
+		<meta name="twitter:creator" content="@julesforrest">
+		<meta name="twitter:title" content="Women Who Design">
+		<meta name="twitter:description" content="A Twitter profile directory of inspiring women in the design industry.">
+		<meta name="twitter:image" content="https://womenwho.design/womenwhodesign_opengraph.png">
+		<link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.0/css/tachyons.min.css"/>
+		<link rel="stylesheet" href="main.css">
+		<link href="https://fonts.googleapis.com/css?family=Karla:400,700" rel="stylesheet">
+	</head>
+	<body class="">
+		<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+			<symbol id="twitter" viewBox="0 0 52.86 42.93">
+			<path class="cls-1" d="M47.42,10.7c0,.47,0,.94,0,1.41,0,14.32-10.9,30.82-30.82,30.82A30.61,30.61,0,0,1,0,38.07a22.4,22.4,0,0,0,2.62.13,21.7,21.7,0,0,0,13.45-4.63A10.85,10.85,0,0,1,5.94,26.06a13.65,13.65,0,0,0,2,.17,11.44,11.44,0,0,0,2.85-.37A10.83,10.83,0,0,1,2.15,15.23v-.13A10.91,10.91,0,0,0,7,16.47,10.85,10.85,0,0,1,3.69,2,30.79,30.79,0,0,0,26,13.31a12.21,12.21,0,0,1-.27-2.48A10.84,10.84,0,0,1,44.51,3.42,21.32,21.32,0,0,0,51.38.8a10.8,10.8,0,0,1-4.76,6A21.71,21.71,0,0,0,52.86,5.1,23.29,23.29,0,0,1,47.42,10.7Z" />
+			</symbol>
+		</svg>
+		<div class="content--container">
+			<div class="sidebar--container ph4 bg-black-80 white pt4 flex justify-between flex-column">
+				<div class="sidebar--content">
+					<a href="./" id="logo"><img src="./images/logo-white.svg" class="logo"></a>
+					<p class="pv4 f6 ttu tracked karla font-smoothing"><a href="javascript:void(0);" class="dim no-underline fw6 white font-smoothing mobile--filter--toggle">Filter</a><span class="mobile--filter--toggle"> · </span><a href="./about" class="ttu tracked dim no-underline fw6 white font-smoothing">About</a> · <a href="./nominate" class="ttu tracked dim no-underline fw6 white font-smoothing">Nominate</a></p>
+					<div id="filter--container" class="filter--container">
+						<h2 class="f5 karla fw6 ">Filter by</h2>
+						<form action="" class="pv3">
+							<div class="checkbox--container">
+								<input id="art" class="dn" type="checkbox" value="art"><label for="art" class="f5 karla"><span class="dib mb2">Art directors</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="author" class="dn" type="checkbox" value="author"><label for="author" class="f5 karla"><span class="dib mb2">Authors</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="ceo" class="dn" type="checkbox" value="ceo"><label for="ceo" class="f5 karla"><span class="dib mb2">CEOs</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="content" class="dn" type="checkbox" value="content"><label for="content" class="f5 karla"><span class="dib mb2">Content strategists</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="creative" class="dn" type="checkbox" value="creative"><label for="creative" class="f5 karla"><span class="dib mb2">Creative directors</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="director" class="dn" type="checkbox" value="director"><label for="director" class="f5 karla"><span class="dib mb2">Directors</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="systems" class="dn" type="checkbox" value="systems"><label for="systems" class="f5 karla"><span class="dib mb2">Design system-ers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="developer" class="dn" type="checkbox" value="developer"><label for="developer" class="f5 karla"><span class="dib mb2">Developers</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="engineer" class="dn" type="checkbox" value="engineer"><label for="engineer" class="f5 karla"><span class="dib mb2">Engineers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="founder" class="dn" type="checkbox" value="founder"><label for="founder" class="f5 karla"><span class="dib mb2">Founders</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="freelance" class="dn" type="checkbox" value="freelance"><label for="freelance" class="f5 karla"><span class="dib mb2">Freelancers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="graphic" class="dn" type="checkbox" value="graphic"><label for="graphic" class="f5 karla"><span class="dib mb2">Graphic designers</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="head" class="dn" type="checkbox" value="head"><label for="head" class="f5 karla"><span class="dib mb2">Heads of</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="illustrator" class="dn" type="checkbox" value="illustrator"><label for="illustrator" class="f5 karla"><span class="dib mb2">Illustrators</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="lead" class="dn" type="checkbox" value="lead"><label for="lead" class="f5 karla"><span class="dib mb2">Leads</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="manager" class="dn" type="checkbox" value="manager"><label for="manager" class="f5 karla"><span class="dib mb2">Managers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="product" class="dn" type="checkbox" value="product"><label for="product" class="f5 karla"><span class="dib mb2">Product designers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="research" class="dn" type="checkbox" value="research"><label for="research" class="f5 karla"><span class="dib mb2">Researchers</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="speaker" class="dn" type="checkbox" value="speaker"><label for="speaker" class="f5 karla"><span class="dib mb2">Speakers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="ux" class="dn" type="checkbox" value="ux"><label for="ux" class="f5 karla"><span class="dib mb2">UX designers</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="vp" class="dn" type="checkbox" value="vp"><label for="vp" class="f5 karla"><span class="dib mb2">VPs</span></label>
+							</div>
+							<div class="checkbox--container secondary-filter dn">
+								<input id="web" class="dn" type="checkbox" value="web"><label for="web" class="f5 karla"><span class="dib mb2">Web designers</span></label>
+							</div>
+							<div class="checkbox--container">
+								<input id="writer" class="dn" type="checkbox" value="writer"><label for="writer" class="f5 karla"><span class="dib mb2">Writers</span></label>
+							</div>
+						</form>
+						<a href="javascript:void(0);" class="karla f5 fw6 dim no-underline pv2" id="filter">Show more filters</a>
+						<a href="javascript:void(0);" class="karla f5 fw6 dim no-underline pv2 dn" id="hide-filter">Show fewer filters</a>
+					</div>
+				</div>
+				<div class="sidebar--footer pb4 pt5">
+					<a href="https://twitter.com/womenwhodesign" target="_blank" class=" dim no-underline karla black-50 mt1 f7 white font-smoothing">If you'd like to opt out, send a DM to @womenwhodesign.</a>
+				</div>
+			</div>
+			<div class="main--container ph3">
+				<!-- 				<div class="loading--container loading--container__height flex flex-column">
+						<div class="intro--container w-100 justify-center items-center center ph3 mt4">
+								<div class="intro--content w-100 bb bw1 b--black-80">
+										<h2 class="intro--headline karla fw6 measure-narrow lh-title pb3">Women Who Design is a Twitter profile directory of inspiring women in the design industry.</h2>
+										<a href="./about" class="intro--button pv3 ph4 mv3 ba bw1 b--black-80 black-80 font-smoothing-hover hover-bg-black-80 hover-white fw6 dib karla f6 ttu tracked no-underline">Read more <span class="pl2">→</span></a>
+								</div>
+						</div>
+						<div class="loader--container pv4">
+								<div class="loader" id="loader-6">
+										<span></span>
+										<span></span>
+										<span></span>
+										<span></span>
+								</div>
+						</div>
+				</div>
+				<div class="disabled--profile--container dn">
+				</div>-->
+				<div id="profile--container" class="flex flex-wrap flex-auto center">
+					<div class="ph3 pt4 mb3 w-100">
+<article class="center  hidden ba mv4">
+  <h1 class="f4 bg-near-black white mv0 pv2 ph3">Title of card</h1>
+  <div class="pa3 bt">
+    <p class="lh-copy">
+      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+      tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At
+      vero eos et accusam et justo duo dolores et ea rebum.
+    </p>
+  </div>
+</article>
+					</div>
+				</div>
+			</div>
+		</body>
+		<script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+		<script src="scrollstop.js" type="text/javascript"></script>
+		<script src="main.js" type="text/javascript"></script>
+	</html>

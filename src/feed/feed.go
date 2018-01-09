@@ -29,7 +29,7 @@ func New(location ...string) (f Feed, err error) {
 		return
 	}
 	f = Feed{
-		StoragePath: locationToSaveData,
+		storagePath: locationToSaveData,
 		Settings:    GenerateSettings(),
 	}
 
@@ -66,12 +66,12 @@ func (f *Feed) init() (err error) {
 	}
 
 	f.log = logging.Log
-	f.log.Info(f.StoragePath)
-	f.db = database.Setup(f.StoragePath)
+	f.log.Info(f.storagePath)
+	f.db = database.Setup(f.storagePath)
 
 	// Setup identity file
 	f.log.Debug("setting up personalKey")
-	identityFile := path.Join(f.StoragePath, "identity.json")
+	identityFile := path.Join(f.storagePath, "identity.json")
 	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
 		var err2 error
 		// generate a new personal key
@@ -120,7 +120,7 @@ func (f *Feed) init() (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path.Join(f.StoragePath, "feed.json"), feedBytes, 0644)
+	err = ioutil.WriteFile(path.Join(f.storagePath, "feed.json"), feedBytes, 0644)
 	return
 }
 
