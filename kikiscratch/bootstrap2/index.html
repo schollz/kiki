@@ -81,21 +81,26 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+<div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle"><img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
-                            data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">&nbsp;Mark</h5>
+        <h5 class="modal-title" id="nameModalLabel"><img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                            data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">&nbsp;
+                            <span id="modalNameName">Mark</span> <small>[<span id="modalNamePublicKey">aasdlkfjas9jf93jfa</span>]</small></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <div class="modal-body">
+        <span id="modalNameContent">
         I enjoy skiing and driving around!
+    </span>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Follow</button>
+        <button type="button" class="btn btn-info">Filter</button>
+        <button type="button" class="btn btn-primary" id="followButton">Follow</button>
         <button type="button" class="btn btn-danger">Block</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
@@ -108,8 +113,8 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="blog-post">
-                            <p class="blog-post-meta">January 1, 2014 by <a href="#!" data-toggle="modal" data-target="#exampleModalLong">Mark</a>
-                                <span class="float-right">&nbsp;<a href="javascript:write({'title':'Edit post','content':'uuidofpost(TODO: use this to get post and copy it in'});"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
+                            <p class="blog-post-meta">January 1, 2014 by <a href="#!" class="activatenamemodal" data-name="Mark!" data-publickey="publickey198f3j" data-content="I love <b>skiing</b> and playing with rabbits" data-image="someimage.png">Mark</a>
+                                <span class="float-right">&nbsp;<a href="#!" data-usecontent="uuidofpost" data-title="Edit post" class="editmodal" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
                             </p>
                             <hr>
                             <div id="uuidofpost">
@@ -142,7 +147,7 @@
                             <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
                         </div>
                             <p>
-                                <p class="text-right">&nbsp;<a href="javascript:write('Reply to XX','Write or drag-and-drop images here...');"><i class="fas fa-reply"></i></a></span>
+                                <p class="text-right">&nbsp;<a href="#!" class="editmodal" data-title="Reply to Mark" data-replyto="UUID" data-purpose="share-text"><i class="fas fa-reply"></i></a></span>
                                 </p>
                                 <hr>
                                 <!--comments begin -->
@@ -289,20 +294,22 @@
             <aside class="col-sm-3 ml-sm-auto blog-sidebar">
                 <div class="sidebar-module sidebar-module-inset">
                     <img src="https://pbs.twimg.com/profile_images/839904034806910976/quhVl5Bc.jpg">
-                    <h4>Zack</h4>
+                    <h4><div id="askldjfa9w3jaw9fj3aw">Zack</div></h4>
+                    <div id="alskdjfalksjdfljas">
                     <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+                </div>
                 </div>
                 <div class="sidebar-module">
                     <h4>Actions</h4>
                     <ol class="list-unstyled">
-                        <li><a href="javascript:write('New post','Write or drag-and-drop images here...','share-text');">Write</a></li>
-                        <li><a href="javascript:write('Edit profile','Current profile text');">Edit profile</a></li>
+                        <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
+                        <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="alskdjfalksjdfljas">Edit profile</a></li>
                         <li><a href="#">Upload image</a></li>
-                        <li><a href="javascript:write('Change name','Zack');">Change name</a></li>
+                        <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="askldjfa9w3jaw9fj3aw">Change name</a></li>
                     </ol>
                 </div>
                 <div class="sidebar-module">
-                    <h4>Elsewhere</h4>
+                    <h4>Friends</h4>
                     <ol class="list-unstyled">
                         <li><a href="#">GitHub</a></li>
                         <li><a href="#">Twitter</a></li>
@@ -349,17 +356,47 @@
           }
           console.log(letter);
       });
+
+    $( ".editmodal" ).click(function() {
+        $("#writingModal").modal();
+        console.log($(this).data('title'));
+        $("#writingModalLabel").text($(this).data('title'));
+        $(".editable").focus(function() { $(this).select(); } );
+        console.log($(this).data("usecontent"));
+        if ($(this).data("usecontent")) {
+            $(".editable").html($("#"+$(this).data("usecontent")).html())
+        } else {
+            $(".editable").text("Write your post...");            
+        }
+        if ($(this).data("replyto")) {
+            $("#letterReplyTo").val($(this).data("replyto"));
+        } else {
+            $("#letterReplyTo").val("");            
+        }
+        if ($(this).data("replaces")) {
+            $("#letterReplaces").val($(this).data("replaces"));
+        } else {
+            $("#letterReplaces").val("");            
+        }
+        $("#letterPurpose").val($(this).data("purpose"));
     });
 
-    function write(title,content,purpose,replyto,replaces) {
-        $("#writingModal").modal();
-        $(".editable").text(content);
-        $("#writingModalLabel").text(title)
-        $(".editable").focus(function() { $(this).select(); } );
-        $("#letterReplaces").val(replaces);
-        $("#letterReplyTo").val(replyto);
-        $("#letterPurpose").val(purpose);
-    }
+    $( ".activatenamemodal" ).click(function() {
+        console.log($(this).data("name"));
+        $("#modalNameName").text($(this).data("name"));
+        $("#modalNamePublicKey").text($(this).data("publickey"));
+        $("#modalNameContent").html($(this).data("content"));
+        $("#nameModal").modal();
+        $("#followButton").attr("data-publickey", $(this).data("publickey"));
+    });
+
+    $( "#followButton" ).click(function() {
+        console.log($(this).data("publickey"));
+        // TODO: MAKE A FOLLOW!
+    });
+
+    });
+
     </script>
 
 </body>
