@@ -75,15 +75,7 @@ func (f *Feed) init() (err error) {
 	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
 		var err2 error
 		// generate a new personal key
-		f.personalKey = keypair.New()
-		pBytes, err2 := json.Marshal(f.personalKey)
-		if err2 != nil {
-			return err2
-		}
-		err2 = ioutil.WriteFile(identityFile, pBytes, 0644)
-		if err2 != nil {
-			return err2
-		}
+		f.PersonalKey = keypair.New()
 
 		// add the friends key
 		err2 = f.AddFriendsKey()
@@ -102,21 +94,9 @@ func (f *Feed) init() (err error) {
 			return err2
 		}
 	}
-	pBytes, err := ioutil.ReadFile(identityFile)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(pBytes, &f.personalKey)
-	if err != nil {
-		return
-	}
-	if f.personalKey.Public == "" {
-		err = errors.New("problem creating personal key")
-		return
-	}
 
 	// overwrite the feed file
-	feedBytes, err := json.Marshal(f)
+	feedBytes, err := json.MarshalIndent(f, "", " ")
 	if err != nil {
 		return
 	}
@@ -142,7 +122,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 			// automatically done when adding any letter
 			// this just put here for pedantic reasons
 		case "friends":
-			friendsKeyPairs, err2 := f.db.GetKeysFromSender(f.personalKey.Public)
+			friendsKeyPairs, err2 := f.db.GetKeysFromSender(f.PersonalKey.Public)
 			if err2 != nil {
 				return err2
 			}
@@ -161,11 +141,11 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	l.To = newTo
 
 	// seal the letter
-	if f.personalKey == f.RegionKey {
+	if f.PersonalKey == f.RegionKey {
 		err = errors.New("cannot post with region key")
 		return
 	}
-	e, err := l.Seal(f.personalKey, f.RegionKey)
+	e, err := l.Seal(f.PersonalKey, f.RegionKey)
 	if err != nil {
 		return
 	}
@@ -186,7 +166,7 @@ func (f Feed) UnsealLetters() (err error) {
 	if err != nil {
 		return err
 	}
-	keysToTry := []keypair.KeyPair{f.personalKey, f.RegionKey}
+	keysToTry := []keypair.KeyPair{f.PersonalKey, f.RegionKey}
 	for _, envelope := range envelopes {
 		if err := envelope.Validate(f.RegionKey); err != nil {
 			// add to purge
