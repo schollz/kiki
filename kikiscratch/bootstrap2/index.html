@@ -36,13 +36,65 @@
         </div>
     </header>
     <main role="main" class="container">
+
+
+        <!-- begin medium modal -->
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reply to XX</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="editable">
+                            <p>My father’s family name being
+                                <a href="https://en.wikipedia.org/wiki/Pip_(Great_Expectations)">Pirrip</a>, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called Pip.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="submit-post">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end medium modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle"><img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                            data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">&nbsp;Mark</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        I enjoy skiing and driving around!
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Follow</button>
+        <button type="button" class="btn btn-danger">Block</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
         <div class="row">
             <div class="col-sm-9 blog-main">
                 <div class="card">
                     <div class="card-body">
                         <div class="blog-post">
-                            <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a>
-                                <span class="float-right">&nbsp;<i class="fas fa-heart"></i> x6</span>
+                            <p class="blog-post-meta">January 1, 2014 by <a href="#!" data-toggle="modal" data-target="#exampleModalLong">Mark</a>
+                                <span class="float-right">&nbsp;<i class="fas fa-edit"></i> &nbsp;<i class="fas fa-heart"></i> x6</span>
                             </p>
                             <hr>
                             <p>This blog post shows a few different types of content that's supported and styled with Bootstrap. Basic typography, images, and code are all supported.</p>
@@ -73,7 +125,7 @@
                             </ol>
                             <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
                             <p>
-                                <p class="text-right">&nbsp;<i class="fas fa-reply"></i></span>
+                                <p class="text-right">&nbsp;<a href="#!" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-reply"></i></a></span>
                                 </p>
                                 <hr>
                                 <!--comments begin -->
@@ -84,7 +136,7 @@
                                             <div class="col-12 bg-info">
                                                 <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion1" aria-expanded="false" aria-controls="exampleAccordion1">
                           <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
-                            style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
+                            data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">
                         </a>
                                                 <span class="align-middle">Stefan</span>
                                                 <span style="  position: absolute;
@@ -263,8 +315,22 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="\popper.min.js"></script>
+    <script src="popper.min.js"></script>
     <script src="bootstrap.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
+    <script>
+    var editor = new MediumEditor('.editable');
+
+    $(function() {
+
+      $("#button").click( function()
+           {
+             alert('button clicked');
+           }
+      );
+});
+    </script>
+
 </body>
 
 </html>

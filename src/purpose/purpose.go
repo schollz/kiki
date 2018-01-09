@@ -2,18 +2,26 @@ package purpose
 
 // There are the available purposes for a letter
 var (
+	// Share text will share a text post
 	ShareText = "share-text"
-	SharePNG  = "share-image/png"
-	ShareJPG  = "share-image/jpg"
+	// SharePNG shares a PNG image
+	SharePNG = "share-image/png"
+	// ShareJPG shares a JPG image
+	ShareJPG = "share-image/jpg"
 	// ShareKey is for sharing keypairs with friends, or with self
-	ShareKey     = "share-key"
+	ShareKey = "share-key"
+	// AssignFollow will follow someone
 	AssignFollow = "assign-follow"
-	AssignName   = "assign-name"
-	AssignBlock  = "assign-block"
+	// AssignLike will give a person a like
+	AssignLike = "assign-like"
+	// AssignName will assign a person a name
+	AssignName    = "assign-name"
+	AssignBlock   = "assign-block"
+	AssignProfile = "assign-profile"
 )
 
 func Valid(purpose string) bool {
-	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, AssignFollow, AssignName, AssignBlock} {
+	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, AssignFollow, AssignName, AssignBlock, AssignProfile, AssignLike} {
 		if purpose == p {
 			return true
 		}

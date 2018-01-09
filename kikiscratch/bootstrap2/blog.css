@@ -7,8 +7,15 @@
   }
 }
 
-img {
+img.img-fluid {
   padding-bottom: 1em;
+}
+
+img.profile-pic {
+  border-radius: 1rem;
+  padding: 0.1em;
+  max-width: 48px; 
+  height: 100%;
 }
 
 body {
