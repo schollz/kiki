@@ -41,9 +41,9 @@ type Envelope struct {
 	// ID is the hash of the Marshaled Letter + the Public key of Sender
 	ID string `json:"id",storm:"id"`
 	// Timestamp is the time at which the envelope was created
-	Timestamp time.Time `json:"timestamp",storm:"index"`
+	Timestamp time.Time `json:"timestamp"`
 	// Sender is public key of the sender
-	Sender keypair.KeyPair `json:"sender", storm:"index"`
+	Sender keypair.KeyPair `json:"sender"`
 	// Signature is the public key of the sender encrypted by
 	// the Sender private key, against the public Region key
 	// to authenticate sender. I.e., Sender == Decrypt(Signature) must be true.

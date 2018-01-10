@@ -61,6 +61,7 @@ func Run() (err error) {
 	r.GET("/download/:id", handleDownload) // download a specific envelope
 	r.GET("/list", handleList)             // list all the current envelopes
 	r.POST("/envelope", handlerEnvelope)   // post to put into database (public)
+	r.POST("/sync", handlerSync)           // tell server to sync with another server (local only)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
 		err := f.ShowFeed()
@@ -87,6 +88,10 @@ func handlerLetter(c *gin.Context) {
 
 func handlerEnvelope(c *gin.Context) {
 	respondWithJSON(c, "envelope added", handleEnvelope(c))
+}
+
+func handlerSync(c *gin.Context) {
+	respondWithJSON(c, "synced", handleSync(c))
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {

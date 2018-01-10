@@ -1,9 +1,11 @@
 package feed
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"path"
 	"path/filepath"
 
@@ -279,4 +281,155 @@ func (f Feed) GetEnvelope(id string) (e letter.Envelope, err error) {
 // GetIDs will return an envelope with the given ID
 func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
 	return f.db.GetIDs()
+}
+
+// Sync will try to sync with the respective address
+func (f Feed) Sync(address string) (err error) {
+	f.log.Debugf("syncing with %s", address)
+
+	// Get a list of my IDs
+	myIDs, err := f.GetIDs()
+	if err != nil {
+		return
+	}
+
+	// Get a list of the IDs from other address
+	type ListPayload struct {
+		RegionPublicKey string              `json:"region_key"`
+		IDs             map[string]struct{} `json:"ids"`
+		Message         string              `json:"message"`
+		Success         bool                `json:"success"`
+	}
+	var target ListPayload
+	req, err := http.NewRequest("GET", address+"/list", nil)
+	if err != nil {
+		return
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	err = json.NewDecoder(resp.Body).Decode(&target)
+	if err != nil {
+		return
+	}
+	if !target.Success {
+		return errors.New(target.Message)
+	}
+	if target.RegionPublicKey != f.RegionKey.Public {
+		return errors.New("cannot sync with another region")
+	}
+
+	f.log.Debugf("got %d IDs from %s", len(target.IDs), address)
+
+	// check whether I need any of their envelopes
+	for theirID := range target.IDs {
+		if _, ok := myIDs[theirID]; ok {
+			continue
+		}
+		f.log.Debugf("%s has new envelope: %s", address, theirID)
+		err = f.DownloadEnvelope(address, theirID)
+		if err != nil {
+			return
+		}
+	}
+
+	// check whether they need any of my envelopes
+	for myID := range myIDs {
+		if _, ok := target.IDs[myID]; ok {
+			continue
+		}
+		f.log.Debugf("my envelope %s is new to %s", myID, address)
+		err = f.UploadEnvelope(address, myID)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+// UploadEnvelope will upload the specified envelope
+func (f Feed) UploadEnvelope(address, id string) (err error) {
+	// get envelope
+	e, err := f.GetEnvelope(id)
+	if err != nil {
+		return
+	}
+
+	// close it
+	e.Letter = letter.Letter{}
+	e.Opened = false
+
+	// marshal it
+	payloadBytes, err := json.Marshal(e)
+	if err != nil {
+		return err
+	}
+	body := bytes.NewReader(payloadBytes)
+
+	// POST it
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/envelope", address), body)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	type Response struct {
+		Message string `json:"message"`
+		Success bool   `json:"success"`
+	}
+
+	var target Response
+	err = json.NewDecoder(resp.Body).Decode(&target)
+	if err != nil {
+		return
+	}
+	if !target.Success {
+		return errors.New(target.Message)
+	}
+
+	f.log.Debugf("uploaded %s to %s", id, address)
+
+	return
+}
+
+// DownloadEnvelope will download the specified envelope
+func (f Feed) DownloadEnvelope(address, id string) (err error) {
+	req, err := http.NewRequest("GET", address+"/download/"+id, nil)
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	type EnvelopeWithMessage struct {
+		Envelope letter.Envelope `json:"envelope"`
+		Message  string          `json:"message"`
+		Success  bool            `json:"success"`
+	}
+
+	var target EnvelopeWithMessage
+	err = json.NewDecoder(resp.Body).Decode(&target)
+	if err != nil {
+		return
+	}
+	if !target.Success {
+		return errors.New(target.Message)
+	}
+
+	f.log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
+
+	err = f.ProcessEnvelope(target.Envelope)
+	return
 }
