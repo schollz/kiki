@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path"
 	"path/filepath"
 
@@ -56,6 +55,11 @@ func Open(locationToFeed string) (f Feed, err error) {
 
 // init initializes the kiki instance
 func (f *Feed) init() (err error) {
+	f.log = logging.Log
+	f.log.Debug("initializing feed")
+	loc, _ := filepath.Abs(f.storagePath)
+	f.log.Infof("database location: %s", loc)
+
 	if f.RegionKey.Public == "" {
 		// define region key
 		f.RegionKey, err = keypair.FromPair("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
@@ -65,16 +69,11 @@ func (f *Feed) init() (err error) {
 		}
 	}
 
-	f.log = logging.Log
-	f.log.Info(f.storagePath)
 	f.db = database.Setup(f.storagePath)
 
-	// Setup identity file
-	f.log.Debug("setting up personalKey")
-	identityFile := path.Join(f.storagePath, "identity.json")
-	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
-		var err2 error
+	if f.PersonalKey.Public == "" {
 		// generate a new personal key
+		var err2 error
 		f.PersonalKey = keypair.New()
 
 		// add the friends key
@@ -274,4 +273,9 @@ func (f Feed) AddFriendsKey() (err error) {
 // GetEnvelope will return an envelope with the given ID
 func (f Feed) GetEnvelope(id string) (e letter.Envelope, err error) {
 	return f.db.GetEnvelopeFromID(id)
+}
+
+// GetIDs will return an envelope with the given ID
+func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
+	return f.db.GetIDs()
 }

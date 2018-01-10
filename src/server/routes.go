@@ -42,6 +42,18 @@ func handleEnvelope(c *gin.Context) (err error) {
 	return
 }
 
+// GET /list
+func handleList(c *gin.Context) {
+	AddCORS(c)
+	ids, err := f.GetIDs()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": "found IDs", "ids": ids})
+	}
+	return
+}
+
 // GET /download/ID
 // You can always download anything you want but the envelopes are transfered so that the letter is closed up.
 func handleDownload(c *gin.Context) {

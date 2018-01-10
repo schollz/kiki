@@ -127,3 +127,21 @@ func (api DatabaseAPI) RemoveLetters(ids []string) (err error) {
 	}
 	return
 }
+
+// GetIDs will delete the letter containing that ID
+func (api DatabaseAPI) GetIDs() (ids map[string]struct{}, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	s, err := db.getIDs()
+	if err != nil {
+		return
+	}
+	ids = make(map[string]struct{})
+	for _, id := range s {
+		ids[id] = struct{}{}
+	}
+	return
+}

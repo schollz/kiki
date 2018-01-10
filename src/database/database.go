@@ -347,6 +347,39 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	return
 }
 
+// getIDs returns all the envelope IDs
+func (d *database) getIDs() (s []string, err error) {
+	query := fmt.Sprintf("SELECT id FROM letters ORDER BY time DESC;")
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "getIDs")
+		return
+	}
+	defer rows.Close()
+
+	// parse rows
+	s = make([]string, 1000000)
+	sI := 0
+	// loop through rows
+	for rows.Next() {
+		var mID string
+		err = rows.Scan(&mID)
+		if err != nil {
+			err = errors.Wrap(err, "getIDs")
+			return
+		}
+		s[sI] = mID
+		sI++
+	}
+	s = s[:sI]
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getIDs")
+	}
+	return
+}
+
 // getName returns the name of a person
 func (d *database) getName(person string) (name string, err error) {
 	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignName, person)

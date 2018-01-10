@@ -34,8 +34,10 @@ func MiddleWareHandler() gin.HandlerFunc {
 func Run() {
 	// Startup feed
 	var err error
+	log.Debug("opening feed")
 	f, err = feed.Open(".")
 	if err != nil {
+		log.Debug("feed not found, creating new one")
 		var err2 error
 		f, err2 = feed.New()
 		if err2 != nil {
@@ -54,9 +56,10 @@ func Run() {
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/ping", PingHandler)
-	r.POST("/letter", handlerLetter) // post to put in letter (local only)
-	r.GET("/download/:id", handleDownload)
-	r.POST("/envelope", handlerEnvelope) // post to put into database (public)
+	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
+	r.GET("/download/:id", handleDownload) // download a specific envelope
+	r.GET("/list", handleList)             // list all the current envelopes
+	r.POST("/envelope", handlerEnvelope)   // post to put into database (public)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
 		err := f.ShowFeed()
