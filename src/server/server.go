@@ -55,6 +55,7 @@ func Run() {
 	})
 	r.GET("/ping", PingHandler)
 	r.POST("/letter", handlerLetter)
+	r.GET("/download/:id", handleDownload)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
 		err := f.ShowFeed()

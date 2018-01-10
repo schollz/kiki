@@ -247,3 +247,8 @@ func (f Feed) AddFriendsKey() (err error) {
 
 	return
 }
+
+// GetEnvelope will return an envelope with the given ID
+func (f Feed) GetEnvelope(id string) (e letter.Envelope, err error) {
+	return f.db.GetEnvelopeFromID(id)
+}

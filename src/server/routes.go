@@ -2,6 +2,8 @@ package server
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -24,4 +26,19 @@ func handleLetter(c *gin.Context) (err error) {
 	}
 	err = f.ProcessLetter(p)
 	return
+}
+
+// GET /download/ID
+func handleDownload(c *gin.Context) {
+	id := c.Param("id")
+	fmt.Println(id)
+	e, err := f.GetEnvelope(id)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+	} else {
+		// Close up envelope
+		e.Letter = letter.Letter{}
+		e.Opened = false
+		c.JSON(http.StatusOK, gin.H{"envelope": e})
+	}
 }

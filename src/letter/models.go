@@ -20,17 +20,16 @@ type Letter struct {
 	// "assign-X" - used to assign public data for reputation purposes (likes, follows, channel subscriptions, settting profile images and text and names)
 	// "share-X" - used to share content either "post" or "image/png"/"image/jpg"
 	Purpose string `json:"purpose,omitempty"`
+
 	// To is a list of who the letter is addressed to: "public", "friends", "self" or the public key of any person
 	To []string `json:"to,omitempty"`
+
 	// Content is is the content of the letter (base64 encoded image, text, or HTML)
 	Content string `json:"content,omitempty"`
 
 	// Replaces is the ID that this letter will replace if it is opened
 	Replaces string `json:"replaces,omitempty"`
 
-	// Things used for "share-post"
-	// Channels is a list of the channels to put the letter in
-	Channels []string `json:"channels,omitempty"`
 	// ReplyTo is the ID of the post being responded to
 	ReplyTo string `json:"reply_to,omitempty"`
 }
@@ -55,8 +54,8 @@ type Envelope struct {
 	// SealedRecipients is list of encypted passphrase (used to encrypt the Content)
 	// encrypted against each of the public keys of the recipients.
 	SealedRecipients []string `json:"sealed_recipients"`
-	// SealedLetter contains the encryoted and compressed letter,
-	// encoded as base64 string
+
+	// SealedLetter contains the encryoted and compressed letter, encoded as base64 string
 	SealedLetter string `json:"sealed_letter,omitempty"`
 
 	// Unsealed envelope information
@@ -68,6 +67,7 @@ type Envelope struct {
 	// then be saved in a bucket for unsealed letters. When the letter remains
 	// sealed then this Letter is set to nil.
 	Letter Letter `json:"letter,omitempty"`
+
 	// Opened is a variable set to true if the Letter is opened, to make
 	// it easier to index the opened/unopened letters in the database.false
 	Opened bool `json:"opened"`

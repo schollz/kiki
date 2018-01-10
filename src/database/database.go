@@ -269,6 +269,7 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 	s = make([]letter.Envelope, 100000)
 	sI := 0
 	// loop through rows
+	err = errors.New("no data available")
 	for rows.Next() {
 		var e letter.Envelope
 		e.Letter = letter.Letter{}
@@ -288,8 +289,13 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 
 		s[sI] = e
 		sI++
+		err = nil
 	}
 	s = s[:sI]
+
+	if err != nil {
+		return
+	}
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getRows")
