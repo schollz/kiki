@@ -159,6 +159,29 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	return
 }
 
+// ProcessEnvelope will determine whether the incoming letter is valid and can be submitted to the database.
+func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
+	// check if envelope has a valid signature
+	err = e.Validate(f.RegionKey)
+	if err != nil {
+		return
+	}
+
+	// check if envelope already exists
+	_, errGet := f.GetEnvelope(e.ID)
+	if errGet == nil {
+		return errors.New("already have envelope")
+	}
+
+	err = f.db.AddEnvelope(e)
+	if err != nil {
+		return
+	}
+
+	err = f.UnsealLetters()
+	return
+}
+
 // UnsealLetters will go through unopened envelopes and open them and then add them to the f.db. Also go through and purge bad letters (invalidated letters)
 func (f Feed) UnsealLetters() (err error) {
 	lettersToPurge := []string{}

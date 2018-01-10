@@ -54,8 +54,9 @@ func Run() {
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/ping", PingHandler)
-	r.POST("/letter", handlerLetter)
+	r.POST("/letter", handlerLetter) // post to put in letter (local only)
 	r.GET("/download/:id", handleDownload)
+	r.POST("/envelope", handlerEnvelope) // post to put into database (public)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
 		err := f.ShowFeed()
@@ -78,6 +79,10 @@ func respondWithJSON(c *gin.Context, message string, err error) {
 
 func handlerLetter(c *gin.Context) {
 	respondWithJSON(c, "letter added", handleLetter(c))
+}
+
+func handlerEnvelope(c *gin.Context) {
+	respondWithJSON(c, "envelope added", handleEnvelope(c))
 }
 
 func readFormFile(file *multipart.FileHeader) (data []byte, err error) {

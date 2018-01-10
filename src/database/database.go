@@ -108,7 +108,7 @@ func (d *database) MakeTables() (err error) {
 		return
 	}
 	// The "letters" table contains all the envelopes (opened and unopened) and their respective inforamtion in the letters.
-	sqlStmt = `create table letters (id text not null primary key, time TIMESTAMP, sender text, signature text, sealed_recipients text, sealed_letter text, opened integer, letter_purpose text, letter_to text, letter_content text, letter_replaces text, letter_replyto text, unique(id));`
+	sqlStmt = `create table letters (id text not null primary key, time TIMESTAMP, sender text, signature text, sealed_recipients text, sealed_letter text, opened integer, letter_purpose text, letter_to text, letter_content text, letter_replaces text, letter_replyto text, unique(id), UNIQUE(signature));`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
 		err = errors.Wrap(err, "MakeTables, letters")
