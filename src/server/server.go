@@ -15,8 +15,10 @@ import (
 var (
 	// Port defines what port the carrier should listen on
 	Port = "8003"
-	f    feed.Feed
-	log  = logging.Log
+	// Location defines where to open up the kiki database
+	Location = "."
+	f        feed.Feed
+	log      = logging.Log
 )
 
 func MiddleWareHandler() gin.HandlerFunc {
@@ -31,17 +33,16 @@ func MiddleWareHandler() gin.HandlerFunc {
 }
 
 // Run will start the server listening
-func Run() {
+func Run() (err error) {
 	// Startup feed
-	var err error
 	log.Debug("opening feed")
-	f, err = feed.Open(".")
+	f, err = feed.Open(Location)
 	if err != nil {
 		log.Debug("feed not found, creating new one")
 		var err2 error
-		f, err2 = feed.New()
+		f, err2 = feed.New(Location)
 		if err2 != nil {
-			panic(err2)
+			return err2
 		}
 	}
 
@@ -68,8 +69,8 @@ func Run() {
 		}
 		c.JSON(http.StatusOK, gin.H{"success": err == nil, "message": message})
 	})
-	r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
-
+	err = r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
+	return
 }
 
 func respondWithJSON(c *gin.Context, message string, err error) {

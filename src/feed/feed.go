@@ -47,6 +47,7 @@ func Open(locationToFeed string) (f Feed, err error) {
 	if err != nil {
 		return
 	}
+	f.storagePath = locationToFeed
 
 	// initialize
 	err = f.init()
