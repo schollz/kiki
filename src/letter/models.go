@@ -98,6 +98,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	// Create blockchain ID (hash of any public key + hash of any content + replaces)
 	h := sha256.New()
 	h.Write([]byte(sender.Public))
+	h.Write([]byte(l.Purpose))
 	h.Write([]byte(l.Content))
 	h.Write([]byte(l.Replaces))
 	h.Write([]byte(l.ReplyTo))

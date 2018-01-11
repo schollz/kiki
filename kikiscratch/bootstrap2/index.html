@@ -13,6 +13,7 @@
     <!-- Custom styles for this template -->
     <link href="blog.css" rel="stylesheet">
     <script defer src="https://use.fontawesome.com/releases/v5.0.3/js/all.js"></script>
+    <link href="toastr.css" rel="stylesheet"/>
 </head>
 
 <body>
@@ -335,19 +336,20 @@
     <script src="popper.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
+    <script src="toastr.min.js"></script>
     <script>
     var editor = new MediumEditor('.editable');
         $(document).ready(function () {
       $("img").addClass("img-fluid");
 
-      $( "#submit-writing" ).click(function() {
+      $( "#submit-writing" ).click(function(event) {
           // Stop form from submitting normally
           event.preventDefault();
           letter = {
             "purpose":$("#letterPurpose").val(),
             "replaces":$("#letterReplaces").val(),
             "reply_to":$("#letterReplyTo").val(),
-            "to":"self",
+            "to":["self"],
             "content": editor.getContent(),
           }
           if ($("#writingToPublic").is(":checked") == true) {
@@ -357,26 +359,18 @@
             letter["to"] = ["friends"];
           }
           console.log(letter);
-            var posting = $.post( "http://localhost:8003/letter", JSON.stringify(letter) );
- 
-  // Put the results in a div
-  posting.done(function( data ) {
-    console.log(data);
-  });
-        //    $.post({
-        //     url: "http://localhost:8003/letter",
-        //     type: "POST",
-        //     data: JSON.stringify(letter),
-        //     // data: letter,
-        //     contentType: "application/json; charset=utf-8", // this
-        //     dataType: "json", // and this
-        //     success: function (data) {
-        //         console.log(data);
-        //     },
-        //     error: function (data) {
-        //         console.log('error: '+data);
-        //     }
-        // });
+        
+          var posting = $.post( "http://localhost:8003/letter", JSON.stringify(letter) );
+          posting.done(function( data ) {
+            console.log(data);
+            $("#writingModal").modal('hide');
+            if (data['success']==true) {
+                toastr.info(data['message']);
+            } else {
+                toastr.warn(data['message']);
+            }
+          });
+
       });
 
     $( ".editmodal" ).click(function() {
