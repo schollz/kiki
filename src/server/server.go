@@ -57,6 +57,7 @@ func Run() (err error) {
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/ping", handlePing)
+	r.GET("/img/:id", handleImage)
 	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
 	r.OPTIONS("/letter", handlePing)       // post to put in letter (local only)
 	r.GET("/download/:id", handleDownload) // download a specific envelope

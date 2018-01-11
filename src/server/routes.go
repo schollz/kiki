@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,10 +11,35 @@ import (
 	"github.com/schollz/kiki/src/letter"
 )
 
+// GET /img
+func handleImage(c *gin.Context) {
+	AddCORS(c)
+	id := c.Param("id")
+	log.Debugf("fetching image: %s", id)
+	e, err := f.GetEnvelope(id)
+	if err != nil {
+		log.Warn(err)
+		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
+		return
+	}
+
+	mimeType := "image/jpeg"
+	if strings.Contains(e.Letter.Purpose, "png") {
+		mimeType = "image/png"
+	}
+
+	imageBytes, err := base64.URLEncoding.DecodeString(e.Letter.Content)
+	if err != nil {
+		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
+		return
+	}
+
+	c.Data(http.StatusOK, mimeType, imageBytes)
+}
+
 // POST /letter
 func handleLetter(c *gin.Context) (err error) {
 	AddCORS(c)
-	log.Debug("got request")
 
 	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
 		log.Debug(err)

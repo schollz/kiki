@@ -2,12 +2,14 @@ package feed
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -17,6 +19,7 @@ import (
 	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/purpose"
 	"github.com/schollz/kiki/src/utils"
+	"github.com/schollz/kiki/src/web"
 )
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
@@ -113,6 +116,10 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		err = errors.New("invalid purpose")
 		return
 	}
+	if f.PersonalKey == f.RegionKey {
+		err = errors.New("cannot post with region key")
+		return
+	}
 
 	// rewrite the letter.To array so that it contains
 	// public keys that are valid
@@ -143,16 +150,40 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 	l.To = newTo
 
-	// seal the letter
-	if f.PersonalKey == f.RegionKey {
-		err = errors.New("cannot post with region key")
+	// determine if their are any images in envelope letter content that should be spliced out
+	newHTML, images, err := web.CaptureBase64Images(l.Content)
+	if err != nil {
 		return
 	}
+	f.log.Debugf("found %d images", len(images))
+	for name := range images {
+		p := purpose.SharePNG
+		if strings.Contains(name, ".jpg") {
+			p = purpose.ShareJPG
+		}
+		newLetter := letter.Letter{
+			To:      l.To,
+			Content: base64.URLEncoding.EncodeToString(images[name]),
+			Purpose: p,
+		}
+		newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)
+		if err2 != nil {
+			return err2
+		}
+		// seal and add envelope
+		err2 = f.db.AddEnvelope(newEnvelope)
+		if err2 != nil {
+			return err2
+		}
+		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
+	}
+	l.Content = newHTML
+
+	// seal the letter
 	e, err := l.Seal(f.PersonalKey, f.RegionKey)
 	if err != nil {
 		return
 	}
-
 	err = f.db.AddEnvelope(e)
 	if err != nil {
 		return
