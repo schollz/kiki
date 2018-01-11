@@ -281,8 +281,6 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 			continue
 		}
 
-		senderName, _ := f.db.GetName(e.Sender.Public)
-
 		recipients := []string{}
 		for _, to := range e.Letter.To {
 			if to == f.RegionKey.Public {
@@ -294,22 +292,23 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 				recipients = []string{friendsName}
 				break
 			}
-			senderName, _ := f.db.GetName(e.Sender.Public)
+			senderName := f.db.GetName(to)
 			if senderName == "" {
 				senderName = to
 			}
 			recipients = append(recipients, senderName)
 		}
 
-		fmt.Printf("%s (%s) to %s [%s]:\n%s\n\n", senderName, e.Sender.Public, strings.Join(recipients, ", "), utils.TimeAgo(e.Timestamp), e.Letter.Content)
 		post := Post{
 			ID:         e.ID,
 			Recipients: strings.Join(recipients, ", "),
 			Content:    template.HTML(e.Letter.Content),
-			Date:       time.Now(), // TODO: convert timestamp
+			Date:       e.Timestamp,
+			TimeAgo:    utils.TimeAgo(e.Timestamp),
 			User: User{
-				Name:      senderName,
+				Name:      f.db.GetName(e.Sender.Public),
 				PublicKey: e.Sender.Public,
+				Profile:   f.db.GetProfile(e.Sender.Public),
 			},
 		}
 		posts[i] = post

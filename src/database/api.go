@@ -103,13 +103,43 @@ func (api DatabaseAPI) GetKeysFromSender(sender string) (s []keypair.KeyPair, er
 }
 
 // GetName will return the assigned name for the public key of a sender
-func (api DatabaseAPI) GetName(publicKey string) (name string, err error) {
+func (api DatabaseAPI) GetName(publicKey string) (name string) {
 	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
 	defer db.Close()
-	return db.getName(publicKey)
+	name, err = db.getName(publicKey)
+	if err != nil {
+		log.Warn(err)
+	}
+	return
+}
+
+// GetProfile will return the assigned profile for the public key of a sender
+func (api DatabaseAPI) GetProfile(publicKey string) (name string) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	name, err = db.getProfile(publicKey)
+	if err != nil {
+		log.Warn(err)
+	}
+	return
+}
+
+// GetUser returns information for a user
+func (api DatabaseAPI) GetUser(publicKey string) (name, profile, image string) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	name, _ = db.getName(publicKey)
+	profile, _ = db.getProfile(publicKey)
+	return
 }
 
 // GetFriendsName will search friend's keys and determine the name of the friends key, e.g. Zack's Friends (where Zack is assigned name of public key)

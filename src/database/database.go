@@ -408,6 +408,34 @@ func (d *database) getName(person string) (name string, err error) {
 	return
 }
 
+// getProfile returns the profile of a person
+func (d *database) getProfile(person string) (profile string, err error) {
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignProfile, person)
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "getProfile")
+		return
+	}
+	defer rows.Close()
+
+	// loop through rows
+	for rows.Next() {
+		err = rows.Scan(&profile)
+		if err != nil {
+			err = errors.Wrap(err, "getProfile")
+			return
+		}
+		break
+	}
+
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getProfile")
+	}
+	return
+}
+
 func (d *database) getFriendsName(publicKey string) (name string) {
 	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == 'share-key' AND letter_content LIKE '%%" + publicKey + "%%' LIMIT 1;"
 	log.Debug(query)

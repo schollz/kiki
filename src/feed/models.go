@@ -45,6 +45,7 @@ type Post struct {
 	Recipients string
 	Content    template.HTML
 	Date       time.Time
+	TimeAgo    string
 	User       User
 }
 
