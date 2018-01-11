@@ -338,14 +338,26 @@
     <script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
     <script src="toastr.min.js"></script>
     <script>
+    function submitLetter(letter) {    
+      var posting = $.post( "http://localhost:8003/letter", JSON.stringify(letter) );
+      posting.done(function( data ) {
+        console.log(data);
+        $("#writingModal").modal('hide');
+        if (data['success']==true) {
+            toastr.info(data['message']);
+        } else {
+            toastr.warn(data['message']);
+        }
+      });
+    }
     var editor = new MediumEditor('.editable');
-        $(document).ready(function () {
+    $(document).ready(function () {
       $("img").addClass("img-fluid");
 
       $( "#submit-writing" ).click(function(event) {
-          // Stop form from submitting normally
-          event.preventDefault();
-          letter = {
+         // Stop form from submitting normally
+         event.preventDefault();
+         letter = {
             "purpose":$("#letterPurpose").val(),
             "replaces":$("#letterReplaces").val(),
             "reply_to":$("#letterReplyTo").val(),
@@ -359,62 +371,51 @@
             letter["to"] = ["friends"];
           }
           console.log(letter);
-        
-          var posting = $.post( "http://localhost:8003/letter", JSON.stringify(letter) );
-          posting.done(function( data ) {
-            console.log(data);
-            $("#writingModal").modal('hide');
-            if (data['success']==true) {
-                toastr.info(data['message']);
-            } else {
-                toastr.warn(data['message']);
-            }
-          });
-
+         submitLetter(letter);
       });
 
-    $( ".editmodal" ).click(function() {
-        $("#writingModal").modal();
-        console.log($(this).data('title'));
-        $("#writingModalLabel").text($(this).data('title'));
-        $(".editable").focus(function() { $(this).select(); } );
-        console.log($(this).data("usecontent"));
-        if ($(this).data("usecontent")) {
-            $(".editable").html($("#"+$(this).data("usecontent")).html())
-        } else {
-            $(".editable").text("Write your post...");            
-        }
-        if ($(this).data("replyto")) {
-            $("#letterReplyTo").val($(this).data("replyto"));
-        } else {
-            $("#letterReplyTo").val("");            
-        }
-        if ($(this).data("replaces")) {
-            $("#letterReplaces").val($(this).data("replaces"));
-        } else {
-            $("#letterReplaces").val("");            
-        }
-        $("#letterPurpose").val($(this).data("purpose"));
-    });
+        $( ".editmodal" ).click(function() {
+            $("#writingModal").modal();
+            console.log($(this).data('title'));
+            $("#writingModalLabel").text($(this).data('title'));
+            $(".editable").focus(function() { $(this).select(); } );
+            console.log($(this).data("usecontent"));
+            if ($(this).data("usecontent")) {
+                $(".editable").html($("#"+$(this).data("usecontent")).html())
+            } else {
+                $(".editable").text("Write your post...");            
+            }
+            if ($(this).data("replyto")) {
+                $("#letterReplyTo").val($(this).data("replyto"));
+            } else {
+                $("#letterReplyTo").val("");            
+            }
+            if ($(this).data("replaces")) {
+                $("#letterReplaces").val($(this).data("replaces"));
+            } else {
+                $("#letterReplaces").val("");            
+            }
+            $("#letterPurpose").val($(this).data("purpose"));
+        });
 
-    $( ".activatenamemodal" ).click(function() {
-        console.log($(this).data("name"));
-        $("#modalNameName").text($(this).data("name"));
-        $("#modalNamePublicKey").text($(this).data("publickey"));
-        $("#modalNameContent").html($(this).data("content"));
-        $("#nameModal").modal();
-        $("#followButton").attr("data-publickey", $(this).data("publickey"));
-    });
+        $( ".activatenamemodal" ).click(function() {
+            console.log($(this).data("name"));
+            $("#modalNameName").text($(this).data("name"));
+            $("#modalNamePublicKey").text($(this).data("publickey"));
+            $("#modalNameContent").html($(this).data("content"));
+            $("#nameModal").modal();
+            $("#followButton").attr("data-publickey", $(this).data("publickey"));
+        });
 
-    $( "#followButton" ).click(function() {
-        console.log($(this).data("publickey"));
-        // TODO: MAKE A FOLLOW!
-    });
+        $( "#followButton" ).click(function() {
+            console.log($(this).data("publickey"));
+            // TODO: MAKE A FOLLOW!
+        });
 
-var restrictInput = function(event) {
-    $("img:not(.img-fluid)").addClass("img-fluid");
-}
-editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
+        var restrictInput = function(event) {
+            $("img:not(.img-fluid)").addClass("img-fluid");
+        }
+        editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
 
     });
 
