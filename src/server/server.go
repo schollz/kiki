@@ -56,7 +56,7 @@ func Run() (err error) {
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
 	})
-	r.GET("/ping", PingHandler)
+	r.GET("/ping", handlePing)
 	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
 	r.GET("/download/:id", handleDownload) // download a specific envelope
 	r.GET("/list", handleList)             // list all the current envelopes
@@ -64,6 +64,7 @@ func Run() (err error) {
 	r.POST("/sync", handlerSync)           // tell server to sync with another server (local only)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
+		fmt.Println(f.IsKikiInstance("http://localhost:8004"))
 		err := f.ShowFeed()
 		if err != nil {
 			message = err.Error()

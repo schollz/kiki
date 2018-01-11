@@ -28,6 +28,11 @@ func handleLetter(c *gin.Context) (err error) {
 	return
 }
 
+// GET /ping
+func handlePing(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": f.RegionKey.Public})
+}
+
 // POST /envelope
 func handleEnvelope(c *gin.Context) (err error) {
 	AddCORS(c)

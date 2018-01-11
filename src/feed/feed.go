@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/database"
@@ -285,6 +286,15 @@ func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
 
 // Sync will try to sync with the respective address
 func (f Feed) Sync(address string) (err error) {
+	// make sure that its a kiki instance
+	isInstance, err := f.IsKikiInstance(address)
+	if err != nil {
+		return
+	}
+	if !isInstance {
+		return errors.New("not a kiki instance")
+	}
+
 	f.log.Debugf("syncing with %s", address)
 
 	// Get a list of my IDs
@@ -431,5 +441,38 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 	f.log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
 
 	err = f.ProcessEnvelope(target.Envelope)
+	return
+}
+
+// IsKikiInstance will download the specified envelope
+func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
+	timeout := time.Duration(100 * time.Millisecond)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.Get(address + "/ping")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	type Message struct {
+		Message string `json:"message"`
+		Success bool   `json:"success"`
+	}
+
+	var target Message
+	err = json.NewDecoder(resp.Body).Decode(&target)
+	if err != nil {
+		return
+	}
+	if !target.Success {
+		err = errors.New(target.Message)
+		return
+	}
+
+	if target.Message == f.RegionKey.Public {
+		yes = true
+	}
 	return
 }
