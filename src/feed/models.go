@@ -51,7 +51,7 @@ type Post struct {
 
 type User struct {
 	Name      string
-	Profile   string
+	Profile   template.HTML
 	PublicKey string
 	Image     string
 }

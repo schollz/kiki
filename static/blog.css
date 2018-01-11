@@ -11,6 +11,9 @@ img.img-fluid {
   padding-bottom: 1em;
 }
 
+.medium-editor-toolbar-form-active {
+visibility: visible;
+}
 
 img.profile-pic {
   border-radius: 1rem;

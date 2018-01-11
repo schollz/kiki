@@ -64,8 +64,13 @@ func Run() (err error) {
 		if err != nil {
 			log.Error(err)
 		}
+		user, err := f.ShowProfile()
+		if err != nil {
+			log.Error(err)
+		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Posts": posts,
+			"User":  user,
 		})
 	})
 	r.GET("/static/:file", func(c *gin.Context) {

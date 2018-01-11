@@ -14,7 +14,8 @@
   <link href="/static/blog.css" rel="stylesheet">
   <script defer src="https://use.fontawesome.com/releases/v5.0.3/js/all.js"></script>
   <link href="/static/toastr.css" rel="stylesheet" />
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+  <link href="/static/themes/tim.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -42,9 +43,9 @@
     <input type=hidden id="letterReplaces" value="" />
     <!-- begin medium modal -->
     <!-- Modal -->
-    <div class="modal fade" id="writingModal" tabindex="-1" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true">
+    <div class="modal fade" id="writingModal" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
       <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+        <div class="modal-content"  id="writingModalBody">
           <div class="modal-header">
             <h5 class="modal-title" id="writingModalLabel"></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -79,7 +80,7 @@
     </div>
     <!-- end medium modal -->
     <!-- Modal -->
-    <div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
+    <div class="modal fade" id="nameModal" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -294,18 +295,18 @@
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
           <img src="https://pbs.twimg.com/profile_images/839904034806910976/quhVl5Bc.jpg">
-          <h4><div id="askldjfa9w3jaw9fj3aw">Zack</div></h4>
-          <div id="alskdjfalksjdfljas">
-            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+          <h4><div id="current-name">{{ .User.Name }}</div></h4>
+          <div id="current-profile">
+            {{ .User.Profile }}
           </div>
         </div>
         <div class="sidebar-module">
           <h4>Actions</h4>
           <ol class="list-unstyled">
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
-            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="alskdjfalksjdfljas">Edit profile</a></li>
+            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="current-profile">Edit profile</a></li>
             <li><a href="#">Upload image</a></li>
-            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="askldjfa9w3jaw9fj3aw">Change name</a></li>
+            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="current-name">Change name</a></li>
           </ol>
         </div>
         <div class="sidebar-module">
@@ -349,7 +350,23 @@
         }
       });
     }
-    var editor = new MediumEditor('.editable');
+    var editor = new MediumEditor('.editable', {
+      toolbar: {
+        relativeContainer: document.querySelector("#writingModalBody"),
+        allowMultiParagraphSelection: true,
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote'],
+        diffLeft: 0,
+        diffTop: -10,
+        firstButtonClass: 'medium-editor-button-first',
+        lastButtonClass: 'medium-editor-button-last',
+        standardizeSelectionStart: false,
+        static: true,
+        /* options which only apply when static is true */
+        align: 'center',
+        sticky: false,
+        updateOnEmptySelection: false
+      }
+    });
     $(document).ready(function() {
       $("img").addClass("img-fluid");
       $("#submit-writing").click(function(event) {
