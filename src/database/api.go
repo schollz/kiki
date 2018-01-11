@@ -112,6 +112,16 @@ func (api DatabaseAPI) GetName(publicKey string) (name string, err error) {
 	return db.getName(publicKey)
 }
 
+// GetFriendsName will search friend's keys and determine the name of the friends key, e.g. Zack's Friends (where Zack is assigned name of public key)
+func (api DatabaseAPI) GetFriendsName(publicKey string) (name string) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.getFriendsName(publicKey)
+}
+
 // RemoveLetters will delete the letter containing that ID
 func (api DatabaseAPI) RemoveLetters(ids []string) (err error) {
 	db, err := open(api.FileName)
@@ -144,13 +154,4 @@ func (api DatabaseAPI) GetIDs() (ids map[string]struct{}, err error) {
 		ids[id] = struct{}{}
 	}
 	return
-}
-
-func (api DatabaseAPI) GetFriendsName(publicKey string) (name string) {
-	db, err := open(api.FileName)
-	if err != nil {
-		return
-	}
-	defer db.Close()
-	return db.getFriendsName(publicKey)
 }
