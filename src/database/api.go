@@ -130,6 +130,20 @@ func (api DatabaseAPI) GetProfile(publicKey string) (name string) {
 	return
 }
 
+// GetProfile will return the assigned profile for the public key of a sender
+func (api DatabaseAPI) GetProfileImage(publicKey string) (imageID string) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	imageID, err = db.getProfileImage(publicKey)
+	if err != nil {
+		log.Warn(err)
+	}
+	return
+}
+
 // GetUser returns information for a user
 func (api DatabaseAPI) GetUser(publicKey string) (name, profile, image string) {
 	db, err := open(api.FileName)
@@ -139,6 +153,7 @@ func (api DatabaseAPI) GetUser(publicKey string) (name, profile, image string) {
 	defer db.Close()
 	name, _ = db.getName(publicKey)
 	profile, _ = db.getProfile(publicKey)
+	image, _ = db.getProfileImage(publicKey)
 	return
 }
 

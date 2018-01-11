@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lunny/html2md"
 	"github.com/pkg/errors"
 	strip "github.com/schollz/html-strip-tags-go"
 	"github.com/schollz/kiki/src/database"
@@ -23,7 +22,6 @@ import (
 	"github.com/schollz/kiki/src/purpose"
 	"github.com/schollz/kiki/src/utils"
 	"github.com/schollz/kiki/src/web"
-	blackfriday "gopkg.in/russross/blackfriday.v2"
 )
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
@@ -179,11 +177,13 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		if err2 != nil {
 			return err2
 		}
+		if l.Purpose == purpose.AssignImage {
+			newHTML = newEnvelope.ID
+			break
+		}
 		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
 	}
 	l.Content = newHTML
-	l.Content = html2md.Convert(l.Content)
-	l.Content = string(blackfriday.Run([]byte(l.Content)))
 
 	// seal the letter
 	e, err := l.Seal(f.PersonalKey, f.RegionKey)
@@ -324,6 +324,7 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 				Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
 				PublicKey: e.Sender.Public,
 				Profile:   template.HTML(f.db.GetProfile(e.Sender.Public)),
+				Image:     f.db.GetProfileImage(e.Sender.Public),
 			},
 		}
 		posts[i] = post

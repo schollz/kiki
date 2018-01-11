@@ -12,10 +12,10 @@
   <link href="/static/bootstrap.min.css" rel="stylesheet">
   <!-- Custom styles for this template -->
   <link href="/static/blog.css" rel="stylesheet">
-  <script defer src="https://use.fontawesome.com/releases/v5.0.3/js/all.js"></script>
+  <script defer src="/static/all.js"></script>
   <link href="/static/toastr.css" rel="stylesheet" />
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
-  <link href="/static/themes/tim.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+  <link href="/static/bootstrap.medium.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -84,7 +84,7 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="nameModalLabel"><img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+            <h5 class="modal-title" id="nameModalLabel"><img id="modalNameImage" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
                                 data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">&nbsp;
                                 <span id="modalNameName">Mark</span> <small>[<span id="modalNamePublicKey">aasdlkfjas9jf93jfa</span>]</small></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -114,7 +114,7 @@
             <div class="blog-post">
               <p class="blog-post-meta">
                 <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;<a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
-                <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/static/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> {{ .Date.Format "January 2, 2006 3:04:05PM" }}
+                <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> {{ .Date.Format "January 2, 2006 3:04:05PM" }}
               </p>
               <hr>
               <div id="{{ .ID }}">
@@ -294,7 +294,7 @@
       <!-- /.blog-main -->
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
-          <img src="https://pbs.twimg.com/profile_images/839904034806910976/quhVl5Bc.jpg">
+          <img src="/img/{{ .User.Image }}">
           <h4><div id="current-name">{{ .User.Name }}</div></h4>
           <div id="current-profile">
             {{ .User.Profile }}
@@ -305,7 +305,7 @@
           <ol class="list-unstyled">
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
             <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="current-profile">Edit profile</a></li>
-            <li><a href="#"  class="editmodal" data-title="Update image" data-purpose="assign-image" data-content="Drag and drop an image...">Upload image</a></li>
+            <li><a href="#"  class="editmodal" data-title="Update image" data-purpose="assign-image" data-makecontent="Drag and drop an image...">Upload image</a></li>
             <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="current-name">Change name</a></li>
           </ol>
         </div>
@@ -332,10 +332,10 @@
   <!-- Bootstrap core JavaScript
     ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="/static/jquery-3.2.1.min.js"></script>
   <script src="/static/popper.min.js"></script>
   <script src="/static/bootstrap.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
+  <script src="/static/medium-editor.min.js"></script>
   <script src="/static/toastr.min.js"></script>
   <script>
     function submitLetter(letter) {
@@ -361,6 +361,7 @@
         lastButtonClass: 'medium-editor-button-last',
         standardizeSelectionStart: false,
         static: true,
+        autoLink: true,
         /* options which only apply when static is true */
         align: 'center',
         sticky: false,
@@ -401,8 +402,8 @@
         } else {
           $(".editable").text("Write your post...");
         }
-        if ($(this).data("content")) {
-          $(".editable").html($("#" + $(this).data("content")).html())
+        if ($(this).data("makecontent")) {
+          $(".editable").html($(this).data("makecontent"));
         }
         if ($(this).data("replyto")) {
           $("#letterReplyTo").val($(this).data("replyto"));
@@ -421,6 +422,7 @@
         $("#modalNameName").text($(this).data("name"));
         $("#modalNamePublicKey").text($(this).data("publickey"));
         $("#modalNameContent").html($(this).data("content"));
+        $("#modalNameImage").attr("src",$(this).data("image"));
         $("#nameModal").modal();
         $("#followButton").attr("data-publickey", $(this).data("publickey"));
       });

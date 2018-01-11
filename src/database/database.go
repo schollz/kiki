@@ -436,6 +436,34 @@ func (d *database) getProfile(person string) (profile string, err error) {
 	return
 }
 
+// getProfileImage returns the ID of the profile image of a person
+func (d *database) getProfileImage(person string) (imageID string, err error) {
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignImage, person)
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "getProfileImage")
+		return
+	}
+	defer rows.Close()
+
+	// loop through rows
+	for rows.Next() {
+		err = rows.Scan(&imageID)
+		if err != nil {
+			err = errors.Wrap(err, "getProfileImage")
+			return
+		}
+		break
+	}
+
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getProfileImage")
+	}
+	return
+}
+
 func (d *database) getFriendsName(publicKey string) (name string) {
 	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == 'share-key' AND letter_content LIKE '%%" + publicKey + "%%' LIMIT 1;"
 	log.Debug(query)
