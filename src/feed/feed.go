@@ -271,9 +271,27 @@ func (f Feed) ShowFeed() (err error) {
 		senderName, err2 := f.db.GetName(e.Sender.Public)
 		if err2 != nil {
 			f.log.Warn(err2)
-			senderName = e.Sender.Public
 		}
-		fmt.Printf("%s (%s) [%s]:\n%s\n\n", senderName, e.Sender.Public, utils.TimeAgo(e.Timestamp), e.Letter.Content)
+
+		recipients := []string{}
+		for _, to := range e.Letter.To {
+			if to == f.RegionKey.Public {
+				recipients = []string{"Public"}
+				break
+			}
+			friendsName := f.db.GetFriendsName(to)
+			if friendsName != "" {
+				recipients = []string{friendsName}
+				break
+			}
+			senderName, _ := f.db.GetName(e.Sender.Public)
+			if senderName == "" {
+				senderName = to
+			}
+			recipients = append(recipients, senderName)
+		}
+
+		fmt.Printf("%s (%s) to %s [%s]:\n%s\n\n", senderName, e.Sender.Public, strings.Join(recipients, ", "), utils.TimeAgo(e.Timestamp), e.Letter.Content)
 
 	}
 	return

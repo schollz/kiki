@@ -408,6 +408,31 @@ func (d *database) getName(person string) (name string, err error) {
 	return
 }
 
+func (d *database) getFriendsName(publicKey string) (name string) {
+	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == 'share-key' AND letter_content LIKE '%%" + publicKey + "%%' LIMIT 1;"
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	var sender string
+	for rows.Next() {
+		rows.Scan(&sender)
+	}
+	if sender == "" {
+		return
+	}
+
+	senderName, _ := d.getName(sender)
+	if senderName != "" {
+		sender = senderName
+	}
+
+	return "Friends of " + sender
+}
+
 // deleteLetterFromID will delete a letter with the pertaining ID.
 func (d *database) deleteLetterFromID(id string) (err error) {
 	tx, err := d.db.Begin()

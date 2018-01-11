@@ -145,3 +145,12 @@ func (api DatabaseAPI) GetIDs() (ids map[string]struct{}, err error) {
 	}
 	return
 }
+
+func (api DatabaseAPI) GetFriendsName(publicKey string) (name string) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.getFriendsName(publicKey)
+}
