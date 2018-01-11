@@ -73,6 +73,11 @@ type Envelope struct {
 	Opened bool `json:"opened"`
 }
 
+func (e *Envelope) Close() {
+	e.Letter = Letter{}
+	e.Opened = false
+}
+
 // Seal creates an envelope and seals it for the specified recipients
 func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envelope, err error) {
 	logging.Log.Info("creating letter")

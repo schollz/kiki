@@ -366,10 +366,8 @@ func (f Feed) UploadEnvelope(address, id string) (err error) {
 	if err != nil {
 		return
 	}
-
 	// close it
-	e.Letter = letter.Letter{}
-	e.Opened = false
+	e.Close()
 
 	// marshal it
 	payloadBytes, err := json.Marshal(e)
