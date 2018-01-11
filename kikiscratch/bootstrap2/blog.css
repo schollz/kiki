@@ -18,6 +18,10 @@ img.profile-pic {
   height: 100%;
 }
 
+*:focus {
+    outline: none;
+}
+
 body {
   font-family: Georgia, "Times New Roman", Times, serif;
   color: #555;

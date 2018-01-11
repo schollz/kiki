@@ -58,6 +58,7 @@ func Run() (err error) {
 	})
 	r.GET("/ping", handlePing)
 	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
+	r.OPTIONS("/letter", handlePing)       // post to put in letter (local only)
 	r.GET("/download/:id", handleDownload) // download a specific envelope
 	r.GET("/list", handleList)             // list all the current envelopes
 	r.POST("/envelope", handlerEnvelope)   // post to put into database (public)
@@ -110,7 +111,7 @@ func readFormFile(file *multipart.FileHeader) (data []byte, err error) {
 func AddCORS(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-	c.Writer.Header().Set("Access-Control-Allow-Methods", "GET")
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
 	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Max")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 }

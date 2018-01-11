@@ -13,8 +13,10 @@ import (
 // POST /letter
 func handleLetter(c *gin.Context) (err error) {
 	AddCORS(c)
+	log.Debug("got request")
 
 	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
+		log.Debug(err)
 		return errors.New("must be on local host")
 	}
 
@@ -22,8 +24,10 @@ func handleLetter(c *gin.Context) (err error) {
 	var p letter.Letter
 	err = c.BindJSON(&p)
 	if err != nil {
+		log.Debug(err)
 		return
 	}
+	log.Debug(p)
 	err = f.ProcessLetter(p)
 	return
 }
