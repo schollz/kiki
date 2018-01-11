@@ -6,7 +6,7 @@ server:
 	./kiki
 
 dev:
-	rerun -p "**/*.{go,tmpl}" --ignore 'bindata.go' make
+	rerun -p "**/*.{go,tmpl,css,js}" --ignore 'bindata.go' make
 
 scratch:
 	cd kikiscratch && browser-sync start --server --files . --index index.html

@@ -287,7 +287,7 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 				recipients = []string{"Public"}
 				break
 			}
-			friendsName := f.db.GetFriendsName(to)
+			friendsName := strip.StripTags(f.db.GetFriendsName(to))
 			if friendsName != "" {
 				recipients = []string{friendsName}
 				break
