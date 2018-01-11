@@ -411,6 +411,11 @@
         // TODO: MAKE A FOLLOW!
     });
 
+var restrictInput = function(event) {
+    $("img:not(.img-fluid)").addClass("img-fluid");
+}
+editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
+
     });
 
     </script>
