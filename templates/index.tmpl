@@ -56,7 +56,8 @@
             <div class="editable">
               <p>My father’s family name being
                 <a href="https://en.wikipedia.org/wiki/Pip_(Great_Expectations)">Pirrip</a>, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called
-                Pip.</p>
+                Pip.
+              </p>
             </div>
           </div>
           <div class="modal-footer">
@@ -112,16 +113,13 @@
           <div class="card-body">
             <div class="blog-post">
               <p class="blog-post-meta">
-                <span class="float-right">&nbsp;<a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
+                <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;<a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
                 <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/static/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> {{ .Date.Format "January 2, 2006 3:04:05PM" }}
               </p>
               <hr>
               <div id="{{ .ID }}">
                 {{ .Content }}
               </div>
-              <p class="text-right">&nbsp;<a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a></span>
-              </p>
-              <hr>
             </div>
           </div>
         </div>

@@ -306,7 +306,7 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 			Date:       e.Timestamp,
 			TimeAgo:    utils.TimeAgo(e.Timestamp),
 			User: User{
-				Name:      f.db.GetName(e.Sender.Public),
+				Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
 				PublicKey: e.Sender.Public,
 				Profile:   f.db.GetProfile(e.Sender.Public),
 			},
