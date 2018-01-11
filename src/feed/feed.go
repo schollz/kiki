@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	strip "github.com/schollz/html-strip-tags-go"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
@@ -271,6 +272,15 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 		if e.Letter.Purpose != purpose.ShareText {
 			continue
 		}
+		// skip something if it is empty
+		if strip.StripTags(e.Letter.Content) == "" {
+			continue
+		}
+		// skip something if it has been replaced
+		if f.db.IsReplaced(e.ID) {
+			continue
+		}
+
 		senderName, _ := f.db.GetName(e.Sender.Public)
 
 		recipients := []string{}

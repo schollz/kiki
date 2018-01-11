@@ -155,3 +155,13 @@ func (api DatabaseAPI) GetIDs() (ids map[string]struct{}, err error) {
 	}
 	return
 }
+
+// IsReplaced returns boolean of whether post with ID has been replaced
+func (api DatabaseAPI) IsReplaced(id string) (yes bool) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.isReplaced(id)
+}

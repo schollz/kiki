@@ -1,432 +1,446 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <link rel="icon" href="../../../../favicon.ico">
-        <title>Blog Template for Bootstrap</title>
-        <!-- Bootstrap core CSS -->
-        <link href="/static/bootstrap.min.css" rel="stylesheet">
-        <!-- Custom styles for this template -->
-        <link href="/static/blog.css" rel="stylesheet">
-        <script defer src="https://use.fontawesome.com/releases/v5.0.3/js/all.js"></script>
-        <link href="/static/toastr.css" rel="stylesheet"/>
-    </head>
-    <body>
-        <header>
-            <div class="blog-masthead">
-                <div class="container">
-                    <nav class="nav">
-                        <a class="nav-link active" href="#">Home</a>
-                        <a class="nav-link" href="#">New features</a>
-                        <a class="nav-link" href="#">Press</a>
-                        <a class="nav-link" href="#">New hires</a>
-                        <a class="nav-link" href="#">About</a>
-                    </nav>
-                </div>
-            </div>
-            <!--         <div class="blog-header">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="../../../../favicon.ico">
+  <title>Blog Template for Bootstrap</title>
+  <!-- Bootstrap core CSS -->
+  <link href="/static/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="/static/blog.css" rel="stylesheet">
+  <script defer src="https://use.fontawesome.com/releases/v5.0.3/js/all.js"></script>
+  <link href="/static/toastr.css" rel="stylesheet" />
+</head>
+
+<body>
+  <header>
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="nav">
+          <a class="nav-link active" href="#">Home</a>
+          <a class="nav-link" href="#">New features</a>
+          <a class="nav-link" href="#">Press</a>
+          <a class="nav-link" href="#">New hires</a>
+          <a class="nav-link" href="#">About</a>
+        </nav>
+      </div>
+    </div>
+    <!--         <div class="blog-header">
                 <div class="container">
                     <h1 class="blog-title">The Bootstrap Blog</h1>
                     <p class="lead blog-description">An example blog template built with Bootstrap.</p>
                 </div>
             </div>
-        -->    </header>
-        <main role="main" class="container">
-            <input type=hidden id="letterPurpose"  value=""/>
-            <input type=hidden id="letterReplyTo"  value=""/>
-            <input type=hidden id="letterReplaces"  value=""/>
-            <!-- begin medium modal -->
-            <!-- Modal -->
-            <div class="modal fade" id="writingModal" tabindex="-1" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="writingModalLabel"></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        -->
+  </header>
+  <main role="main" class="container">
+    <input type=hidden id="letterPurpose" value="" />
+    <input type=hidden id="letterReplyTo" value="" />
+    <input type=hidden id="letterReplaces" value="" />
+    <!-- begin medium modal -->
+    <!-- Modal -->
+    <div class="modal fade" id="writingModal" tabindex="-1" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="writingModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                             </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="editable">
-                                <p>My father’s family name being
-                                    <a href="https://en.wikipedia.org/wiki/Pip_(Great_Expectations)">Pirrip</a>, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called Pip.</p>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-info">
+          </div>
+          <div class="modal-body">
+            <div class="editable">
+              <p>My father’s family name being
+                <a href="https://en.wikipedia.org/wiki/Pip_(Great_Expectations)">Pirrip</a>, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called
+                Pip.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-info">
                                         <input type="radio" name="options" id="writingToSelf" autocomplete="off">Self
                                     </label>
-                                    <label class="btn btn-info">
+              <label class="btn btn-info">
                                         <input type="radio" name="options" id="writingToFriends" autocomplete="off"> Friends
                                     </label>
-                                    <label class="btn btn-info active">
+              <label class="btn btn-info active">
                                         <input type="radio" name="options" id="writingToPublic" autocomplete="off" checked> Public
                                     </label>
-                                </div>
-                                <button type="button" class="btn btn-primary" id="submit-writing">Submit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end medium modal -->
-                <!-- Modal -->
-                <div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="nameModalLabel"><img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+            </div>
+            <button type="button" class="btn btn-primary" id="submit-writing">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end medium modal -->
+    <!-- Modal -->
+    <div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="nameModalLabel"><img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
                                 data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">&nbsp;
                                 <span id="modalNameName">Mark</span> <small>[<span id="modalNamePublicKey">aasdlkfjas9jf93jfa</span>]</small></h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                                 </button>
-                            </div>
-                            <div class="modal-body">
-                                <span id="modalNameContent">
+          </div>
+          <div class="modal-body">
+            <span id="modalNameContent">
                                     I enjoy skiing and driving around!
                                 </span>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-info">Filter</button>
-                                <button type="button" class="btn btn-primary" id="followButton">Follow</button>
-                                <button type="button" class="btn btn-danger">Block</button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-9 blog-main">
-
-
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-info">Filter</button>
+            <button type="button" class="btn btn-primary" id="followButton">Follow</button>
+            <button type="button" class="btn btn-danger">Block</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-9 blog-main">
         {{ range .Posts }}
         <!--begin blog post -->
         <div class="card">
-            <div class="card-body">
-                <div class="blog-post">
-                    <p class="blog-post-meta">
-                        <span class="float-right">&nbsp;<a href="#!" data-usecontent="uuidofpost" data-title="Edit post" class="editmodal" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
-                        <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/static/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a> to {{ .Recipients }} <br>
-                        {{ .Date.Format "January 2, 2006 3:04:05PM" }}
-                    </p>
-                    <hr>
-                    <div id="{{ .ID }}">
-                        {{ .Content }}
-                    </div>
-                    <p class="text-right">&nbsp;<a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a></span></p>
-                    <hr>
-                </div>
+          <div class="card-body">
+            <div class="blog-post">
+              <p class="blog-post-meta">
+                <span class="float-right">&nbsp;<a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
+                <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/static/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> {{ .Date.Format "January 2, 2006 3:04:05PM" }}
+              </p>
+              <hr>
+              <div id="{{ .ID }}">
+                {{ .Content }}
+              </div>
+              <p class="text-right">&nbsp;<a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a></span>
+              </p>
+              <hr>
             </div>
+          </div>
         </div>
         <!-- /.blog-post -->
         {{ end }}
-                <!-- end blog post -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="blog-post">
-                            <p class="blog-post-meta">January 1, 2014 11:15am <a href="#!" class="activatenamemodal" data-name="Mark!" data-publickey="publickey198f3j" data-content="I love <b>skiing</b> and playing with rabbits" data-image="someimage.png">Mark</a> to Friends
-                            <span class="float-right">&nbsp;<a href="#!" data-usecontent="uuidofpost" data-title="Edit post" class="editmodal" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
-                        </p>
-                        <hr>
-                        <div id="uuidofpost">
-                            <p>This blog post shows a few different types of content that's supported and styled with Bootstrap. Basic typography, images, and code are all supported.</p>
-                            <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
-                            <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg" alt="Some image" class="img-fluid" />
-                            <blockquote>
-                                <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                            </blockquote>
-                            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
-                            <h2>Heading</h2>
-                            <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
-                            <h3>Sub-heading</h3>
-                            <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
-                        <pre><code>Example code block</code></pre>
-                        <p>Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
-                        <h3>Sub-heading</h3>
-                        <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                        <ul>
-                            <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
-                            <li>Donec id elit non mi porta gravida at eget metus.</li>
-                            <li>Nulla vitae elit libero, a pharetra augue.</li>
-                        </ul>
-                        <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
-                        <ol>
-                            <li>Vestibulum id ligula porta felis euismod semper.</li>
-                            <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
-                            <li>Maecenas sed diam eget risus varius blandit sit amet non magna.</li>
-                        </ol>
-                        <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
+        <!-- end blog post -->
+        <div class="card">
+          <div class="card-body">
+            <div class="blog-post">
+              <p class="blog-post-meta">January 1, 2014 11:15am <a href="#!" class="activatenamemodal" data-name="Mark!" data-publickey="publickey198f3j" data-content="I love <b>skiing</b> and playing with rabbits" data-image="someimage.png">Mark</a> to Friends
+                <span class="float-right">&nbsp;<a href="#!" data-usecontent="uuidofpost" data-title="Edit post" class="editmodal" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
+              </p>
+              <hr>
+              <div id="uuidofpost">
+                <p>This blog post shows a few different types of content that's supported and styled with Bootstrap. Basic typography, images, and code are all supported.</p>
+                <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur
+                  purus sit amet fermentum.</p>
+                <img src="https://bubblesandbeebots.files.wordpress.com/2017/06/bunnyrabbit-large_trans_nvbqzqnjv4bqkm3ycdi1zvq0mt8cxo2c41vse9jsn00kzbur3ixhago.jpg" alt="Some image" class="img-fluid" />
+                <blockquote>
+                  <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                </blockquote>
+                <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+                <h2>Heading</h2>
+                <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+                <h3>Sub-heading</h3>
+                <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                <pre><code>Example code block</code></pre>
+                <p>Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
+                <h3>Sub-heading</h3>
+                <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+                  condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                <ul>
+                  <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
+                  <li>Donec id elit non mi porta gravida at eget metus.</li>
+                  <li>Nulla vitae elit libero, a pharetra augue.</li>
+                </ul>
+                <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
+                <ol>
+                  <li>Vestibulum id ligula porta felis euismod semper.</li>
+                  <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+                  <li>Maecenas sed diam eget risus varius blandit sit amet non magna.</li>
+                </ol>
+                <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
+              </div>
+              <p>
+                <p class="text-right">&nbsp;<a href="#!" class="editmodal" data-title="Reply to Mark" data-replyto="UUID" data-purpose="share-text"><i class="fas fa-reply"></i></a></span>
+                </p>
+                <hr>
+                <!--comments begin -->
+                <div data-children=".item">
+                  <!-- <div id="exampleAccordion" data-children=".item"> THIS VERSION COLLAPSES OTHERS WHEN OPENING A NEW ONE-->
+                  <div class="item">
+                    <div class="row">
+                      <div class="col-12 bg-info">
+                        <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion1" aria-expanded="false" aria-controls="exampleAccordion1">
+                                                <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                                                data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">
+                                            </a>
+                        <span class="align-middle">Stefan</span>
+                        <span style="  position: absolute;
+                                                top: 50%;
+                                                right: 10px;
+                                            transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
+                      </div>
                     </div>
-                    <p>
-                        <p class="text-right">&nbsp;<a href="#!" class="editmodal" data-title="Reply to Mark" data-replyto="UUID" data-purpose="share-text"><i class="fas fa-reply"></i></a></span>
-                    </p>
-                    <hr>
-                    <!--comments begin -->
-                    <div data-children=".item">
-                        <!-- <div id="exampleAccordion" data-children=".item"> THIS VERSION COLLAPSES OTHERS WHEN OPENING A NEW ONE-->
-                        <div class="item">
+                    <div id="exampleAccordion1" class="collapse" role="tabpanel">
+                      <p class="mb-3">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
+                      </p>
+                      <!-- comments within comments -->
+                      <div class="row">
+                        <div class="col-1"></div>
+                        <div class="col-11">
+                          <div class="item">
                             <div class="row">
-                                <div class="col-12 bg-info">
-                                    <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion1" aria-expanded="false" aria-controls="exampleAccordion1">
-                                        <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
-                                        data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">
-                                    </a>
-                                    <span class="align-middle">Stefan</span>
-                                    <span style="  position: absolute;
-                                        top: 50%;
-                                        right: 10px;
-                                    transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
-                                </div>
+                              <div class="col-12 bg-info">
+                                <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                                  style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
+                                <span class="align-middle">Stefan</span>
+                                <span style="  position: absolute;
+                                                                top: 50%;
+                                                                right: 10px;
+                                                            transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
+                              </div>
                             </div>
-                            <div id="exampleAccordion1" class="collapse" role="tabpanel">
-                                <p class="mb-3">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
-                                </p>
-                                <!-- comments within comments -->
-                                <div class="row">
-                                    <div class="col-1"></div>
-                                    <div class="col-11">
-                                        <div class="item">
-                                            <div class="row">
-                                                <div class="col-12 bg-info">
-                                                    <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg==" style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
-                                                    <span class="align-middle">Stefan</span>
-                                                    <span style="  position: absolute;
-                                                        top: 50%;
-                                                        right: 10px;
-                                                    transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
-                                                </div>
-                                            </div>
-                                            <div id="" role="tabpanel">
-                                                <p class="mb-3">
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="row">
-                                                <div class="col-12 bg-warning">
-                                                    <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg==" style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
-                                                    <span class="align-middle">Barack</span>
-                                                    <span style="  position: absolute;
-                                                        top: 50%;
-                                                        right: 10px;
-                                                    transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
-                                                </div>
-                                            </div>
-                                            <div id="" role="tabpanel">
-                                                <p class="mb-3">
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg==" style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
-                                            <span class="align-middle">Maurice</span>
-                                            <div id="" role="tabpanel">
-                                                <p class="mb-3">
-                                                    Donec at ipsum dignissim, rutrum turpis scelerisque, tristique lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus nec dui turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- comments within comments -->
+                            <div id="" role="tabpanel">
+                              <p class="mb-3">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
+                              </p>
                             </div>
+                          </div>
+                          <div class="item">
+                            <div class="row">
+                              <div class="col-12 bg-warning">
+                                <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                                  style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
+                                <span class="align-middle">Barack</span>
+                                <span style="  position: absolute;
+                                                                top: 50%;
+                                                                right: 10px;
+                                                            transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
+                              </div>
+                            </div>
+                            <div id="" role="tabpanel">
+                              <p class="mb-3">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
+                              </p>
+                            </div>
+                          </div>
+                          <div class="item">
+                            <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                              style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
+                            <span class="align-middle">Maurice</span>
+                            <div id="" role="tabpanel">
+                              <p class="mb-3">
+                                Donec at ipsum dignissim, rutrum turpis scelerisque, tristique lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus nec dui turpis. Orci varius natoque penatibus et magnis dis parturient montes,
+                                nascetur ridiculus mus.
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div class="item">
-                            <div class="row">
-                                <div class="col-12 bg-warning">
-                                    <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion2" aria-expanded="false" aria-controls="exampleAccordion1">
+                      </div>
+                      <!-- comments within comments -->
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="row">
+                      <div class="col-12 bg-warning">
+                        <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion2" aria-expanded="false" aria-controls="exampleAccordion1">
+                                                <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
+                                                style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
+                                            </a>
+                        <span class="align-middle">Barack</span>
+                        <span style="  position: absolute;
+                                                top: 50%;
+                                                right: 10px;
+                                            transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
+                      </div>
+                    </div>
+                    <div id="exampleAccordion2" class="collapse" role="tabpanel">
+                      <p class="mb-3">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion3" aria-expanded="true" aria-controls="exampleAccordion2">
                                         <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
                                         style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
+                                        <span class="align-middle">Maurice</span>
                                     </a>
-                                    <span class="align-middle">Barack</span>
-                                    <span style="  position: absolute;
-                                        top: 50%;
-                                        right: 10px;
-                                    transform: translateY(-50%);">December 31st, 2017 12:02PM</span>
-                                </div>
-                            </div>
-                            <div id="exampleAccordion2" class="collapse" role="tabpanel">
-                                <p class="mb-3">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium lorem non vestibulum scelerisque. Proin a vestibulum sem, eget tristique massa. Aliquam lacinia rhoncus nibh quis ornare.
-                                </p>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <a data-toggle="collapse" data-parent="#exampleAccordion" href="#exampleAccordion3" aria-expanded="true" aria-controls="exampleAccordion2">
-                                <img data-holder-rendered="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
-                                style="width: 48px; height: 48px;" data-src="holder.js/64x64" alt="64x64" class="align-middle">
-                                <span class="align-middle">Maurice</span>
-                            </a>
-                            <div id="exampleAccordion3" class="collapse show" role="tabpanel">
-                                <p class="mb-3">
-                                    Donec at ipsum dignissim, rutrum turpis scelerisque, tristique lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus nec dui turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-                                </p>
-                            </div>
-                        </div>
+                    <div id="exampleAccordion3" class="collapse show" role="tabpanel">
+                      <p class="mb-3">
+                        Donec at ipsum dignissim, rutrum turpis scelerisque, tristique lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus nec dui turpis. Orci varius natoque penatibus et magnis dis parturient montes,
+                        nascetur ridiculus mus.
+                      </p>
                     </div>
-                    <!-- comments end -->
+                  </div>
                 </div>
-                <!-- /.blog-post -->
+                <!-- comments end -->
             </div>
+            <!-- /.blog-post -->
+          </div>
         </div>
         <div class="blog-post">
-            <h2 class="blog-post-title">Another blog post</h2>
-            <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
-            <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
-            <blockquote>
-                <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-            </blockquote>
-            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
-            <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+          <h2 class="blog-post-title">Another blog post</h2>
+          <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
+          <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur
+            purus sit amet fermentum.</p>
+          <blockquote>
+            <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+          </blockquote>
+          <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+          <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
         </div>
         <!-- /.blog-post -->
         <div class="blog-post">
-            <h2 class="blog-post-title">New feature</h2>
-            <p class="blog-post-meta">December 14, 2013 by <a href="#">Chris</a></p>
-            <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-            <ul>
-                <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
-                <li>Donec id elit non mi porta gravida at eget metus.</li>
-                <li>Nulla vitae elit libero, a pharetra augue.</li>
-            </ul>
-            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
-            <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
+          <h2 class="blog-post-title">New feature</h2>
+          <p class="blog-post-meta">December 14, 2013 by <a href="#">Chris</a></p>
+          <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum
+            nibh, ut fermentum massa justo sit amet risus.</p>
+          <ul>
+            <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
+            <li>Donec id elit non mi porta gravida at eget metus.</li>
+            <li>Nulla vitae elit libero, a pharetra augue.</li>
+          </ul>
+          <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+          <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
         </div>
         <!-- /.blog-post -->
         <nav class="blog-pagination">
-            <a class="btn btn-outline-primary" href="#">Older</a>
-            <a class="btn btn-outline-secondary disabled" href="#">Newer</a>
+          <a class="btn btn-outline-primary" href="#">Older</a>
+          <a class="btn btn-outline-secondary disabled" href="#">Newer</a>
         </nav>
-    </div>
-    <!-- /.blog-main -->
-    <aside class="col-sm-3 ml-sm-auto blog-sidebar">
+      </div>
+      <!-- /.blog-main -->
+      <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
-            <img src="https://pbs.twimg.com/profile_images/839904034806910976/quhVl5Bc.jpg">
-            <h4><div id="askldjfa9w3jaw9fj3aw">Zack</div></h4>
-            <div id="alskdjfalksjdfljas">
-                <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
-            </div>
+          <img src="https://pbs.twimg.com/profile_images/839904034806910976/quhVl5Bc.jpg">
+          <h4><div id="askldjfa9w3jaw9fj3aw">Zack</div></h4>
+          <div id="alskdjfalksjdfljas">
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+          </div>
         </div>
         <div class="sidebar-module">
-            <h4>Actions</h4>
-            <ol class="list-unstyled">
-                <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
-                <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="alskdjfalksjdfljas">Edit profile</a></li>
-                <li><a href="#">Upload image</a></li>
-                <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="askldjfa9w3jaw9fj3aw">Change name</a></li>
-            </ol>
+          <h4>Actions</h4>
+          <ol class="list-unstyled">
+            <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
+            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="alskdjfalksjdfljas">Edit profile</a></li>
+            <li><a href="#">Upload image</a></li>
+            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="askldjfa9w3jaw9fj3aw">Change name</a></li>
+          </ol>
         </div>
         <div class="sidebar-module">
-            <h4>Friends</h4>
-            <ol class="list-unstyled">
-                <li><a href="#">GitHub</a></li>
-                <li><a href="#">Twitter</a></li>
-                <li><a href="#">Facebook</a></li>
-            </ol>
+          <h4>Friends</h4>
+          <ol class="list-unstyled">
+            <li><a href="#">GitHub</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Facebook</a></li>
+          </ol>
         </div>
-    </aside>
-    <!-- /.blog-sidebar -->
-</div>
-<!-- /.row -->
-</main>
-<!-- /.container -->
-<footer class="blog-footer">
-<p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
-<p>
-    <a href="#">Back to top</a>
-</p>
-</footer>
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="/static/popper.min.js"></script>
-<script src="/static/bootstrap.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
-<script src="/static/toastr.min.js"></script>
-<script>
-function submitLetter(letter) {
-var posting = $.post( "http://localhost:8003/letter", JSON.stringify(letter) );
-posting.done(function( data ) {
-console.log(data);
-$("#writingModal").modal('hide');
-if (data['success']==true) {
-toastr.info(data['message']);
-} else {
-toastr.warn(data['message']);
-}
-});
-}
-var editor = new MediumEditor('.editable');
-$(document).ready(function () {
-$("img").addClass("img-fluid");
-$( "#submit-writing" ).click(function(event) {
-// Stop form from submitting normally
-event.preventDefault();
-letter = {
-"purpose":$("#letterPurpose").val(),
-"replaces":$("#letterReplaces").val(),
-"reply_to":$("#letterReplyTo").val(),
-"to":["self"],
-"content": editor.getContent(),
-}
-if ($("#writingToPublic").is(":checked") == true) {
-letter["to"] = ["public"];
-}
-if ($("#writingToFriends").is(":checked") == true) {
-letter["to"] = ["friends"];
-}
-console.log(letter);
-submitLetter(letter);
-});
-$( ".editmodal" ).click(function() {
-$("#writingModal").modal();
-console.log($(this).data('title'));
-$("#writingModalLabel").text($(this).data('title'));
-$(".editable").focus(function() { $(this).select(); } );
-console.log($(this).data("usecontent"));
-if ($(this).data("usecontent")) {
-$(".editable").html($("#"+$(this).data("usecontent")).html())
-} else {
-$(".editable").text("Write your post...");
-}
-if ($(this).data("replyto")) {
-$("#letterReplyTo").val($(this).data("replyto"));
-} else {
-$("#letterReplyTo").val("");
-}
-if ($(this).data("replaces")) {
-$("#letterReplaces").val($(this).data("replaces"));
-} else {
-$("#letterReplaces").val("");
-}
-$("#letterPurpose").val($(this).data("purpose"));
-});
-$( ".activatenamemodal" ).click(function() {
-console.log($(this).data("name"));
-$("#modalNameName").text($(this).data("name"));
-$("#modalNamePublicKey").text($(this).data("publickey"));
-$("#modalNameContent").html($(this).data("content"));
-$("#nameModal").modal();
-$("#followButton").attr("data-publickey", $(this).data("publickey"));
-});
-$( "#followButton" ).click(function() {
-console.log($(this).data("publickey"));
-// TODO: MAKE A FOLLOW!
-});
-var restrictInput = function(event) {
-$("img:not(.img-fluid)").addClass("img-fluid");
-}
-editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
-});
-</script>
+      </aside>
+      <!-- /.blog-sidebar -->
+    </div>
+    <!-- /.row -->
+  </main>
+  <!-- /.container -->
+  <footer class="blog-footer">
+    <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+    <p>
+      <a href="#">Back to top</a>
+    </p>
+  </footer>
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="/static/popper.min.js"></script>
+  <script src="/static/bootstrap.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js"></script>
+  <script src="/static/toastr.min.js"></script>
+  <script>
+    function submitLetter(letter) {
+      var posting = $.post("http://localhost:8003/letter", JSON.stringify(letter));
+      posting.done(function(data) {
+        console.log(data);
+        $("#writingModal").modal('hide');
+        if (data['success'] == true) {
+          toastr.info(data['message']);
+        } else {
+          toastr.warn(data['message']);
+        }
+      });
+    }
+    var editor = new MediumEditor('.editable');
+    $(document).ready(function() {
+      $("img").addClass("img-fluid");
+      $("#submit-writing").click(function(event) {
+        // Stop form from submitting normally
+        event.preventDefault();
+        letter = {
+          "purpose": $("#letterPurpose").val(),
+          "replaces": $("#letterReplaces").val(),
+          "reply_to": $("#letterReplyTo").val(),
+          "to": ["self"],
+          "content": editor.getContent(),
+        }
+        if ($("#writingToPublic").is(":checked") == true) {
+          letter["to"] = ["public"];
+        }
+        if ($("#writingToFriends").is(":checked") == true) {
+          letter["to"] = ["friends"];
+        }
+        console.log(letter);
+        submitLetter(letter);
+      });
+      $(".editmodal").click(function() {
+        $("#writingModal").modal();
+        console.log($(this).data('title'));
+        $("#writingModalLabel").text($(this).data('title'));
+        $(".editable").focus(function() {
+          $(this).select();
+        });
+        console.log($(this).data("usecontent"));
+        if ($(this).data("usecontent")) {
+          $(".editable").html($("#" + $(this).data("usecontent")).html())
+        } else {
+          $(".editable").text("Write your post...");
+        }
+        if ($(this).data("replyto")) {
+          $("#letterReplyTo").val($(this).data("replyto"));
+        } else {
+          $("#letterReplyTo").val("");
+        }
+        if ($(this).data("replaces")) {
+          $("#letterReplaces").val($(this).data("replaces"));
+        } else {
+          $("#letterReplaces").val("");
+        }
+        $("#letterPurpose").val($(this).data("purpose"));
+      });
+      $(".activatenamemodal").click(function() {
+        console.log($(this).data("name"));
+        $("#modalNameName").text($(this).data("name"));
+        $("#modalNamePublicKey").text($(this).data("publickey"));
+        $("#modalNameContent").html($(this).data("content"));
+        $("#nameModal").modal();
+        $("#followButton").attr("data-publickey", $(this).data("publickey"));
+      });
+      $("#followButton").click(function() {
+        console.log($(this).data("publickey"));
+        // TODO: MAKE A FOLLOW!
+      });
+      var restrictInput = function(event) {
+        $("img:not(.img-fluid)").addClass("img-fluid");
+      }
+      editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
+    });
+  </script>
 </body>
+
 </html>

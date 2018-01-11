@@ -459,3 +459,19 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 
 	return
 }
+
+func (d *database) isReplaced(id string) (yes bool) {
+	query := "SELECT id FROM letters WHERE opened == 1 AND letter_replaces=='" + id + "' LIMIT 1;"
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		return true
+	}
+	return false
+}
