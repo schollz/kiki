@@ -223,7 +223,16 @@ func (f Feed) UnsealLetters() (err error) {
 	if err != nil {
 		return err
 	}
-	keysToTry := []keypair.KeyPair{f.PersonalKey, f.RegionKey}
+
+	// get friends keys
+	keysToTry, err := f.db.GetKeys()
+	if err != nil {
+		return
+	}
+	// prepend public key
+	keysToTry = append([]keypair.KeyPair{f.RegionKey}, keysToTry...)
+	// add personal key last
+	keysToTry = append(keysToTry, f.PersonalKey)
 	for _, envelope := range envelopes {
 		if err := envelope.Validate(f.RegionKey); err != nil {
 			// add to purge

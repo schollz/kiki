@@ -66,7 +66,6 @@ func Run() (err error) {
 	r.POST("/sync", handlerSync)           // tell server to sync with another server (local only)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
-		fmt.Println(f.IsKikiInstance("http://localhost:8004"))
 		err := f.ShowFeed()
 		if err != nil {
 			message = err.Error()
