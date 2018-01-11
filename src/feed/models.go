@@ -1,6 +1,9 @@
 package feed
 
 import (
+	"html/template"
+	"time"
+
 	"github.com/cihub/seelog"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
@@ -35,4 +38,19 @@ func GenerateSettings() Settings {
 		BlockPublicPhotos:      false,
 		HidePublicPosts:        false,
 	}
+}
+
+type Post struct {
+	ID         string
+	Recipients string
+	Content    template.HTML
+	Date       time.Time
+	User       User
+}
+
+type User struct {
+	Name      string
+	Profile   string
+	PublicKey string
+	Image     string
 }

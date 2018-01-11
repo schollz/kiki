@@ -13,6 +13,23 @@ import (
 	"strings"
 )
 
+// ContentType returns the type of content
+func ContentType(filename string) string {
+	switch {
+	case strings.Contains(filename, ".css"):
+		return "text/css"
+	case strings.Contains(filename, ".jpg"):
+		return "image/jpeg"
+	case strings.Contains(filename, ".png"):
+		return "image/png"
+	case strings.Contains(filename, ".js"):
+		return "application/javascript"
+	case strings.Contains(filename, ".xml"):
+		return "application/xml"
+	}
+	return "text/html"
+}
+
 // CaptureBase64Images takes HTML and replaces all base64 representations (except GIF) with a filename. It returns the new HTML and also a map of the new file names and their associated data (converted from base64 to binary).
 func CaptureBase64Images(startingHTML string) (newHTML string, images map[string][]byte, err error) {
 	images = make(map[string][]byte)

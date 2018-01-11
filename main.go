@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/schollz/kiki/src/logging"
-	"github.com/schollz/kiki/src/server"
 )
 
 func main() {
@@ -18,9 +17,9 @@ func main() {
 	} else {
 		logging.Log.Debug(false)
 	}
-	server.Port = *port
-	server.Location = *location
-	err := server.Run()
+	Port = *port
+	Location = *location
+	err := Run()
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}

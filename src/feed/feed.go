@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -258,20 +259,19 @@ func (f Feed) UnsealLetters() (err error) {
 	return
 }
 
-func (f Feed) ShowFeed() (err error) {
+func (f Feed) ShowFeed() (posts []Post, err error) {
 	envelopes, err := f.db.GetAllEnvelopes(true)
 	if err != nil {
 		return
 	}
 	f.log.Debugf("Found %d envelopes", len(envelopes))
+	posts = make([]Post, len(envelopes))
+	i := 0
 	for _, e := range envelopes {
 		if e.Letter.Purpose != purpose.ShareText {
 			continue
 		}
-		senderName, err2 := f.db.GetName(e.Sender.Public)
-		if err2 != nil {
-			f.log.Warn(err2)
-		}
+		senderName, _ := f.db.GetName(e.Sender.Public)
 
 		recipients := []string{}
 		for _, to := range e.Letter.To {
@@ -292,8 +292,22 @@ func (f Feed) ShowFeed() (err error) {
 		}
 
 		fmt.Printf("%s (%s) to %s [%s]:\n%s\n\n", senderName, e.Sender.Public, strings.Join(recipients, ", "), utils.TimeAgo(e.Timestamp), e.Letter.Content)
+		post := Post{
+			ID:         e.ID,
+			Recipients: strings.Join(recipients, ", "),
+			Content:    template.HTML(e.Letter.Content),
+			Date:       time.Now(), // TODO: convert timestamp
+			User: User{
+				Name:      senderName,
+				PublicKey: e.Sender.Public,
+			},
+		}
+		posts[i] = post
+		i++
 
 	}
+	posts = posts[:i]
+
 	return
 }
 

@@ -1,8 +1,13 @@
 .PHONY: scratch, install
 
 server:
-	fresh
-	
+	go-bindata static/... templates/...
+	go build 
+	./kiki
+
+dev:
+	rerun -p "**/*.{go,tmpl}" --ignore 'bindata.go' make
+
 scratch:
 	cd kikiscratch && browser-sync start --server --files . --index index.html
 
