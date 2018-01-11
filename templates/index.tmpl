@@ -305,7 +305,7 @@
           <ol class="list-unstyled">
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
             <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="current-profile">Edit profile</a></li>
-            <li><a href="#">Upload image</a></li>
+            <li><a href="#"  class="editmodal" data-title="Update image" data-purpose="assign-image" data-content="Drag and drop an image...">Upload image</a></li>
             <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="current-name">Change name</a></li>
           </ol>
         </div>
@@ -400,6 +400,9 @@
           $(".editable").html($("#" + $(this).data("usecontent")).html())
         } else {
           $(".editable").text("Write your post...");
+        }
+        if ($(this).data("content")) {
+          $(".editable").html($("#" + $(this).data("content")).html())
         }
         if ($(this).data("replyto")) {
           $("#letterReplyTo").val($(this).data("replyto"));
