@@ -118,7 +118,7 @@ func (f *Feed) init() (err error) {
 func (f Feed) doSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
-			err := f.Sync(server)
+			f.Sync(server)
 			if err != nil {
 				f.log.Warn(err)
 			}

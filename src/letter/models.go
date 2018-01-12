@@ -99,7 +99,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 
 	e = Envelope{}
 
-	e.Timestamp = time.Now()
+	e.Timestamp = time.Now().UTC()
 	e.Sender = sender.PublicKey()
 	// Create blockchain ID (hash of any public key + hash of any content + replaces)
 	h := sha256.New()
