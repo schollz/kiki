@@ -194,6 +194,9 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	if l.Purpose == purpose.AssignName {
 		l.Content = strip.StripTags(l.Content)
 	}
+	if strip.StripTags(l.Content) == "" {
+		l.Content = ""
+	}
 
 	// seal the letter
 	e, err := l.Seal(f.PersonalKey, f.RegionKey)

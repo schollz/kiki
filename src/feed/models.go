@@ -37,6 +37,7 @@ func GenerateSettings() Settings {
 		FriendsOfFriends:       true,
 		BlockPublicPhotos:      false,
 		HidePublicPosts:        false,
+		AvailableServers:       []string{"https://kiki.network"},
 	}
 }
 
