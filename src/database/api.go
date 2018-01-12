@@ -89,7 +89,12 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 		return
 	}
 	defer db.Close()
-	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_replyto = ? ORDER BY time DESC", id)
+	// purpose should be to share text
+	// can be empty
+	// should not be replaced
+	// should be a reply
+	// ordered by time ascending
+	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_replyto == ? ORDER BY time", id)
 }
 
 func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {

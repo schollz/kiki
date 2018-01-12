@@ -49,6 +49,7 @@ type BasicPost struct {
 	Depth      int
 	ID         string
 	Recipients string
+	ReplyTo    string
 	Content    template.HTML
 	Date       time.Time
 	TimeAgo    string

@@ -286,7 +286,7 @@ func (f Feed) ShowProfile() (u User, err error) {
 }
 
 func (f Feed) ShowFeed() (posts []Post, err error) {
-	envelopes, err := f.db.GetAllEnvelopes(true)
+	envelopes, err := f.db.GetBasicPosts()
 	if err != nil {
 		return
 	}
@@ -294,8 +294,8 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 	posts = make([]Post, len(envelopes))
 	i := 0
 	for _, e := range envelopes {
-
-		comments := []BasicPost{}
+		post := f.MakePost(e)
+		comments := f.DetermineComments(post.ID)
 
 		posts[i] = Post{
 			Post:     post,
@@ -305,27 +305,11 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 
 	}
 	posts = posts[:i]
-
+	fmt.Println(posts)
 	return
 }
 
-func (f Feed) MakePost(e letter.Envelope) (post BasicPost, err error) {
-	if e.Letter.Purpose != purpose.ShareText {
-		err = errors.New("purpose must be to share text")
-	}
-	// skip something if it is empty
-	if strip.StripTags(e.Letter.Content) == "" {
-		continue
-	}
-	// skip something if it has been replaced
-	if f.db.IsReplaced(e.ID) {
-		continue
-	}
-	// skip comments for the main feed
-	if e.Letter.ReplyTo != "" {
-		continue
-	}
-
+func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {
 	recipients := []string{}
 	for _, to := range e.Letter.To {
 		if to == f.RegionKey.Public {
@@ -344,7 +328,7 @@ func (f Feed) MakePost(e letter.Envelope) (post BasicPost, err error) {
 		recipients = append(recipients, senderName)
 	}
 
-	post := BasicPost{
+	post = BasicPost{
 		ID:         e.ID,
 		Recipients: strings.Join(recipients, ", "),
 		Content:    template.HTML(e.Letter.Content),
@@ -357,12 +341,11 @@ func (f Feed) MakePost(e letter.Envelope) (post BasicPost, err error) {
 			Image:     f.db.GetProfileImage(e.Sender.Public),
 		},
 	}
-
 	return
 }
-func (f Feed) DetermineComments(postID string) (comments []BasicPost) {
-	comments = f.recurseComments(postID, []BasicPost{}, 0)
-	return
+
+func (f Feed) DetermineComments(postID string) []BasicPost {
+	return f.recurseComments(postID, []BasicPost{}, 0)
 }
 
 func (f Feed) recurseComments(postID string, comments []BasicPost, depth int) []BasicPost {
@@ -371,7 +354,11 @@ func (f Feed) recurseComments(postID string, comments []BasicPost, depth int) []
 		f.log.Error(err)
 	}
 	for _, e := range es {
-		comments = append(comments, e)
+		comment := f.MakePost(e)
+		comment.Depth = depth
+		comment.ReplyTo = postID
+		comments = append(comments, comment)
+		comments = f.recurseComments(comment.ID, comments, depth+1)
 	}
 	return comments
 }

@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,10 @@ func MiddleWareHandler() gin.HandlerFunc {
 	}
 }
 
+func minus(a, b int) string {
+	return strconv.FormatInt(int64(a)-int64(b), 10)
+}
+
 // Run will start the server listening
 func Run() (err error) {
 	// Startup feed
@@ -53,8 +58,7 @@ func Run() (err error) {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.New()
-	// Standardize logs
-	r.Use(MiddleWareHandler(), gin.Recovery())
+	r.Use(MiddleWareHandler(), gin.Recovery()) // Standardize logs
 	r.HTMLRender = loadTemplates("index.tmpl")
 	r.HEAD("/", func(c *gin.Context) { // handler for the uptime robot
 		c.String(http.StatusOK, "OK")
@@ -142,12 +146,15 @@ func AddCORS(c *gin.Context) {
 
 func loadTemplates(list ...string) multitemplate.Render {
 	r := multitemplate.New()
+	funcMap := template.FuncMap{
+		"minus": minus,
+	}
 	for _, x := range list {
 		templateString, err := Asset("templates/" + x)
 		if err != nil {
 			panic(err)
 		}
-		tmplMessage, err := template.New(x).Parse(string(templateString))
+		tmplMessage, err := template.New(x).Funcs(funcMap).Parse(string(templateString))
 		if err != nil {
 			panic(err)
 		}
