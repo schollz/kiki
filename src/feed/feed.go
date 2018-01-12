@@ -285,10 +285,19 @@ func (f Feed) ShowProfile() (u User, err error) {
 	return
 }
 
-func (f Feed) ShowFeed() (posts []Post, err error) {
-	envelopes, err := f.db.GetBasicPosts()
-	if err != nil {
-		return
+func (f Feed) ShowFeed(id ...string) (posts []Post, err error) {
+	var envelopes []letter.Envelope
+	if len(id) == 0 {
+		envelopes, err = f.db.GetBasicPosts()
+		if err != nil {
+			return
+		}
+	} else {
+		envelopes = make([]letter.Envelope, 1)
+		envelopes[0], err = f.db.GetEnvelopeFromID(id[0])
+		if err != nil {
+			return
+		}
 	}
 	f.log.Debugf("Found %d envelopes", len(envelopes))
 	posts = make([]Post, len(envelopes))

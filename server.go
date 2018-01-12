@@ -77,6 +77,21 @@ func Run() (err error) {
 			"User":  user,
 		})
 	})
+	r.GET("/view/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		posts, err := f.ShowFeed(id)
+		if err != nil {
+			log.Error(err)
+		}
+		user, err := f.ShowProfile()
+		if err != nil {
+			log.Error(err)
+		}
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			"Posts": posts,
+			"User":  user,
+		})
+	})
 	r.GET("/static/:file", func(c *gin.Context) {
 		file := c.Param("file")
 		filename := "static/" + file
