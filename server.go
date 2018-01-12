@@ -67,10 +67,14 @@ func Run() (err error) {
 		posts, err := f.ShowFeed()
 		if err != nil {
 			log.Error(err)
+			handleError(500, err, c)
+			return
 		}
 		user, err := f.ShowProfile()
 		if err != nil {
 			log.Error(err)
+			handleError(500, err, c)
+			return
 		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Posts": posts,
@@ -81,10 +85,14 @@ func Run() (err error) {
 		posts, err := f.ShowFeed()
 		if err != nil {
 			log.Error(err)
+			handleError(500, err, c)
+			return
 		}
 		user, err := f.ShowProfile()
 		if err != nil {
 			log.Error(err)
+			handleError(500, err, c)
+			return
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"posts": posts,
@@ -96,10 +104,14 @@ func Run() (err error) {
 		posts, err := f.ShowFeed(id)
 		if err != nil {
 			log.Error(err)
+			handleError(500, err, c)
+			return
 		}
 		user, err := f.ShowProfile()
 		if err != nil {
 			log.Error(err)
+			handleError(500, err, c)
+			return
 		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Posts": posts,

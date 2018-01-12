@@ -11,6 +11,13 @@ import (
 	"github.com/schollz/kiki/src/letter"
 )
 
+func handleError(status_code int, err error, c *gin.Context) {
+	c.JSON(status_code, gin.H{
+		"status": "error",
+		"error":  err.Error(),
+	})
+}
+
 // GET /img
 func handleImage(c *gin.Context) {
 	AddCORS(c)
