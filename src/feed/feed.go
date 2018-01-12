@@ -112,6 +112,7 @@ func (f *Feed) init() (err error) {
 
 	// do syncing in the background
 	go f.doSyncing()
+
 	return
 }
 
@@ -119,9 +120,6 @@ func (f Feed) doSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
 			f.Sync(server)
-			if err != nil {
-				f.log.Warn(err)
-			}
 		}
 		time.Sleep(10 * time.Second)
 	}
@@ -355,12 +353,19 @@ func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		recipients = append(recipients, senderName)
 	}
 
+	// convert UTC timestamps to local time
+	timeLocation, err := time.LoadLocation("Local")
+	if err != nil {
+		panic(err)
+	}
+	convertedTime := e.Timestamp.In(timeLocation)
+
 	post = BasicPost{
 		ID:         e.ID,
 		Recipients: strings.Join(recipients, ", "),
 		Content:    template.HTML(e.Letter.Content),
-		Date:       e.Timestamp,
-		TimeAgo:    utils.TimeAgo(e.Timestamp),
+		Date:       convertedTime,
+		TimeAgo:    utils.TimeAgo(convertedTime),
 		User: User{
 			Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
 			PublicKey: e.Sender.Public,
