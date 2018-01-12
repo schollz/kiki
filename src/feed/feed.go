@@ -121,7 +121,7 @@ func (f Feed) doSyncing() {
 		for _, server := range f.Settings.AvailableServers {
 			f.Sync(server)
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(60 * time.Second)
 	}
 }
 
@@ -600,7 +600,7 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 
 // IsKikiInstance will download the specified envelope
 func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
-	timeout := time.Duration(100 * time.Millisecond)
+	timeout := time.Duration(1500 * time.Millisecond)
 	client := http.Client{
 		Timeout: timeout,
 	}
