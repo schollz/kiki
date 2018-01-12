@@ -19,6 +19,7 @@ img.profile-pic {
   border-radius: 1rem;
   padding: 0.1em;
   max-width: 48px;
+  max-height: 48px;
   height: 100%;
 }
 

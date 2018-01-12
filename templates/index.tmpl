@@ -84,8 +84,7 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="nameModalLabel"><img id="modalNameImage" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEyLjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="
-                                data-src="holder.js/64x64" alt="64x64" class="align-middle profile-pic">&nbsp;
+            <h5 class="modal-title" id="nameModalLabel"><img id="modalNameImage" src="" class="align-middle profile-pic">&nbsp;
                                 <span id="modalNameName">Mark</span> <small>[<span id="modalNamePublicKey">aasdlkfjas9jf93jfa</span>]</small></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -114,6 +113,8 @@
             <div class="blog-post">
               <p class="blog-post-meta">
                 <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;<a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
+
+                <img src="/img/{{ .User.Image }}" class="align-middle profile-pic">
                 <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> {{ .Date.Format "January 2, 2006 3:04:05PM" }}
               </p>
               <hr>
@@ -312,9 +313,7 @@
         <div class="sidebar-module">
           <h4>Friends</h4>
           <ol class="list-unstyled">
-            <li><a href="#">GitHub</a></li>
-            <li><a href="#">Twitter</a></li>
-            <li><a href="#">Facebook</a></li>
+            <li><a href="#">TODO</a></li>
           </ol>
         </div>
       </aside>
@@ -339,7 +338,7 @@
   <script src="/static/toastr.min.js"></script>
   <script>
     function submitLetter(letter) {
-      var posting = $.post("http://localhost:8003/letter", JSON.stringify(letter));
+      var posting = $.post("/letter", JSON.stringify(letter));
       posting.done(function(data) {
         console.log(data);
         $("#writingModal").modal('hide');
