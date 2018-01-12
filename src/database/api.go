@@ -236,5 +236,9 @@ func (api DatabaseAPI) IsReplaced(id string) (yes bool) {
 		return
 	}
 	defer db.Close()
-	return db.isReplaced(id)
+	yes, err = db.isReplaced(id)
+	if err != nil {
+		log.Error(err)
+	}
+	return
 }

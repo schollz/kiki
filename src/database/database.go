@@ -516,18 +516,19 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 	return
 }
 
-func (d *database) isReplaced(id string) (yes bool) {
-	query := "SELECT id FROM letters WHERE opened == 1 AND letter_replaces=='" + id + "' LIMIT 1;"
-	log.Debug(query)
-	rows, err := d.db.Query(query)
+func (d *database) isReplaced(id string) (yes bool, err error) {
+
+	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE letter_replaces==? AND sender == (SELECT sender FROM letters WHERE id==?)")
 	if err != nil {
-		log.Error(err)
+		err = errors.Wrap(err, "problem preparing SQL")
 		return
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		return true
+	defer stmt.Close()
+	var result string
+	err = stmt.QueryRow(id, id).Scan(&result)
+	if err != nil {
+		return false, errors.Wrap(err, "problem getting")
 	}
-	return false
+	yes = result != ""
+	return
 }

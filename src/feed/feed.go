@@ -135,6 +135,15 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		err = errors.New("cannot post with region key")
 		return
 	}
+	if l.Replaces != "" {
+		e, err2 := f.db.GetEnvelopeFromID(l.Replaces)
+		if err2 != nil {
+			return errors.New("problem replacing that")
+		}
+		if f.PersonalKey.Public != e.Sender.Public {
+			return errors.New("refusing to replace someone else's post")
+		}
+	}
 
 	if strings.Contains(l.Purpose, "assign-") {
 		// assignments are always public
