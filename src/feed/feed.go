@@ -328,7 +328,7 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 			recipients = append(recipients, senderName)
 		}
 
-		post := Post{
+		post := BasicPost{
 			ID:         e.ID,
 			Recipients: strings.Join(recipients, ", "),
 			Content:    template.HTML(e.Letter.Content),
@@ -341,7 +341,9 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 				Image:     f.db.GetProfileImage(e.Sender.Public),
 			},
 		}
-		posts[i] = post
+		posts[i] = Post{
+			Post: post,
+		}
 		i++
 
 	}

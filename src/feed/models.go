@@ -41,6 +41,12 @@ func GenerateSettings() Settings {
 }
 
 type Post struct {
+	Post     BasicPost
+	Comments []BasicPost
+}
+
+type BasicPost struct {
+	Depth      int
 	ID         string
 	Recipients string
 	Content    template.HTML
