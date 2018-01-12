@@ -123,34 +123,39 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		return
 	}
 
-	// rewrite the letter.To array so that it contains
-	// public keys that are valid
-	newTo := []string{}
-	for _, to := range l.To {
-		switch to {
-		case "public":
-			newTo = append(newTo, f.RegionKey.Public)
-		case "self":
-			// automatically done when adding any letter
-			// this just put here for pedantic reasons
-		case "friends":
-			friendsKeyPairs, err2 := f.db.GetKeysFromSender(f.PersonalKey.Public)
-			if err2 != nil {
-				return err2
-			}
-			for _, friendsKeyPair := range friendsKeyPairs {
-				newTo = append(newTo, friendsKeyPair.Public)
-			}
-		default:
-			_, err2 := keypair.FromPublic(to)
-			if err2 != nil {
-				f.log.Infof("Not a valid public key: '%s'", to)
-			} else {
-				newTo = append(newTo, to)
+	if strings.Contains(l.Purpose, "assign-") {
+		// assignments are always public
+		l.To = []string{f.RegionKey.Public}
+	} else {
+		// rewrite the letter.To array so that it contains
+		// public keys that are valid
+		newTo := []string{}
+		for _, to := range l.To {
+			switch to {
+			case "public":
+				newTo = append(newTo, f.RegionKey.Public)
+			case "self":
+				// automatically done when adding any letter
+				// this just put here for pedantic reasons
+			case "friends":
+				friendsKeyPairs, err2 := f.db.GetKeysFromSender(f.PersonalKey.Public)
+				if err2 != nil {
+					return err2
+				}
+				for _, friendsKeyPair := range friendsKeyPairs {
+					newTo = append(newTo, friendsKeyPair.Public)
+				}
+			default:
+				_, err2 := keypair.FromPublic(to)
+				if err2 != nil {
+					f.log.Infof("Not a valid public key: '%s'", to)
+				} else {
+					newTo = append(newTo, to)
+				}
 			}
 		}
+		l.To = newTo
 	}
-	l.To = newTo
 
 	// determine if their are any images in envelope letter content that should be spliced out
 	newHTML, images, err := web.CaptureBase64Images(l.Content)
@@ -184,6 +189,11 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
 	}
 	l.Content = newHTML
+
+	// remove tags from name change
+	if l.Purpose == purpose.AssignName {
+		l.Content = strip.StripTags(l.Content)
+	}
 
 	// seal the letter
 	e, err := l.Seal(f.PersonalKey, f.RegionKey)

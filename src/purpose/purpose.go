@@ -14,6 +14,8 @@ var (
 	// ShareKey is for sharing keypairs with friends, or with self
 	ShareKey = "share-key"
 
+	// Assignments are always public
+
 	// AssignFollow will follow someone
 	AssignFollow = "assign-follow"
 
