@@ -8,7 +8,6 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -45,9 +44,11 @@ func CaptureBase64Images(startingHTML string) (newHTML string, images map[string
 
 		// https://stackoverflow.com/questions/46022262/covert-base64-string-to-jpg-golang
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64data))
-		m, _, err := image.Decode(reader)
-		if err != nil {
-			log.Fatal(err)
+		m, _, err2 := image.Decode(reader)
+		if err2 != nil {
+			log.Error(err2)
+			err = err2
+			return
 		}
 		// bounds := m.Bounds()
 		// fmt.Println(bounds, formatString)

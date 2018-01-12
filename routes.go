@@ -13,8 +13,8 @@ import (
 
 func handleError(status_code int, err error, c *gin.Context) {
 	c.JSON(status_code, gin.H{
-		"status": "error",
-		"error":  err.Error(),
+		"success": false,
+		"message": err.Error(),
 	})
 }
 
@@ -47,9 +47,7 @@ func handleImage(c *gin.Context) {
 // POST /letter
 func handleLetter(c *gin.Context) (err error) {
 	AddCORS(c)
-
-	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
-		log.Debug(err)
+	if !ValidateLocalAddress(c) {
 		return errors.New("must be on local host")
 	}
 

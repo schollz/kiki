@@ -185,6 +185,15 @@ func AddCORS(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 }
 
+func ValidateLocalAddress(c *gin.Context) (valid bool) {
+	clientIP, errIP := web.GetClientIPHelper(c.Request)
+	if errIP != nil {
+		return
+	}
+	log.Debugf("Got IP adddress: '%s'", clientIP)
+	return clientIP == "127.0.0.1"
+}
+
 func loadTemplates(list ...string) multitemplate.Render {
 	r := multitemplate.New()
 	funcMap := template.FuncMap{
