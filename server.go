@@ -77,6 +77,20 @@ func Run() (err error) {
 			"User":  user,
 		})
 	})
+	r.GET("/feed.json", func(c *gin.Context) {
+		posts, err := f.ShowFeed()
+		if err != nil {
+			log.Error(err)
+		}
+		user, err := f.ShowProfile()
+		if err != nil {
+			log.Error(err)
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"posts": posts,
+			"user":  user,
+		})
+	})
 	r.GET("/view/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		posts, err := f.ShowFeed(id)

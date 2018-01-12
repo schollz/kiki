@@ -42,24 +42,24 @@ func GenerateSettings() Settings {
 }
 
 type Post struct {
-	Post     BasicPost
-	Comments []BasicPost
+	Post     BasicPost   `json:"post"`
+	Comments []BasicPost `json:"comments"`
 }
 
 type BasicPost struct {
-	Depth      int
-	ID         string
-	Recipients string
-	ReplyTo    string
-	Content    template.HTML
-	Date       time.Time
-	TimeAgo    string
-	User       User
+	Depth      int           `json:"depth"`
+	ID         string        `json:"id"`
+	Recipients string        `json:"recipients"`
+	ReplyTo    string        `json:"reply_to"`
+	Content    template.HTML `json:"content"`
+	Date       time.Time     `json:"date"`
+	TimeAgo    string        `json:"time_ago"`
+	User       User          `json:"user"`
 }
 
 type User struct {
-	Name      string
-	Profile   template.HTML
-	PublicKey string
-	Image     string
+	Name      string        `json:"name"`
+	Profile   template.HTML `json:"profile"`
+	PublicKey string        `json:"public_key"`
+	Image     string        `json:"image"`
 }
