@@ -82,6 +82,29 @@ func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err
 	}
 }
 
+// GetReplies returns all envelopes that are replies to a specific envelope
+func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_replyto = ? ORDER BY time DESC", id)
+}
+
+func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	// purpose should be to share text
+	// should not be empty
+	// should not be replaced
+	// should not be a reply
+	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
+}
+
 // GetKeys will return all the keys
 func (api DatabaseAPI) GetKeys() (s []keypair.KeyPair, err error) {
 	db, err := open(api.FileName)

@@ -294,55 +294,12 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 	posts = make([]Post, len(envelopes))
 	i := 0
 	for _, e := range envelopes {
-		if e.Letter.Purpose != purpose.ShareText {
-			continue
-		}
-		// skip something if it is empty
-		if strip.StripTags(e.Letter.Content) == "" {
-			continue
-		}
-		// skip something if it has been replaced
-		if f.db.IsReplaced(e.ID) {
-			continue
-		}
-		// skip comments for the main feed
-		if e.Letter.ReplyTo != "" {
-			continue
-		}
 
-		recipients := []string{}
-		for _, to := range e.Letter.To {
-			if to == f.RegionKey.Public {
-				recipients = []string{"Public"}
-				break
-			}
-			friendsName := strip.StripTags(f.db.GetFriendsName(to))
-			if friendsName != "" {
-				recipients = []string{friendsName}
-				break
-			}
-			senderName := f.db.GetName(to)
-			if senderName == "" {
-				senderName = to
-			}
-			recipients = append(recipients, senderName)
-		}
+		comments := []BasicPost{}
 
-		post := BasicPost{
-			ID:         e.ID,
-			Recipients: strings.Join(recipients, ", "),
-			Content:    template.HTML(e.Letter.Content),
-			Date:       e.Timestamp,
-			TimeAgo:    utils.TimeAgo(e.Timestamp),
-			User: User{
-				Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
-				PublicKey: e.Sender.Public,
-				Profile:   template.HTML(f.db.GetProfile(e.Sender.Public)),
-				Image:     f.db.GetProfileImage(e.Sender.Public),
-			},
-		}
 		posts[i] = Post{
-			Post: post,
+			Post:     post,
+			Comments: comments,
 		}
 		i++
 
@@ -350,6 +307,73 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 	posts = posts[:i]
 
 	return
+}
+
+func (f Feed) MakePost(e letter.Envelope) (post BasicPost, err error) {
+	if e.Letter.Purpose != purpose.ShareText {
+		err = errors.New("purpose must be to share text")
+	}
+	// skip something if it is empty
+	if strip.StripTags(e.Letter.Content) == "" {
+		continue
+	}
+	// skip something if it has been replaced
+	if f.db.IsReplaced(e.ID) {
+		continue
+	}
+	// skip comments for the main feed
+	if e.Letter.ReplyTo != "" {
+		continue
+	}
+
+	recipients := []string{}
+	for _, to := range e.Letter.To {
+		if to == f.RegionKey.Public {
+			recipients = []string{"Public"}
+			break
+		}
+		friendsName := strip.StripTags(f.db.GetFriendsName(to))
+		if friendsName != "" {
+			recipients = []string{friendsName}
+			break
+		}
+		senderName := f.db.GetName(to)
+		if senderName == "" {
+			senderName = to
+		}
+		recipients = append(recipients, senderName)
+	}
+
+	post := BasicPost{
+		ID:         e.ID,
+		Recipients: strings.Join(recipients, ", "),
+		Content:    template.HTML(e.Letter.Content),
+		Date:       e.Timestamp,
+		TimeAgo:    utils.TimeAgo(e.Timestamp),
+		User: User{
+			Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
+			PublicKey: e.Sender.Public,
+			Profile:   template.HTML(f.db.GetProfile(e.Sender.Public)),
+			Image:     f.db.GetProfileImage(e.Sender.Public),
+		},
+	}
+
+	return
+}
+func (f Feed) DetermineComments(postID string) (comments []BasicPost) {
+	comments = f.recurseComments(postID, []BasicPost{}, 0)
+	return
+}
+
+func (f Feed) recurseComments(postID string, comments []BasicPost, depth int) []BasicPost {
+	es, err := f.db.GetReplies(postID)
+	if err != nil {
+		f.log.Error(err)
+	}
+	for _, e := range es {
+		comments = append(comments, e)
+	}
+	return comments
 }
 
 // AddFriendsKey will generate a new friends key and post it to the feed
