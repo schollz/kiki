@@ -305,6 +305,10 @@ func (f Feed) ShowFeed() (posts []Post, err error) {
 		if f.db.IsReplaced(e.ID) {
 			continue
 		}
+		// skip comments for the main feed
+		if e.Letter.ReplyTo != "" {
+			continue
+		}
 
 		recipients := []string{}
 		for _, to := range e.Letter.To {
