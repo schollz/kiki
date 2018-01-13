@@ -229,6 +229,7 @@
             error: function(xhr, status, err) {
                 toastr["error"](err, "Posting to KiKi");
                 callback && callback(err);
+                $("#writingModal").modal('hide');
             },
             success: function(data, status, xhr) {
                 if ("ok" != data.status) {
@@ -238,6 +239,7 @@
                 }
                 toastr["success"](data['message'], "Posting to KiKi");
                 callback && callback(null, data);
+                $("#writingModal").modal('hide');
             }
         });
 
