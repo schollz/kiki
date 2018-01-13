@@ -55,6 +55,10 @@ func Run() (err error) {
 		}
 	}
 
+	if !NoSync {
+		go f.DoSyncing()
+	}
+
 	// Startup server
 	gin.SetMode(gin.ReleaseMode)
 

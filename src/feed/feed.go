@@ -110,13 +110,10 @@ func (f *Feed) init() (err error) {
 	}
 	err = ioutil.WriteFile(path.Join(f.storagePath, "feed.json"), feedBytes, 0644)
 
-	// do syncing in the background
-	go f.doSyncing()
-
 	return
 }
 
-func (f Feed) doSyncing() {
+func (f Feed) DoSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
 			f.Sync(server)

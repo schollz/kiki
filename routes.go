@@ -75,9 +75,8 @@ func handleEnvelope(c *gin.Context) (err error) {
 func handleList(c *gin.Context) {
 	AddCORS(c)
 	ids, err := f.GetIDs()
-	log.Debug(ids)
-	log.Debug(err)
 	if err != nil {
+		log.Error(err)
 		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": ids, "region_key": f.RegionKey.Public})
