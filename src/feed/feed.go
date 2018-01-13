@@ -574,12 +574,6 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	// type EnvelopeWithMessage struct {
-	// 	Envelope letter.Envelope `json:"envelope"`
-	// 	Message  string          `json:"message"`
-	// 	Success  bool            `json:"success"`
-	// }
-
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
@@ -606,11 +600,6 @@ func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
 		return
 	}
 	defer resp.Body.Close()
-
-	// type Message struct {
-	// 	Message string `json:"message"`
-	// 	Success bool   `json:"success"`
-	// }
 
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
