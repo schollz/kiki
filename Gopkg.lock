@@ -14,6 +14,12 @@
   version = "v2.6"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/darkowlzz/openurl"
+  packages = ["."]
+  revision = "673a04d14da017f965f0b97f87ab369ec4a1fd08"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -124,6 +130,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8bcdc8c6ac209079055cce9f9e8cd7deb4997a682bc2697966d36c28060b120e"
+  inputs-digest = "787f3e597f7b08e1f34b08506581965b38d0bcff3fafae6720f9ac829cdc8254"
   solver-name = "gps-cdcl"
   solver-version = 1

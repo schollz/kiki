@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/darkowlzz/openurl"
 	"github.com/schollz/kiki/src/logging"
 )
 
@@ -24,6 +25,7 @@ func main() {
 		logging.Log.Debug(false)
 	}
 
+	go openurl.Open("http://localhost:8004")
 	err := Run()
 	if err != nil {
 		fmt.Println("error: " + err.Error())
