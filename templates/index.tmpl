@@ -215,35 +215,40 @@
   <script src="/static/medium-editor.min.js"></script>
   <script src="/static/toastr.min.js"></script>
   <script>
-    function submitLetter(letter, callback) {
+  function submitLetter(letter, callback) {
 
-        function onError(data) {
-            toastr["error"](data.error, "Posting to KiKi")
-        }
+      function onError(data) {
+          toastr["error"](data.error, "Posting to KiKi")
+      }
 
-        $.ajax({
-            url: "/letter",
-            method: "POST",
-            data: JSON.stringify(letter),
-            contentType: "application/json",
-            error: function(xhr, status, err) {
-                toastr["error"](err, "Posting to KiKi");
-                callback && callback(err);
-                $("#writingModal").modal('hide');
-            },
-            success: function(data, status, xhr) {
-                if ("ok" != data.status) {
-                    // hhtp headers
-                    callback && callback(new Error(data.error));
-                    return onError(data);
-                }
-                toastr["success"](data['message'], "Posting to KiKi");
-                callback && callback(null, data);
-                $("#writingModal").modal('hide');
-            }
-        });
+      $.ajax({
+          url: "/letter",
+          method: "POST",
+          data: JSON.stringify(letter),
+          contentType: "application/json",
+          error: function(xhr, status, err) {
+              try {
+                  var err_json = xhr.responseJSON.error;
+                  toastr["error"](err_json, "Posting to KiKi");
+                  callback && callback(new Error(err_json));
+              }
+              catch(error) {
+                  toastr["error"](err, "Posting to KiKi");
+                  callback && callback(err);
+              }
+          },
+          success: function(data, status, xhr) {
+              if ("ok" != data.status) {
+                  // hhtp headers
+                  callback && callback(new Error(data.error));
+                  return onError(data);
+              }
+              toastr["success"](data['message'], "Posting to KiKi");
+              callback && callback(null, data);
+          }
+      });
 
-    }
+  }
 
 
     toastr.options = {
