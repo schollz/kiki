@@ -65,16 +65,8 @@ func Run() (err error) {
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/", func(c *gin.Context) {
-		posts, err := f.ShowFeed()
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		user, err := f.ShowProfile()
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
+		posts, _ := f.ShowFeed()
+		user, _ := f.ShowProfile()
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Posts": posts,
 			"User":  user,
@@ -128,10 +120,9 @@ func Run() (err error) {
 	})
 	r.GET("/ping", handlePing)
 	r.GET("/img/:id", handleImage)
-	r.POST("/letter", handlerLetter)     // post to put in letter (local only)
-	r.OPTIONS("/letter", handlePing)     // post to put in letter (local only)
-	r.POST("/envelope", handlerEnvelope) // post to put into database (public)
-	r.POST("/sync", handlerSync)         // tell server to sync with another server (local only)
+	r.POST("/letter", handlerLetter) // post to put in letter (local only)
+	r.OPTIONS("/letter", handlePing) // post to put in letter (local only)
+	r.POST("/sync", handlerSync)     // tell server to sync with another server (local only)
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
 		f.ShowFeed()
@@ -139,23 +130,27 @@ func Run() (err error) {
 	})
 
 	// PUBLIC FACING ROUTES
-	local_router := gin.New()
-	local_router.Use(MiddleWareHandler(), gin.Recovery())
-	local_router.GET("/ping", handlePing)
-	local_router.GET("/list", handleList)
-	local_router.GET("/download/:id", handleDownload) // download a specific envelope
+	publicRouter := gin.New()
+	publicRouter.Use(MiddleWareHandler(), gin.Recovery())
+	publicRouter.GET("/ping", handlePing)             // PING a kiki server to see if it is available
+	publicRouter.GET("/list", handleList)             // GET list of all envelope IDs
+	publicRouter.POST("/envelope", handlerEnvelope)   // post to put into database (public)
+	publicRouter.GET("/download/:id", handleDownload) // download a specific envelope
 	go (func() {
-		err = local_router.Run(":" + PublicPort)
-		if nil != err {
+		log.Infof("Running public router on 0.0.0.0:%s", PublicPort)
+		err = publicRouter.Run(":" + PublicPort)
+		if err != nil {
+			log.Error(err)
 			panic(err)
 		}
 	})()
 
-	// PRIVATE ROUTES
-	//  - bind to localhost
-	err = r.Run("localhost:" + PrivatePort) // listen and serve on 0.0.0.0:Port
+	// private routes bind to localhost
+	log.Infof("Running private router on localhost:%s", PrivatePort)
+	err = r.Run("localhost:" + PrivatePort)
 	if nil != err {
-		panic(err)
+		log.Error(err)
+		return
 	}
 	return
 }
