@@ -469,6 +469,7 @@ func (f Feed) Sync(address string) (err error) {
 	}
 
 	var target Response
+	f.log.Debug("getting list")
 	req, err := http.NewRequest("GET", address+"/list", nil)
 	if err != nil {
 		return
@@ -478,10 +479,12 @@ func (f Feed) Sync(address string) (err error) {
 		return
 	}
 	defer resp.Body.Close()
+	f.log.Debug("unmarshaling response")
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
+	f.log.Debug(target)
 	if "ok" != target.Status {
 		return errors.New(target.Error)
 	}
