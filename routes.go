@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,13 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/letter"
 )
-
-// func handleError(status_code int, err error, c *gin.Context) {
-// 	c.JSON(status_code, gin.H{
-// 		"success": false,
-// 		"message": err.Error(),
-// 	})
-// }
 
 // GET /img
 func handleImage(c *gin.Context) {
@@ -47,9 +39,6 @@ func handleImage(c *gin.Context) {
 // POST /letter
 func handleLetter(c *gin.Context) (err error) {
 	AddCORS(c)
-	// if !ValidateLocalAddress(c) {
-	// 	return errors.New("must be on local host")
-	// }
 
 	// bind the payload
 	var p letter.Letter
@@ -112,10 +101,6 @@ func handleDownload(c *gin.Context) {
 // POST /sync
 func handleSync(c *gin.Context) (err error) {
 	AddCORS(c)
-
-	if !strings.Contains(c.Request.RemoteAddr, "127.0.0.1") && !strings.Contains(c.Request.RemoteAddr, "[::1]") {
-		return errors.New("must be on local host")
-	}
 
 	// bind the payload
 	type Payload struct {

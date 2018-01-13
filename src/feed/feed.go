@@ -468,14 +468,14 @@ func (f Feed) Sync(address string) (err error) {
 		return
 	}
 
-	// Get a list of the IDs from other address
-	type ListPayload struct {
-		RegionPublicKey string              `json:"region_key"`
-		IDs             map[string]struct{} `json:"ids"`
-		Message         string              `json:"message"`
-		Success         bool                `json:"success"`
-	}
-	var target ListPayload
+	// // Get a list of the IDs from other address
+	// type ListPayload struct {
+	// 	RegionPublicKey string              `json:"region_key"`
+	// 	IDs             map[string]struct{} `json:"ids"`
+	// 	Message         string              `json:"message"`
+	// 	Success         string              `json:"success"`
+	// }
+	var target Response
 	req, err := http.NewRequest("GET", address+"/list", nil)
 	if err != nil {
 		return
@@ -489,8 +489,8 @@ func (f Feed) Sync(address string) (err error) {
 	if err != nil {
 		return
 	}
-	if !target.Success {
-		return errors.New(target.Message)
+	if "ok" != target.Status {
+		return errors.New(target.Error)
 	}
 	if target.RegionPublicKey != f.RegionKey.Public {
 		return errors.New("cannot sync with another region")
@@ -553,18 +553,13 @@ func (f Feed) UploadEnvelope(address, id string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	type Response struct {
-		Message string `json:"message"`
-		Success bool   `json:"success"`
-	}
-
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
-	if !target.Success {
-		return errors.New(target.Message)
+	if "ok" != target.Status {
+		return errors.New(target.Error)
 	}
 
 	f.log.Debugf("uploaded %s to %s", id, address)
@@ -586,19 +581,19 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	type EnvelopeWithMessage struct {
-		Envelope letter.Envelope `json:"envelope"`
-		Message  string          `json:"message"`
-		Success  bool            `json:"success"`
-	}
+	// type EnvelopeWithMessage struct {
+	// 	Envelope letter.Envelope `json:"envelope"`
+	// 	Message  string          `json:"message"`
+	// 	Success  bool            `json:"success"`
+	// }
 
-	var target EnvelopeWithMessage
+	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
-	if !target.Success {
-		return errors.New(target.Message)
+	if "ok" != target.Status {
+		return errors.New(target.Error)
 	}
 
 	f.log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
@@ -619,18 +614,18 @@ func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
 	}
 	defer resp.Body.Close()
 
-	type Message struct {
-		Message string `json:"message"`
-		Success bool   `json:"success"`
-	}
+	// type Message struct {
+	// 	Message string `json:"message"`
+	// 	Success bool   `json:"success"`
+	// }
 
-	var target Message
+	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
-	if !target.Success {
-		err = errors.New(target.Message)
+	if "ok" != target.Status {
+		err = errors.New(target.Error)
 		return
 	}
 

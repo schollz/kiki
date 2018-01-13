@@ -7,7 +7,33 @@ import (
 	"github.com/cihub/seelog"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
+	"github.com/schollz/kiki/src/letter"
 )
+
+// Http response
+// Get a list of the IDs from other address
+// type ListPayload struct {
+// 	RegionPublicKey string              `json:"region_key"`
+// 	IDs             map[string]struct{} `json:"ids"`
+// 	Message         string              `json:"message"`
+// 	Error           string              `json:"error"`
+// 	Status          string              `json:"status"`
+// }
+
+// type EnvelopeWithMessage struct {
+// 	Envelope letter.Envelope `json:"envelope"`
+// 	Message  string          `json:"message"`
+// 	Success  bool            `json:"success"`
+// }
+
+type Response struct {
+	RegionPublicKey string              `json:"region_key"`
+	IDs             map[string]struct{} `json:"ids"`
+	Envelope        letter.Envelope     `json:"envelope"`
+	Error           string              `json:"error"`
+	Message         string              `json:"message"`
+	Status          string              `json:"Status"`
+}
 
 // Feed stores your basic data
 type Feed struct {
