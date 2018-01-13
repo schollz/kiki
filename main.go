@@ -17,6 +17,7 @@ func main() {
 	flag.StringVar(&PublicPort, "public", DEFAULT_PUBLIC_PORT, "port for the data (this) server")
 	flag.StringVar(&PrivatePort, "private", DEFAULT_PRIVATE_PORT, "port for the data (this) server")
 	debug := flag.Bool("debug", false, "turn on debug mode")
+	noBrowser := flag.Bool("no-browser", false, "do not open browser")
 	flag.StringVar(&Location, "path", ".", "path to the kiki database folder")
 	flag.Parse()
 	if *debug {
@@ -25,7 +26,9 @@ func main() {
 		logging.Log.Debug(false)
 	}
 
-	go openurl.Open("http://localhost:8004")
+	if !*noBrowser {
+		go openurl.Open("http://localhost:" + PublicPort)
+	}
 	err := Run()
 	if err != nil {
 		fmt.Println("error: " + err.Error())
