@@ -54,7 +54,7 @@ func handleLetter(c *gin.Context) (err error) {
 
 // GET /ping
 func handlePing(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": f.RegionKey.Public})
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": f.RegionKey.Public})
 }
 
 // POST /envelope
@@ -76,9 +76,9 @@ func handleList(c *gin.Context) {
 	AddCORS(c)
 	ids, err := f.GetIDs()
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"success": true, "message": "found IDs", "ids": ids, "region_key": f.RegionKey.Public})
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": ids, "region_key": f.RegionKey.Public})
 	}
 	return
 }
@@ -92,9 +92,9 @@ func handleDownload(c *gin.Context) {
 	// Close up envelope
 	e.Close()
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"success": true, "message": "found envelope", "envelope": e})
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found envelope", "envelope": e})
 	}
 }
 
