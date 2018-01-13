@@ -127,10 +127,8 @@ func Run() (err error) {
 	})
 	r.GET("/ping", handlePing)
 	r.GET("/img/:id", handleImage)
-	r.POST("/letter", handlerLetter) // post to put in letter (local only)
-	r.OPTIONS("/letter", handlePing) // post to put in letter (local only)
-	// r.GET("/download/:id", handleDownload) // download a specific envelope
-	// r.GET("/list", handleList)             // list all the current envelopes
+	r.POST("/letter", handlerLetter)     // post to put in letter (local only)
+	r.OPTIONS("/letter", handlePing)     // post to put in letter (local only)
 	r.POST("/envelope", handlerEnvelope) // post to put into database (public)
 	r.POST("/sync", handlerSync)         // tell server to sync with another server (local only)
 	r.GET("/test", func(c *gin.Context) {
@@ -139,7 +137,7 @@ func Run() (err error) {
 		c.JSON(http.StatusOK, gin.H{"success": err == nil, "message": message})
 	})
 
-	// BIND PROTECTED ROUTES LOCALHOST
+	// PUBLIC FACING ROUTES
 	local_router := gin.New()
 	local_router.Use(MiddleWareHandler(), gin.Recovery())
 	local_router.GET("/ping", handlePing)
@@ -152,7 +150,8 @@ func Run() (err error) {
 		}
 	})()
 
-	// err = r.Run(":" + Port) // listen and serve on 0.0.0.0:Port
+	// PRIVATE ROUTES
+	//  - bind to localhost
 	err = r.Run("localhost:8004") // listen and serve on 0.0.0.0:Port
 	if nil != err {
 		panic(err)
