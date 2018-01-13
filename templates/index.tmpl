@@ -221,23 +221,25 @@
             toastr["error"](data.error, "Posting to KiKi")
         }
 
-        $.ajax(
+        $.ajax({
             url: "/letter",
             method: "POST",
-            data: letter,
+            data: JSON.stringify(letter),
+            contentType: "application/json",
             error: function(xhr, status, err) {
                 toastr["error"](err, "Posting to KiKi");
                 callback && callback(err);
             },
             success: function(data, status, xhr) {
                 if ("ok" != data.status) {
+                    // hhtp headers
                     callback && callback(new Error(data.error));
                     return onError(data);
                 }
                 toastr["success"](data['message'], "Posting to KiKi");
                 callback && callback(null, data);
             }
-        );
+        });
 
     }
 
