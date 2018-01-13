@@ -468,13 +468,6 @@ func (f Feed) Sync(address string) (err error) {
 		return
 	}
 
-	// // Get a list of the IDs from other address
-	// type ListPayload struct {
-	// 	RegionPublicKey string              `json:"region_key"`
-	// 	IDs             map[string]struct{} `json:"ids"`
-	// 	Message         string              `json:"message"`
-	// 	Success         string              `json:"success"`
-	// }
 	var target Response
 	req, err := http.NewRequest("GET", address+"/list", nil)
 	if err != nil {
@@ -581,12 +574,6 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	// type EnvelopeWithMessage struct {
-	// 	Envelope letter.Envelope `json:"envelope"`
-	// 	Message  string          `json:"message"`
-	// 	Success  bool            `json:"success"`
-	// }
-
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
@@ -613,11 +600,6 @@ func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
 		return
 	}
 	defer resp.Body.Close()
-
-	// type Message struct {
-	// 	Message string `json:"message"`
-	// 	Success bool   `json:"success"`
-	// }
 
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
