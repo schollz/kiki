@@ -18,7 +18,8 @@ import (
 
 var (
 	// Port defines what port the carrier should listen on
-	Port = "8003"
+	PublicPort  = "8003"
+	PrivatePort = "8004"
 	// Location defines where to open up the kiki database
 	Location = "."
 	f        feed.Feed
@@ -144,7 +145,7 @@ func Run() (err error) {
 	local_router.GET("/list", handleList)
 	local_router.GET("/download/:id", handleDownload) // download a specific envelope
 	go (func() {
-		err = local_router.Run(":" + Port)
+		err = local_router.Run(":" + PublicPort)
 		if nil != err {
 			panic(err)
 		}
@@ -152,7 +153,7 @@ func Run() (err error) {
 
 	// PRIVATE ROUTES
 	//  - bind to localhost
-	err = r.Run("localhost:8004") // listen and serve on 0.0.0.0:Port
+	err = r.Run("localhost:" + PrivatePort) // listen and serve on 0.0.0.0:Port
 	if nil != err {
 		panic(err)
 	}
