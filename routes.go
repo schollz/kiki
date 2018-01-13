@@ -47,9 +47,9 @@ func handleImage(c *gin.Context) {
 // POST /letter
 func handleLetter(c *gin.Context) (err error) {
 	AddCORS(c)
-	if !ValidateLocalAddress(c) {
-		return errors.New("must be on local host")
-	}
+	// if !ValidateLocalAddress(c) {
+	// 	return errors.New("must be on local host")
+	// }
 
 	// bind the payload
 	var p letter.Letter
