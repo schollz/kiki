@@ -32,7 +32,7 @@ type Response struct {
 	Envelope        letter.Envelope     `json:"envelope"`
 	Error           string              `json:"error"`
 	Message         string              `json:"message"`
-	Status          string              `json:"Status"`
+	Status          string              `json:"status"`
 }
 
 // Feed stores your basic data

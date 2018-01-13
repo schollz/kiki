@@ -468,13 +468,6 @@ func (f Feed) Sync(address string) (err error) {
 		return
 	}
 
-	// // Get a list of the IDs from other address
-	// type ListPayload struct {
-	// 	RegionPublicKey string              `json:"region_key"`
-	// 	IDs             map[string]struct{} `json:"ids"`
-	// 	Message         string              `json:"message"`
-	// 	Success         string              `json:"success"`
-	// }
 	var target Response
 	req, err := http.NewRequest("GET", address+"/list", nil)
 	if err != nil {
