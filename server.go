@@ -66,14 +66,12 @@ func Run() (err error) {
 	r.GET("/", func(c *gin.Context) {
 		posts, err := f.ShowFeed()
 		if err != nil {
-			log.Error(err)
-			handleError(500, err, c)
+			respondWithJSON(c, "", err)
 			return
 		}
 		user, err := f.ShowProfile()
 		if err != nil {
-			log.Error(err)
-			handleError(500, err, c)
+			respondWithJSON(c, "", err)
 			return
 		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
@@ -84,33 +82,32 @@ func Run() (err error) {
 	r.GET("/feed.json", func(c *gin.Context) {
 		posts, err := f.ShowFeed()
 		if err != nil {
-			log.Error(err)
-			handleError(500, err, c)
+			respondWithJSON(c, "", err)
 			return
 		}
 		user, err := f.ShowProfile()
 		if err != nil {
-			log.Error(err)
-			handleError(500, err, c)
+			respondWithJSON(c, "", err)
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"posts": posts,
-			"user":  user,
+			"status": "ok",
+			"data": gin.H{
+				"posts": posts,
+				"user":  user,
+			},
 		})
 	})
 	r.GET("/view/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		posts, err := f.ShowFeed(id)
 		if err != nil {
-			log.Error(err)
-			handleError(500, err, c)
+			respondWithJSON(c, "", err)
 			return
 		}
 		user, err := f.ShowProfile()
 		if err != nil {
-			log.Error(err)
-			handleError(500, err, c)
+			respondWithJSON(c, "", err)
 			return
 		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
@@ -146,11 +143,15 @@ func Run() (err error) {
 }
 
 func respondWithJSON(c *gin.Context, message string, err error) {
-	success := err == nil
-	if !success {
-		message = err.Error()
+	if nil != err {
+		log.Error(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, 500))
+		log.Warn(err)
+		c.JSON(500, gin.H{"status": "error", "message": err.Error()})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": success, "message": message})
+	log.Info(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, 200))
+	log.Debug(message)
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": message})
 }
 
 func handlerLetter(c *gin.Context) {

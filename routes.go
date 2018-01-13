@@ -11,12 +11,12 @@ import (
 	"github.com/schollz/kiki/src/letter"
 )
 
-func handleError(status_code int, err error, c *gin.Context) {
-	c.JSON(status_code, gin.H{
-		"success": false,
-		"message": err.Error(),
-	})
-}
+// func handleError(status_code int, err error, c *gin.Context) {
+// 	c.JSON(status_code, gin.H{
+// 		"success": false,
+// 		"message": err.Error(),
+// 	})
+// }
 
 // GET /img
 func handleImage(c *gin.Context) {
