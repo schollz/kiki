@@ -32,7 +32,7 @@ func main() {
 	}
 
 	if !*noBrowser {
-		go openurl.Open("http://localhost:" + PublicPort)
+		go openurl.Open("http://localhost:" + PrivatePort)
 	}
 	err := Run()
 	if err != nil {
