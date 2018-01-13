@@ -251,6 +251,27 @@
   }
 
 
+var KiKiApi = function() {}
+
+KiKiApi.prototype.fetch = function(ajaxObj, callback){
+    $.ajax(ajaxObj);
+}
+
+KiKiApi.prototype.onError = function(){}
+
+KiKiApi.prototype.onSuccess = function(){}
+
+KiKiApi.prototype.submitLetter = function(letter, callback) {
+    
+}
+
+var app = {
+    Api: new KiKiApi()
+}
+
+
+
+
     toastr.options = {
       "closeButton": true,
       "debug": false,
