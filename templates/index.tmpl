@@ -215,18 +215,33 @@
   <script src="/static/medium-editor.min.js"></script>
   <script src="/static/toastr.min.js"></script>
   <script>
-    function submitLetter(letter) {
-      var posting = $.post("/letter", JSON.stringify(letter));
-      posting.done(function(data) {
-        console.log(data);
-        $("#writingModal").modal('hide');
-        if (data['success'] == true) {
-          toastr["success"](data['message'], "Posting to KiKi")
-        } else {
-          toastr["error"](data['message'], "Posting to KiKi")
+    function submitLetter(letter, callback) {
+
+        function onError(data) {
+            toastr["error"](data.error, "Posting to KiKi")
         }
-      });
+
+        $.ajax(
+            url: "/letter",
+            method: "POST",
+            data: letter,
+            error: function(xhr, status, err) {
+                toastr["error"](err, "Posting to KiKi");
+                callback && callback(err);
+            },
+            success: function(data, status, xhr) {
+                if ("ok" != data.status) {
+                    callback && callback(new Error(data.error));
+                    return onError(data);
+                }
+                toastr["success"](data['message'], "Posting to KiKi");
+                callback && callback(null, data);
+            }
+        );
+
     }
+
+
     toastr.options = {
       "closeButton": true,
       "debug": false,
