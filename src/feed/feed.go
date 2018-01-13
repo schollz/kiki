@@ -94,7 +94,7 @@ func (f *Feed) init() (err error) {
 		// block the region public key from being used as a sender, ever
 		err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{"public"},
-			Purpose: purpose.AssignBlock,
+			Purpose: purpose.ActionBlock,
 			Content: f.RegionKey.Public,
 		})
 		if err2 != nil {
@@ -142,7 +142,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		}
 	}
 
-	if strings.Contains(l.Purpose, "assign-") {
+	if strings.Contains(l.Purpose, "action-") {
 		// assignments are always public
 		l.To = []string{f.RegionKey.Public}
 	} else {
@@ -201,7 +201,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		if err2 != nil {
 			return err2
 		}
-		if l.Purpose == purpose.AssignImage {
+		if l.Purpose == purpose.ActionImage {
 			newHTML = newEnvelope.ID
 			break
 		}
@@ -210,7 +210,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	l.Content = newHTML
 
 	// remove tags from name change
-	if l.Purpose == purpose.AssignName {
+	if l.Purpose == purpose.ActionName {
 		l.Content = strip.StripTags(l.Content)
 	}
 	if strip.StripTags(l.Content) == "" {
@@ -425,7 +425,7 @@ func (f Feed) AddFriendsKey() (err error) {
 	// block the friends public key from being used as a sender, ever
 	err = f.ProcessLetter(letter.Letter{
 		To:      []string{"public"},
-		Purpose: purpose.AssignBlock,
+		Purpose: purpose.ActionBlock,
 		Content: myfriends.Public,
 	})
 	if err != nil {

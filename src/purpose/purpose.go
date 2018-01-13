@@ -14,25 +14,29 @@ var (
 	// ShareKey is for sharing keypairs with friends, or with self
 	ShareKey = "share-key"
 
-	// Assignments are always public
+	// Actionments are always public
 
-	// AssignFollow will follow someone
-	AssignFollow = "assign-follow"
+	// ActionFollow will follow someone
+	ActionFollow = "action-follow"
 
-	// AssignLike will give a person a like
-	AssignLike = "assign-like"
+	// ActionLike will give a person a like
+	ActionLike = "action-like"
 
-	// AssignName will assign a person a name
-	AssignName = "assign-name"
+	// ActionName will assign a person a name
+	ActionName = "action-assign/name"
 
-	AssignProfile = "assign-profile"
+	ActionProfile = "action-assign/profile"
 
-	AssignImage = "assign-image"
-	AssignBlock = "assign-block"
+	ActionImage = "action-assign/image"
+
+	ActionBlock = "action-assign/block"
+
+	// ActionErase will erase a persons profile from every carrier
+	ActionErase = "action-erase"
 )
 
 func Valid(purpose string) bool {
-	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, AssignFollow, AssignName, AssignBlock, AssignProfile, AssignLike, AssignImage} {
+	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, ActionFollow, ActionName, ActionBlock, ActionProfile, ActionLike, ActionImage} {
 		if purpose == p {
 			return true
 		}

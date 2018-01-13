@@ -18,7 +18,7 @@ import (
 // Letter specifies the content being transfered to the self, or other users. The Letter has a purpose - either to "share" or "assign". You can "share" posts  or images. You assign things like follows, likes, profile names, etc.
 type Letter struct {
 	// Purpose specifies the purpose of letter. Currently the purposes are:
-	// "assign-X" - used to assign public data for reputation purposes (likes, follows, channel subscriptions, settting profile images and text and names)
+	// "action-X" - used to assign public data for reputation purposes (likes, follows, channel subscriptions, settting profile images and text and names)
 	// "share-X" - used to share content either "post" or "image/png"/"image/jpg"
 	Purpose string `json:"purpose,omitempty"`
 

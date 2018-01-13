@@ -382,7 +382,7 @@ func (d *database) getIDs() (s []string, err error) {
 
 // getName returns the name of a person
 func (d *database) getName(person string) (name string, err error) {
-	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignName, person)
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ActionName, person)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -410,7 +410,7 @@ func (d *database) getName(person string) (name string, err error) {
 
 // getProfile returns the profile of a person
 func (d *database) getProfile(person string) (profile string, err error) {
-	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignProfile, person)
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ActionProfile, person)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -438,7 +438,7 @@ func (d *database) getProfile(person string) (profile string, err error) {
 
 // getProfileImage returns the ID of the profile image of a person
 func (d *database) getProfileImage(person string) (imageID string, err error) {
-	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.AssignImage, person)
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ActionImage, person)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
