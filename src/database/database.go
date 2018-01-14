@@ -227,7 +227,6 @@ func (d *database) addEnvelope(e letter.Envelope) (err error) {
 }
 
 func (d *database) getAllFromQuery(query string) (s []letter.Envelope, err error) {
-	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getAllFromQuery")
@@ -517,7 +516,6 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 }
 
 func (d *database) isReplaced(id string) (yes bool, err error) {
-
 	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE letter_replaces==? AND sender == (SELECT sender FROM letters WHERE id==?)")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
@@ -530,5 +528,51 @@ func (d *database) isReplaced(id string) (yes bool, err error) {
 		return false, errors.Wrap(err, "problem getting")
 	}
 	yes = result != ""
+	return
+}
+
+func (d *database) diskSpaceForUser(user string) (diskSpace int64, err error) {
+	stmt, err := d.db.Prepare("SELECT SUM(LENGTH(sealed_letter))+SUM(LENGTH(sealed_recipients)) FROM letters WHERE sender==?")
+	if err != nil {
+		err = errors.Wrap(err, "problem preparing SQL")
+		return
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(user).Scan(&diskSpace)
+	if err != nil {
+		err = errors.Wrap(err, "problem getting")
+	}
+	return
+}
+
+func (d *database) listUsers() (s []string, err error) {
+	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters;")
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "listUsers")
+		return
+	}
+	defer rows.Close()
+
+	// parse rows
+	s = make([]string, 1000000)
+	sI := 0
+	// loop through rows
+	for rows.Next() {
+		var mID string
+		err = rows.Scan(&mID)
+		if err != nil {
+			err = errors.Wrap(err, "listUsers")
+			return
+		}
+		s[sI] = mID
+		sI++
+	}
+	s = s[:sI]
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "listUsers")
+	}
 	return
 }

@@ -2,7 +2,7 @@
 
 server:
 	go-bindata static/... templates/...
-	go build 
+	go build -no-browser -no-sync
 	./kiki
 
 dev:

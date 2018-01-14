@@ -242,3 +242,23 @@ func (api DatabaseAPI) IsReplaced(id string) (yes bool) {
 	}
 	return
 }
+
+// DiskSpaceForUser returns the bytes used by a user for recipients + sealed_content
+func (api DatabaseAPI) DiskSpaceForUser(user string) (diskSpace int64, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.diskSpaceForUser(user)
+}
+
+// DiskSpaceForUser returns the bytes used by a user for recipients + sealed_content
+func (api DatabaseAPI) ListUsers() (users []string, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.listUsers()
+}

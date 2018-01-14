@@ -627,3 +627,24 @@ func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
 	}
 	return
 }
+
+// PurgeOverflowingStorage will delete old messages
+func (f Feed) PurgeOverflowingStorage() (err error) {
+	f.log.Debug(f.db.ListUsers())
+	f.log.Debug(f.db.DiskSpaceForUser(f.PersonalKey.Public))
+	users, err := f.db.ListUsers()
+	if err != nil {
+		return
+	}
+	for _, user := range users {
+		// skip personal user
+		if user == f.PersonalKey.Public {
+			continue
+		}
+		// skip friends
+		// TODO
+		f.log.Debug(user)
+		f.log.Debug(f.db.DiskSpaceForUser(user))
+	}
+	return
+}
