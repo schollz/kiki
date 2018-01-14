@@ -113,10 +113,12 @@
             <div class="blog-post">
               <p class="blog-post-meta">
                 <span class="float-right">
-
-                  <a href="#!" class="editmodal" data-title="Reply to {{ .Post.User.Name }}" data-replyto="{{ .Post.ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;<a href="#!" data-usecontent="{{.Post.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.Post.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>
-
-                &nbsp;<a href="#!" data-id="{{.Post.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
+                  &nbsp;
+                  <a href="#!" class="editmodal" data-title="Reply to {{ .Post.User.Name }}" data-replyto="{{ .Post.ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>
+                  &nbsp;
+                  <a href="#!" data-usecontent="{{.Post.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.Post.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>
+                 &nbsp;
+                <a href="#!" data-id="{{.Post.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Post.Likes 1 }}x{{ .Post.Likes }}{{ end }}</a>
               </span>
 
                 <img src="/img/{{ .Post.User.Image }}" class="align-middle profile-pic">
@@ -142,7 +144,10 @@
 
                                 <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
 
-                                <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
+                                <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
+                              <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
+                            </span>
+
                                 {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
                                 <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
 
@@ -195,9 +200,27 @@
           </ol>
         </div>
         <div class="sidebar-module">
-          <h4>Friends</h4>
+          <h4>Following  ({{ len .Friends.Following }})</h4>
           <ol class="list-unstyled">
-            <li><a href="#">TODO</a></li>
+            {{ range .Friends.Following }}
+            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ if .Name }}{{ .Name }}{{ else }}<small>{{ .PublicKey }}</small>{{ end }}</a></li>
+            {{ end }}
+          </ol>
+        </div>
+        <div class="sidebar-module">
+          <h4>Followers  ({{ len .Friends.Followers }})</h4>
+          <ol class="list-unstyled">
+            {{ range .Friends.Followers }}
+            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ if .Name }}{{ .Name }}{{ else }}<small>{{ .PublicKey }}</small>{{ end }}</a></li>
+            {{ end }}
+          </ol>
+        </div>
+        <div class="sidebar-module">
+          <h4>Friends ({{ len .Friends.Friends }})</h4>
+          <ol class="list-unstyled">
+            {{ range .Friends.Friends }}
+            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ if .Name }}{{ .Name }}{{ else }}<small>{{ .PublicKey }}</small>{{ end }}</a></li>
+            {{ end }}
           </ol>
         </div>
       </aside>
@@ -333,7 +356,7 @@ var app = {
         }
         console.log(letter);
         submitLetter(letter);
-	$("#writingModal").modal('hide');
+	      $("#writingModal").modal('hide');
       });
       $(".editmodal").click(function() {
         $("#writingModal").modal();
@@ -374,9 +397,14 @@ var app = {
         $("#followButton").attr("data-publickey", $(this).data("publickey"));
       });
       $("#followButton").click(function(event) {
-        event.preventDefault();
         console.log($(this).data("publickey"));
-        // TODO: MAKE A FOLLOW!
+        letter = {
+          "purpose": "action-follow",
+          "to": ["public"],
+          "content": $(this).data("publickey"),
+        };
+        submitLetter(letter);
+        $("#nameModal").modal('hide');
       });
       $(".likebutton").click(function(event) {
         console.log($(this).data("id"));

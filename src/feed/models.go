@@ -53,7 +53,6 @@ func GenerateSettings() Settings {
 
 type Post struct {
 	Post     BasicPost   `json:"post"`
-	Likes    int64       `json:"likes"`
 	Comments []BasicPost `json:"comments"`
 }
 
@@ -66,6 +65,7 @@ type BasicPost struct {
 	Date       time.Time     `json:"date"`
 	TimeAgo    string        `json:"time_ago"`
 	User       User          `json:"user"`
+	Likes      int64         `json:"likes"`
 }
 
 type User struct {
@@ -73,4 +73,13 @@ type User struct {
 	Profile   template.HTML `json:"profile"`
 	PublicKey string        `json:"public_key"`
 	Image     string        `json:"image"`
+	Followers []string      `json:"followers"`
+	Following []string      `json:"following"`
+	Friends   []string      `json:"friends"`
+}
+
+type UserFriends struct {
+	Friends   []User `json:"user_friends"`
+	Followers []User `json:"user_followers"`
+	Following []User `json:"user_following"`
 }

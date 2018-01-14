@@ -591,6 +591,76 @@ func (d *database) listUsers() (s []string, err error) {
 	return
 }
 
+func (d *database) getFollowing(publicKey string) (s []string, err error) {
+	query := fmt.Sprintf("SELECT DISTINCT(letter_content) FROM letters WHERE sender == '%s' AND letter_purpose == '%s';", publicKey, purpose.ActionFollow)
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "getFollowing")
+		return
+	}
+	defer rows.Close()
+
+	// parse rows
+	s = make([]string, 1000000)
+	sI := 0
+	// loop through rows
+	for rows.Next() {
+		var mID string
+		err = rows.Scan(&mID)
+		if err != nil {
+			err = errors.Wrap(err, "getFollowing")
+			return
+		}
+		if mID == "" {
+			continue
+		}
+		s[sI] = mID
+		sI++
+	}
+	s = s[:sI]
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getFollowing")
+	}
+	return
+}
+
+func (d *database) getFollowers(publicKey string) (s []string, err error) {
+	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters WHERE letter_content == '%s' AND letter_purpose == '%s';", publicKey, purpose.ActionFollow)
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "getFollowers")
+		return
+	}
+	defer rows.Close()
+
+	// parse rows
+	s = make([]string, 1000000)
+	sI := 0
+	// loop through rows
+	for rows.Next() {
+		var mID string
+		err = rows.Scan(&mID)
+		if err != nil {
+			err = errors.Wrap(err, "getFollowers")
+			return
+		}
+		if mID == "" {
+			continue
+		}
+		s[sI] = mID
+		sI++
+	}
+	s = s[:sI]
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "getFollowers")
+	}
+	return
+}
+
 func (d *database) getAllVersions(id string) (s []string, err error) {
 	s = []string{id}
 	// forward propogation, find letters that replace current letter
@@ -627,5 +697,28 @@ func (d *database) getAllVersions(id string) (s []string, err error) {
 	}
 	stmt.Close()
 	err = nil
+	return
+}
+
+func (d *database) getKeyForFriends(user string) (key keypair.KeyPair, err error) {
+	stmt, err := d.db.Prepare("SELECT letter_content FROM letters WHERE sender==? AND letter_purpose==? ORDER BY time DESC")
+	if err != nil {
+		err = errors.Wrap(err, "getKeyForFriends")
+		return
+	}
+	defer stmt.Close()
+	var keystring string
+	err = stmt.QueryRow(user, purpose.ShareKey).Scan(&keystring)
+	if err != nil {
+		err = errors.Wrap(err, "getKeyForFriends")
+		return
+	}
+
+	err = json.Unmarshal([]byte(keystring), &key)
+	if err != nil {
+		err = errors.Wrap(err, "getKeyForFriends")
+		return
+	}
+
 	return
 }

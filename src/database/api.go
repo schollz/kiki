@@ -307,3 +307,76 @@ func (api DatabaseAPI) NumberOfLikes(postID string) (likes int64) {
 	}
 	return
 }
+
+// Friends will return the followers, following and friends for a given user
+func (api DatabaseAPI) Friends(publicKey string) (followers, following, friends []string) {
+	followers = []string{}
+	following = []string{}
+	friends = []string{}
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	followers, err = db.getFollowers(publicKey)
+	if err != nil {
+		log.Warn(err)
+	}
+	following, err = db.getFollowing(publicKey)
+	if err != nil {
+		log.Warn(err)
+	}
+	followingMap := make(map[string]struct{})
+	for _, f := range following {
+		followingMap[f] = struct{}{}
+	}
+	followerMap := make(map[string]struct{})
+	for _, f := range followers {
+		followerMap[f] = struct{}{}
+	}
+
+	friends = make([]string, len(following)+len(followers))
+	i := 0
+	for _, follower := range followers {
+		if _, ok := followingMap[follower]; ok {
+			friends[i] = follower
+			i++
+		}
+	}
+	friends = friends[:i]
+
+	i = 0
+	for _, follower := range followers {
+		if follower == "" {
+			continue
+		}
+		if _, ok := followingMap[follower]; !ok {
+			followers[i] = follower
+			i++
+		}
+	}
+	followers = followers[:i]
+
+	i = 0
+	for _, followin := range following {
+		if followin == "" {
+			continue
+		}
+		if _, ok := followerMap[followin]; !ok {
+			following[i] = followin
+			i++
+		}
+	}
+	following = following[:i]
+	return
+}
+
+// GetLatestKeyForFriends will return the latest key for encrypting messages to friends
+func (api DatabaseAPI) GetLatestKeyForFriends(publicKey string) (key keypair.KeyPair, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.getKeyForFriends(publicKey)
+}

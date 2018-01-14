@@ -3,7 +3,7 @@
 server:
 	go-bindata static/... templates/...
 	go build
-	./kiki -no-sync -no-browser
+	./kiki -no-browser
 
 dev:
 	rerun -p "**/*.{go,tmpl,css,js}" --ignore 'bindata.go' make

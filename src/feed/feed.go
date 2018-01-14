@@ -109,7 +109,14 @@ func (f *Feed) init() (err error) {
 		return
 	}
 	err = ioutil.WriteFile(path.Join(f.storagePath, "feed.json"), feedBytes, 0644)
+	if err != nil {
+		return
+	}
 
+	err = f.UpdateFriends()
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -121,8 +128,18 @@ func (f Feed) DoSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
 			f.Sync(server)
+			// unseal any new letters
+			err := f.UnsealLetters()
+			if err != nil {
+				f.log.Warn(err)
+			}
+			// send out friends keys for new friends
+			err = f.UpdateFriends()
+			if err != nil {
+				f.log.Warn(err)
+			}
 		}
-		time.Sleep(60 * time.Second)
+		time.Sleep(3 * time.Second)
 	}
 }
 
@@ -271,6 +288,7 @@ func (f Feed) UnsealLetters() (err error) {
 	if err != nil {
 		return
 	}
+	f.log.Debugf("Keys from friends: %v", keysToTry)
 	// prepend public key
 	keysToTry = append([]keypair.KeyPair{f.RegionKey}, keysToTry...)
 	// add personal key last
@@ -300,13 +318,68 @@ func (f Feed) UnsealLetters() (err error) {
 	return
 }
 
-func (f Feed) ShowProfile() (u User, err error) {
-	name, profile, image := f.db.GetUser(f.PersonalKey.Public)
+// GetUser returns the information for a specific user
+func (f Feed) GetUser(public ...string) (u User) {
+	publicKey := f.PersonalKey.Public
+	if len(public) > 0 {
+		publicKey = public[0]
+	}
+	name, profile, image := f.db.GetUser(publicKey)
+	followers, following, friends := f.db.Friends(publicKey)
 	u = User{
 		Name:      strip.StripTags(name),
 		PublicKey: f.PersonalKey.Public,
 		Profile:   template.HTML(profile),
 		Image:     image,
+		Followers: followers,
+		Following: following,
+		Friends:   friends,
+	}
+	return
+}
+
+// GetUserFriends returns detailed friend information
+func (f Feed) GetUserFriends() (u UserFriends) {
+	followers, following, friends := f.db.Friends(f.PersonalKey.Public)
+	u.Followers = make([]User, len(followers))
+	for i := range followers {
+		u.Followers[i] = f.GetUser(followers[i])
+	}
+	u.Following = make([]User, len(following))
+	for i := range following {
+		u.Following[i] = f.GetUser(following[i])
+	}
+	u.Friends = make([]User, len(friends))
+	for i := range friends {
+		u.Friends[i] = f.GetUser(friends[i])
+	}
+	return
+}
+
+// UpdateFriends will post keys to friends
+func (f Feed) UpdateFriends() (err error) {
+	friendsKey, err := f.db.GetLatestKeyForFriends(f.PersonalKey.Public)
+	if err != nil {
+		err = errors.Wrap(err, "UpdateFriends")
+		return
+	}
+	bFriendsKey, err := json.Marshal(friendsKey)
+	if err != nil {
+		err = errors.Wrap(err, "UpdateFriends")
+		return
+	}
+	_, _, friends := f.db.Friends(f.PersonalKey.Public)
+	for _, friend := range friends {
+		l := letter.Letter{
+			To:      []string{friend},
+			Purpose: purpose.ShareKey,
+			Content: string(bFriendsKey),
+		}
+		err = f.ProcessLetter(l)
+		if err != nil {
+			err = errors.Wrap(err, "UpdateFriends")
+			return
+		}
 	}
 	return
 }
@@ -346,7 +419,6 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		posts[i] = Post{
 			Post:     post,
 			Comments: f.DetermineComments(post.ID),
-			Likes:    f.db.NumberOfLikes(post.ID),
 		}
 		i++
 	}
@@ -393,6 +465,7 @@ func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {
 			Profile:   template.HTML(f.db.GetProfile(e.Sender.Public)),
 			Image:     f.db.GetProfileImage(e.Sender.Public),
 		},
+		Likes: f.db.NumberOfLikes(e.ID),
 	}
 	return
 }
@@ -529,6 +602,7 @@ func (f Feed) Sync(address string) (err error) {
 			return
 		}
 	}
+
 	return
 }
 

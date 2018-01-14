@@ -89,10 +89,10 @@ func Run() (err error) {
 		p.Latest = c.DefaultQuery("latest", "") == "1"
 
 		posts, _ := f.ShowFeed(p)
-		user, _ := f.ShowProfile()
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"Posts": posts,
-			"User":  user,
+			"Posts":   posts,
+			"User":    f.GetUser(),
+			"Friends": f.GetUserFriends(),
 		})
 	})
 
@@ -104,10 +104,9 @@ func Run() (err error) {
 		p.Search = c.DefaultQuery("search", "")
 		p.Latest = c.DefaultQuery("latest", "") == "1"
 		posts, _ := f.ShowFeed(p)
-		user, _ := f.ShowProfile()
 		c.HTML(http.StatusOK, "client.html", gin.H{
 			"Posts": posts,
-			"User":  user,
+			"User":  f.GetUser(),
 		})
 	})
 
@@ -123,11 +122,7 @@ func Run() (err error) {
 			respondWithJSON(c, "", err)
 			return
 		}
-		user, err := f.ShowProfile()
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
+		user := f.GetUser()
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{

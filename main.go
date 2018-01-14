@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/darkowlzz/openurl"
 	"github.com/schollz/kiki/src/logging"
@@ -34,6 +35,8 @@ func main() {
 	if !*noBrowser {
 		go openurl.Open("http://localhost:" + PrivatePort)
 	}
+
+	os.Mkdir(Location, 0755)
 
 	err := Run()
 	if err != nil {
