@@ -22,6 +22,7 @@ import (
 	"github.com/schollz/kiki/src/purpose"
 	"github.com/schollz/kiki/src/utils"
 	"github.com/schollz/kiki/src/web"
+	blackfriday "gopkg.in/russross/blackfriday.v2"
 )
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
@@ -229,6 +230,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
 	}
 	l.Content = newHTML
+	l.Content = string(blackfriday.Run([]byte(l.Content)))
 
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {
