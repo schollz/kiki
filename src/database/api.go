@@ -1,7 +1,9 @@
 package database
 
 import (
+	"fmt"
 	"path"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
@@ -94,7 +96,11 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 	// should not be replaced
 	// should be a reply
 	// ordered by time ascending
-	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_replyto == ? ORDER BY time", id)
+	ids, err := db.getAllVersions(id)
+	if err != nil {
+		return
+	}
+	return db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_replyto IN ('%s') ORDER BY time", strings.Join(ids, "','")))
 }
 
 func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
