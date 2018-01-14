@@ -293,3 +293,17 @@ func (api DatabaseAPI) GetAllVersions(id string) (ids []string, err error) {
 	defer db.Close()
 	return db.getAllVersions(id)
 }
+
+// NumberOfLikes returns the number of likes for a post
+func (api DatabaseAPI) NumberOfLikes(postID string) (likes int64) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	likes, err = db.numLikesPerPost(postID)
+	if err != nil {
+		log.Warn(err)
+	}
+	return
+}

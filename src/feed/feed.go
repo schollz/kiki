@@ -343,10 +343,10 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	i := 0
 	for _, e := range envelopes {
 		post := f.MakePost(e)
-		comments := f.DetermineComments(post.ID)
 		posts[i] = Post{
 			Post:     post,
-			Comments: comments,
+			Comments: f.DetermineComments(post.ID),
+			Likes:    f.db.NumberOfLikes(post.ID),
 		}
 		i++
 	}

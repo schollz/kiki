@@ -53,6 +53,7 @@ func GenerateSettings() Settings {
 
 type Post struct {
 	Post     BasicPost   `json:"post"`
+	Likes    int64       `json:"likes"`
 	Comments []BasicPost `json:"comments"`
 }
 

@@ -545,6 +545,20 @@ func (d *database) diskSpaceForUser(user string) (diskSpace int64, err error) {
 	return
 }
 
+func (d *database) numLikesPerPost(idPost string) (likes int64, err error) {
+	stmt, err := d.db.Prepare("SELECT COUNT(id) FROM letters WHERE letter_purpose == '" + purpose.ActionLike + "' AND letter_content=?")
+	if err != nil {
+		err = errors.Wrap(err, "problem preparing SQL")
+		return
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(idPost).Scan(&likes)
+	if err != nil {
+		err = errors.Wrap(err, "problem getting")
+	}
+	return
+}
+
 func (d *database) listUsers() (s []string, err error) {
 	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters;")
 	log.Debug(query)
