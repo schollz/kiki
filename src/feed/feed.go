@@ -280,6 +280,8 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 		return
 	}
 
+	// TODO: Determine if this envelope will overflow the limits, and if so, then delete an envelope also
+
 	err = f.UnsealLetters()
 	return
 }
