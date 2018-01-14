@@ -139,6 +139,11 @@ func (f Feed) DoSyncing() {
 			if err != nil {
 				f.log.Warn(err)
 			}
+			// purge overflowing storage
+			err = f.PurgeOverflowingStorage()
+			if err != nil {
+				f.log.Warn(err)
+			}
 		}
 		time.Sleep(3 * time.Second)
 	}
