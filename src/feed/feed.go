@@ -89,7 +89,7 @@ func (f *Feed) init() (err error) {
 		// add the friends key
 		err2 = f.AddFriendsKey()
 		if err2 != nil {
-			return err2
+			return errors.Wrap(err2, "add the friends key")
 		}
 
 		// block the region public key from being used as a sender, ever
@@ -230,12 +230,13 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
 	}
 	l.Content = newHTML
+	if l.Purpose == purpose.ShareText {
+		l.Content = string(blackfriday.Run([]byte(l.Content)))
+	}
 
 	// remove tags from name change
-	if l.Purpose == purpose.ActionName || l.Purpose == purpose.ActionImage {
+	if l.Purpose == purpose.ActionName {
 		l.Content = strip.StripTags(l.Content)
-	} else {
-		l.Content = string(blackfriday.Run([]byte(l.Content)))
 	}
 	if strip.StripTags(l.Content) == "" {
 		l.Content = ""
@@ -289,6 +290,7 @@ func (f Feed) UnsealLetters() (err error) {
 	// get friends keys
 	keysToTry, err := f.db.GetKeys()
 	if err != nil {
+		err = errors.Wrap(err, "UnsealLetters, getting keys")
 		return
 	}
 	f.log.Debugf("Keys from friends: %v", keysToTry)
@@ -497,7 +499,7 @@ func (f Feed) AddFriendsKey() (err error) {
 	// generate a key for friends
 	myfriends := keypair.New()
 	if err != nil {
-		err = errors.Wrap(err, "AddFriendsKey")
+		err = errors.Wrap(err, "AddFriendsKey, making keypair")
 		return
 	}
 	myfriendsByte, err := json.Marshal(myfriends)
@@ -509,7 +511,7 @@ func (f Feed) AddFriendsKey() (err error) {
 		Content: string(myfriendsByte),
 	})
 	if err != nil {
-		err = errors.Wrap(err, "AddFriendsKey")
+		err = errors.Wrap(err, "AddFriendsKey, processing letter")
 		return
 	}
 
@@ -520,7 +522,7 @@ func (f Feed) AddFriendsKey() (err error) {
 		Content: myfriends.Public,
 	})
 	if err != nil {
-		err = errors.Wrap(err, "AddFriendsKey")
+		err = errors.Wrap(err, "AddFriendsKey, processing public letter")
 		return
 	}
 
