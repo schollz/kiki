@@ -230,11 +230,12 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
 	}
 	l.Content = newHTML
-	l.Content = string(blackfriday.Run([]byte(l.Content)))
 
 	// remove tags from name change
-	if l.Purpose == purpose.ActionName {
+	if l.Purpose == purpose.ActionName || l.Purpose == purpose.ActionImage {
 		l.Content = strip.StripTags(l.Content)
+	} else {
+		l.Content = string(blackfriday.Run([]byte(l.Content)))
 	}
 	if strip.StripTags(l.Content) == "" {
 		l.Content = ""
