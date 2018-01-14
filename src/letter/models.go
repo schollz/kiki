@@ -15,10 +15,10 @@ import (
 	"github.com/schollz/kiki/src/symmetric"
 )
 
-// Letter specifies the content being transfered to the self, or other users. The Letter has a purpose - either to "share" or "assign". You can "share" posts  or images. You assign things like follows, likes, profile names, etc.
+// Letter specifies the content being transfered to the self, or other users. The Letter has a purpose - either to "share" or to do an "action". You can "share" posts  or images. You action things like follows, likes, profile names, etc.
 type Letter struct {
 	// Purpose specifies the purpose of letter. Currently the purposes are:
-	// "action-X" - used to assign public data for reputation purposes (likes, follows, channel subscriptions, settting profile images and text and names)
+	// "action-X" - used to action public data for reputation purposes (likes, follows, channel subscriptions, settting profile images and text and names)
 	// "share-X" - used to share content either "post" or "image/png"/"image/jpg"
 	Purpose string `json:"purpose,omitempty"`
 
@@ -40,7 +40,7 @@ type Envelope struct {
 	// Sealed envelope information
 
 	// ID is the hash of the Marshaled Letter + the Public key of Sender
-	ID string `json:"id",storm:"id"`
+	ID string `json:"id"`
 	// Timestamp is the time at which the envelope was created
 	Timestamp time.Time `json:"timestamp"`
 	// Sender is public key of the sender
