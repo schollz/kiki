@@ -128,8 +128,7 @@ func Run() (err error) {
 	r.GET("/download/:id", handleDownload) // download a specific envelope
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
-		// f.ShowFeed(feed.ShowFeedParameters{})
-		f.PurgeOverflowingStorage()
+		f.TestStuff()
 		c.JSON(http.StatusOK, gin.H{"success": err == nil, "message": message})
 	})
 

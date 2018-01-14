@@ -576,3 +576,41 @@ func (d *database) listUsers() (s []string, err error) {
 	}
 	return
 }
+
+func (d *database) getAllVersions(id string) (s []string, err error) {
+	s = []string{id}
+	// forward propogation, find letters that replace current letter
+	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE letter_replaces==? LIMIT 1")
+	if err != nil {
+		err = errors.Wrap(err, "problem preparing SQL")
+		return
+	}
+	for {
+		err = stmt.QueryRow(s[0]).Scan(&id)
+		if err != nil {
+			break
+		} else {
+			// found one that replaces it, prepend it
+			s = append([]string{id}, s...)
+		}
+	}
+	stmt.Close()
+	// backward propogation, find letters that this letter has replaced
+	// forward propogation, find letters that replace current letter
+	stmt, err = d.db.Prepare("SELECT id FROM letters WHERE id IN (SELECT letter_replaces FROM letters WHERE id == ? LIMIT 1)")
+	if err != nil {
+		err = errors.Wrap(err, "problem preparing SQL")
+		return
+	}
+	for {
+		err = stmt.QueryRow(s[len(s)-1]).Scan(&id)
+		if err != nil {
+			break
+		} else {
+			// found one that replaces it, append it
+			s = append(s, id)
+		}
+	}
+	stmt.Close()
+	return
+}

@@ -262,3 +262,13 @@ func (api DatabaseAPI) ListUsers() (users []string, err error) {
 	defer db.Close()
 	return db.listUsers()
 }
+
+// GetAllVersions returns the bytes used by a user for recipients + sealed_content
+func (api DatabaseAPI) GetAllVersions(id string) (ids []string, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.getAllVersions(id)
+}
