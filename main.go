@@ -34,6 +34,7 @@ func main() {
 	if !*noBrowser {
 		go openurl.Open("http://localhost:" + PrivatePort)
 	}
+
 	err := Run()
 	if err != nil {
 		fmt.Println("error: " + err.Error())

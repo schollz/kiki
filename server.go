@@ -7,7 +7,10 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
@@ -54,6 +57,15 @@ func Run() (err error) {
 			return err2
 		}
 	}
+
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func(f feed.Feed) {
+		<-c
+		f.Cleanup()
+		os.Exit(1)
+	}(f)
+	defer f.Cleanup()
 
 	if !NoSync {
 		go f.DoSyncing()

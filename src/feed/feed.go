@@ -113,6 +113,10 @@ func (f *Feed) init() (err error) {
 	return
 }
 
+func (f Feed) Cleanup() {
+	fmt.Println("cleaning up...")
+}
+
 func (f Feed) DoSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
