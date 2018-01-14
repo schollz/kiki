@@ -612,5 +612,6 @@ func (d *database) getAllVersions(id string) (s []string, err error) {
 		}
 	}
 	stmt.Close()
+	err = nil
 	return
 }

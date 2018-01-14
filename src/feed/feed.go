@@ -650,5 +650,5 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 }
 
 func (f Feed) TestStuff() {
-	f.log.Debug(f.db.GetAllVersions("alskdjfklasjd"))
+	f.log.Debug(f.db.GetAllVersions("9f94a236940326a7fb9eb06d3cc0fece47dee6fa58b8d328b47a9ebc175d7616"))
 }
