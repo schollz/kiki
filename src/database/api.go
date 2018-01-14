@@ -100,7 +100,22 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 	if err != nil {
 		return
 	}
-	return db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_replyto IN ('%s') ORDER BY time", strings.Join(ids, "','")))
+	envelopes, err := db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_replyto IN ('%s') ORDER BY time", strings.Join(ids, "','")))
+	if err != nil {
+		return
+	}
+	e = make([]letter.Envelope, len(envelopes))
+	i := 0
+	for _, envelope := range envelopes {
+		yes, _ := db.isReplaced(envelope.ID)
+		if yes {
+			continue
+		}
+		e[i] = envelope
+		i++
+	}
+	e = e[:i]
+	return
 }
 
 func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
