@@ -397,7 +397,7 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	if p.ID != "" {
 		envelopes = make([]letter.Envelope, 1)
 		if p.Latest {
-
+			envelopes[0], err = f.db.GetLatestEnvelopeFromID(p.ID)
 		} else {
 			envelopes[0], err = f.db.GetEnvelopeFromID(p.ID)
 		}

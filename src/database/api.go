@@ -66,6 +66,20 @@ func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err erro
 	return
 }
 
+// GetLatestEnvelopeFromID returns a single envelope from its ID, trying to find the latest version of it
+func (api DatabaseAPI) GetLatestEnvelopeFromID(id string) (e letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	es, err := db.getAllVersions(id)
+	if err != nil {
+		return
+	}
+	db.Close()
+	return api.GetEnvelopeFromID(es[0])
+}
+
 // GetAllEnvelopes returns all envelopes determined by whether they are opened
 func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
 	db, err := open(api.FileName)
