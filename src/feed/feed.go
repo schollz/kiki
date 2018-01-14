@@ -713,25 +713,54 @@ func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
 
 // PurgeOverflowingStorage will delete old messages
 func (f Feed) PurgeOverflowingStorage() (err error) {
-	f.log.Debug(f.db.ListUsers())
-	f.log.Debug(f.db.DiskSpaceForUser(f.PersonalKey.Public))
 	users, err := f.db.ListUsers()
 	if err != nil {
 		return
 	}
+	_, _, friendsList := f.db.Friends(f.PersonalKey.Public)
+	friendsMap := make(map[string]struct{})
+	for _, friend := range friendsList {
+		friendsMap[friend] = struct{}{}
+	}
+
 	for _, user := range users {
 		// skip personal user
 		if user == f.PersonalKey.Public {
 			continue
 		}
-		// skip friends
-		// TODO
-		f.log.Debug(user)
-		f.log.Debug(f.db.DiskSpaceForUser(user))
+
+		// determine limit
+		limit := f.Settings.StoragePerPublicPerson
+		if _, ok := friendsMap[user]; ok {
+			limit = f.Settings.StoragePerFriend
+		}
+
+		currentSpace, err2 := f.db.DiskSpaceForUser(user)
+		if err2 != nil {
+			return err2
+		}
+
+		for {
+			f.log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
+			if currentSpace < limit {
+				break
+			}
+			err = f.db.DeleteUsersOldestPost(user)
+			if err != nil {
+				return
+			}
+			currentSpace, err2 = f.db.DiskSpaceForUser(user)
+			if err2 != nil {
+				return err2
+			}
+		}
 	}
 	return
 }
 
 func (f Feed) TestStuff() {
-	f.log.Debug(f.db.GetAllVersions("9f94a236940326a7fb9eb06d3cc0fece47dee6fa58b8d328b47a9ebc175d7616"))
+	err := f.PurgeOverflowingStorage()
+	if err != nil {
+		f.log.Error(err)
+	}
 }

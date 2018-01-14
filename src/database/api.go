@@ -288,7 +288,7 @@ func (api DatabaseAPI) DiskSpaceForUser(user string) (diskSpace int64, err error
 	return db.diskSpaceForUser(user)
 }
 
-// DiskSpaceForUser returns the bytes used by a user for recipients + sealed_content
+// ListUsers returns the bytes used by a user for recipients + sealed_content
 func (api DatabaseAPI) ListUsers() (users []string, err error) {
 	db, err := open(api.FileName)
 	if err != nil {
@@ -393,4 +393,14 @@ func (api DatabaseAPI) GetLatestKeyForFriends(publicKey string) (key keypair.Key
 	}
 	defer db.Close()
 	return db.getKeyForFriends(publicKey)
+}
+
+// DeleteUsersOldestPost will delete the users oldest post
+func (api DatabaseAPI) DeleteUsersOldestPost(publicKey string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.deleteUsersOldestPost(publicKey)
 }

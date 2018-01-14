@@ -23,6 +23,8 @@ var (
 	// Port defines what port the carrier should listen on
 	PublicPort  = "8003"
 	PrivatePort = "8004"
+
+	NoSync bool
 	// Location defines where to open up the kiki database
 	Location = "."
 	f        feed.Feed

@@ -494,7 +494,7 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "deleteLetterFromID")
 	}
-	query := fmt.Sprintf("DELETE FROM letters WHERE id == '%s'", id)
+	query := fmt.Sprintf("DELETE FROM letters WHERE id == '%s';", id)
 	log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -515,6 +515,33 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 	return
 }
 
+// deleteUsersOldestPost will delete a letter with the pertaining ID.
+func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+	log.Debug(publicKey)
+	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE sender == ? ORDER BY time LIMIT 1);"
+	log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(publicKey)
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+	return
+}
+
 func (d *database) isReplaced(id string) (yes bool, err error) {
 	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE letter_replaces==? AND sender == (SELECT sender FROM letters WHERE id==?)")
 	if err != nil {
@@ -532,16 +559,14 @@ func (d *database) isReplaced(id string) (yes bool, err error) {
 }
 
 func (d *database) diskSpaceForUser(user string) (diskSpace int64, err error) {
+	diskSpace = 0
 	stmt, err := d.db.Prepare("SELECT SUM(LENGTH(sealed_letter))+SUM(LENGTH(sealed_recipients)) FROM letters WHERE sender==?")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(user).Scan(&diskSpace)
-	if err != nil {
-		err = errors.Wrap(err, "problem getting")
-	}
+	stmt.QueryRow(user).Scan(&diskSpace)
 	return
 }
 
