@@ -69,7 +69,14 @@ func Run() (err error) {
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/", func(c *gin.Context) {
-		posts, _ := f.ShowFeed()
+		p := feed.ShowFeedParameters{}
+		p.ID = c.DefaultQuery("id", "")
+		p.Channel = c.DefaultQuery("channel", "")
+		p.User = c.DefaultQuery("user", "")
+		p.Search = c.DefaultQuery("search", "")
+		p.Latest = c.DefaultQuery("latest", "") == "1"
+
+		posts, _ := f.ShowFeed(p)
 		user, _ := f.ShowProfile()
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Posts": posts,
@@ -77,7 +84,13 @@ func Run() (err error) {
 		})
 	})
 	r.GET("/feed.json", func(c *gin.Context) {
-		posts, err := f.ShowFeed()
+		p := feed.ShowFeedParameters{}
+		p.ID = c.DefaultQuery("id", "")
+		p.Channel = c.DefaultQuery("channel", "")
+		p.User = c.DefaultQuery("user", "")
+		p.Search = c.DefaultQuery("search", "")
+		p.Latest = c.DefaultQuery("latest", "") == "1"
+		posts, err := f.ShowFeed(p)
 		if err != nil {
 			respondWithJSON(c, "", err)
 			return
@@ -95,23 +108,6 @@ func Run() (err error) {
 			},
 		})
 	})
-	r.GET("/view/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		posts, err := f.ShowFeed(id)
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		user, err := f.ShowProfile()
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"Posts": posts,
-			"User":  user,
-		})
-	})
 	r.GET("/static/:file", func(c *gin.Context) {
 		file := c.Param("file")
 		filename := "static/" + file
@@ -124,12 +120,15 @@ func Run() (err error) {
 	})
 	r.GET("/ping", handlePing)
 	r.GET("/img/:id", handleImage)
-	r.POST("/letter", handlerLetter) // post to put in letter (local only)
-	r.OPTIONS("/letter", handlePing) // post to put in letter (local only)
-	r.POST("/sync", handlerSync)     // tell server to sync with another server (local only)
+	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
+	r.OPTIONS("/letter", handlePing)       // post to put in letter (local only)
+	r.POST("/sync", handlerSync)           // tell server to sync with another server (local only)
+	r.GET("/list", handleList)             // GET list of all envelope IDs
+	r.POST("/envelope", handlerEnvelope)   // post to put into database (public)
+	r.GET("/download/:id", handleDownload) // download a specific envelope
 	r.GET("/test", func(c *gin.Context) {
 		message := ""
-		f.ShowFeed()
+		f.ShowFeed(feed.ShowFeedParameters{})
 		c.JSON(http.StatusOK, gin.H{"success": err == nil, "message": message})
 	})
 

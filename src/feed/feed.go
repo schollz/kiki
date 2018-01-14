@@ -307,19 +307,32 @@ func (f Feed) ShowProfile() (u User, err error) {
 	return
 }
 
-func (f Feed) ShowFeed(id ...string) (posts []Post, err error) {
+type ShowFeedParameters struct {
+	ID      string // view a single post
+	Channel string // filter by channel
+	User    string // filter by user
+	Search  string // filter by search term
+	Latest  bool   // get the latest
+}
+
+func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	var envelopes []letter.Envelope
-	if len(id) == 0 {
-		envelopes, err = f.db.GetBasicPosts()
-		if err != nil {
-			return
-		}
-	} else {
+	if p.ID != "" {
 		envelopes = make([]letter.Envelope, 1)
-		envelopes[0], err = f.db.GetEnvelopeFromID(id[0])
-		if err != nil {
-			return
+		if p.Latest {
+
+		} else {
+			envelopes[0], err = f.db.GetEnvelopeFromID(p.ID)
 		}
+	} else if p.Channel != "" {
+
+	} else if p.User != "" {
+
+	} else if p.Search != "" {
+
+	} else {
+		// reteurn all envelopes
+		envelopes, err = f.db.GetBasicPosts()
 	}
 	f.log.Debugf("Found %d envelopes", len(envelopes))
 	posts = make([]Post, len(envelopes))
@@ -327,13 +340,11 @@ func (f Feed) ShowFeed(id ...string) (posts []Post, err error) {
 	for _, e := range envelopes {
 		post := f.MakePost(e)
 		comments := f.DetermineComments(post.ID)
-
 		posts[i] = Post{
 			Post:     post,
 			Comments: comments,
 		}
 		i++
-
 	}
 	posts = posts[:i]
 	fmt.Println(posts)
