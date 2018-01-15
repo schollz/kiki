@@ -200,7 +200,7 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 		    '['||
 		        '{'||
 		            '"id": "' ||  id ||'",'||
-		            '"time":"' ||  time ||'",'||
+		            '"timestamp":"' || strftime('%Y-%m-%dT%H:%M:%SZ',time) ||'",'||
 		            '"sender_raw": "' ||  sender ||'",'||
 		            '"signature":"' ||  signature ||'",'||
 		            '"sealed_recipients":' ||  sealed_recipients ||','||
@@ -211,18 +211,19 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 							ELSE 'true'
 						END
 					||','||
-		            '"letter_purpose":"' ||  letter_purpose ||'",'||
-		            '"letter_to": ' ||  letter_to ||','||
-		            '"letter_content": "' ||  replace(letter_content, '"',  '''') ||'",'||
-		            '"letter_replaces": "' ||  letter_replaces ||'",'||
-		            '"letter_replyto": "' ||  letter_replyto ||'",'||
-		            '"comments":[]'
+					'"letter": {'||
+			            '"purpose":"' ||  letter_purpose ||'",'||
+			            '"to": ' ||  letter_to ||','||
+			            '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+			            '"replaces": "' ||  letter_replaces ||'",'||
+			            '"reply_to": "' ||  letter_replyto ||'"'
+					||'}'
 		        ||'}'
 		    ||']'
 		FROM letters
 		WHERE
-						opened == 1
-			  AND
+				opened == 1
+			AND
 		        letter_purpose = 'share-text'
 		    AND
 		        letter_content != ''
@@ -250,15 +251,20 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	for rows.Next() {
 		var text string
 		err = rows.Scan(&text)
-
-		text = strings.Replace(text, "\n", "", -1)
-		// err = rows.Scan(&envelopes)
-
 		if nil != err {
 			return envelopes, err
 		}
 
+		text = strings.Replace(text, "\n", "", -1)
+
 		err = json.Unmarshal([]byte(text), &envelopes)
+		if nil != err {
+			return envelopes, err
+		}
+	}
+
+	for i := range envelopes {
+		envelopes[i].Sender, err = keypair.FromPublic(envelopes[i].SenderRaw)
 		if nil != err {
 			return envelopes, err
 		}
