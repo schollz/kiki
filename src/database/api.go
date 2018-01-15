@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -154,25 +155,63 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	}
 	defer db.Close()
 
+	// query := `
+	// 	SELECT
+	// 	    json_array(
+	// 	        json_object(
+	// 	            'id', id,
+	// 	            'time', time,
+	// 	            'sender', sender,
+	// 	            'signature', signature,
+	// 	            'sealed_recipients', sealed_recipients,
+	// 	            'sealed_letter', sealed_letter,
+	// 	            'opened', opened,
+	// 	            'letter_purpose', letter_purpose,
+	// 	            'letter_to', letter_to,
+	// 	            'letter_content', letter_content,
+	// 	            'letter_replaces', letter_replaces,
+	// 	            'letter_replyto', letter_replyto,
+	// 	            'comments', json_array()
+	// 	        )
+	// 	    )
+	// 	FROM letters
+	// 	WHERE
+	// 	        letter_purpose = 'share-text'
+	// 	    AND
+	// 	        letter_content != ''
+	// 	    AND
+	// 	        id NOT IN (
+	// 	            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+	// 	        )
+	// 	    AND letter_replyto == ''
+	// 	ORDER BY time DESC;
+	// `
+
+	// json1 needs to be loaded...
 	query := `
 		SELECT
-		    json_array(
-		        json_object(
-		            'id', id,
-		            'time', time,
-		            'sender', sender,
-		            'signature', signature,
-		            'sealed_recipients', sealed_recipients,
-		            'sealed_letter', sealed_letter,
-		            'opened', opened,
-		            'letter_purpose', letter_purpose,
-		            'letter_to', letter_to,
-		            'letter_content', letter_content,
-		            'letter_replaces', letter_replaces,
-		            'letter_replyto', letter_replyto,
-		            'comments', json_array()
-		        )
-		    )
+		    '['||
+		        '{'||
+		            '"id": "' ||  id ||'",'||
+		            '"time":"' ||  time ||'",'||
+		            '"sender_raw": "' ||  sender ||'",'||
+		            '"signature":"' ||  signature ||'",'||
+		            '"sealed_recipients":' ||  sealed_recipients ||','||
+		            '"sealed_letter":"' ||  sealed_letter ||'",'||
+		            '"opened":' ||
+						CASE opened
+							WHEN 0 then 'false'
+							ELSE 'true'
+						END
+					||','||
+		            '"letter_purpose":"' ||  letter_purpose ||'",'||
+		            '"letter_to": ' ||  letter_to ||','||
+		            '"letter_content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		            '"letter_replaces": "' ||  letter_replaces ||'",'||
+		            '"letter_replyto": "' ||  letter_replyto ||'",'||
+		            '"comments":[]'
+		        ||'}'
+		    ||']'
 		FROM letters
 		WHERE
 		        letter_purpose = 'share-text'
@@ -184,12 +223,7 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 		        )
 		    AND letter_replyto == ''
 		ORDER BY time DESC;
-	`
-
-	// err = db.db.LoadExtension("json1", "json1")
-	// if nil != err {
-	// 	panic(err)
-	// }
+`
 
 	// prepare statement
 	stmt, err := db.db.Prepare(query)
@@ -205,7 +239,19 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&envelopes)
+		var text string
+		err = rows.Scan(&text)
+
+		text = strings.Replace(text, "\n", "", -1)
+		// err = rows.Scan(&envelopes)
+
+		if nil != err {
+			return envelopes, err
+		}
+
+		// fmt.Println(text)
+
+		err = json.Unmarshal([]byte(text), &envelopes)
 		if nil != err {
 			return envelopes, err
 		}
