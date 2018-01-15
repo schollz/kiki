@@ -8,7 +8,7 @@ import (
 )
 
 func TestMakePost(t *testing.T) {
-	logging.Debug(false)
+	logging.SetLoggingLevel("warn")
 	f, err := Open(".")
 	f.Debug(false)
 	logging.SetLoggingLevel("critical")
