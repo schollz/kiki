@@ -766,8 +766,5 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 }
 
 func (f Feed) TestStuff() {
-	err := f.PurgeOverflowingStorage()
-	if err != nil {
-		f.log.Error(err)
-	}
+	fmt.Println(f.GetUserFriends())
 }

@@ -115,23 +115,30 @@ func (d *database) MakeTables() (err error) {
 		return
 	}
 
-	// The following tables are for organizing the letter data to make it more easily (and quickly) parsed. These tables are filled in when regenerating the feed.
-
-	// The "persons" table fills with public information about the people on the network with how they relate to you (following/follower/blocking) and how they prsent themselves (profile, name, image). All this information is determined by reading letters, but as letters determine these properties dynamically and chronologically, this table will ensure that the latest version is determined.
-	sqlStmt = `CREATE TABLE persons (id INTEGER PRIMARY KEY, public_key TEXT, name TEXT, profile TEXT, image TEXT, following INTEGER, follower INTEGER, blocking INTEGER);`
+	// indices
+	sqlStmt = `CREATE INDEX idx_sender ON letters(opened,letter_purpose,sender);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
-		err = errors.Wrap(err, "MakeTables, persons")
+		err = errors.Wrap(err, "MakeTables, letters")
 		return
 	}
-	// // The "keypairs" table fills with all the keys provided for friends, as well as keys from friends. When encrypting for friends it will only use keys for friends. When encrypting for friends of friends it will use all the keys. For decrypting, it will try every keypair.
-	// // This table is filled in dynamically, inserting each keypair found into the table.
-	// sqlStmt = `CREATE TABLE keypairs (id INTEGER PRIMARY KEY, persons_id integer, time TIMESTAMP, keypair TEXT);`
-	// _, err = d.db.Exec(sqlStmt)
-	// if err != nil {
-	// 	err = errors.Wrap(err, "MakeTables, keypairs")
-	// 	return
-	// }
+
+	// indices
+	sqlStmt = `CREATE INDEX idx_content ON letters(opened,letter_purpose,letter_content);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables, letters")
+		return
+	}
+
+	// indices
+	sqlStmt = `CREATE INDEX idx_replaces ON letters(opened,letter_replaces);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables, letters")
+		return
+	}
+
 	return
 }
 
@@ -464,7 +471,7 @@ func (d *database) getProfileImage(person string) (imageID string, err error) {
 }
 
 func (d *database) getFriendsName(publicKey string) (name string) {
-	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == 'share-key' AND letter_content LIKE '%%" + publicKey + "%%' LIMIT 1;"
+	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ShareKey + "' AND letter_content == '" + publicKey + "' LIMIT 1;"
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -522,7 +529,7 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 		return errors.Wrap(err, "deleteUsersOldestPost")
 	}
 	log.Debug(publicKey)
-	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE sender == ? ORDER BY time LIMIT 1);"
+	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND sender == ? ORDER BY time LIMIT 1);"
 	log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -543,7 +550,7 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 }
 
 func (d *database) isReplaced(id string) (yes bool, err error) {
-	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE letter_replaces==? AND sender == (SELECT sender FROM letters WHERE id==?)")
+	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE opened == 1 AND letter_replaces==? AND sender == (SELECT sender FROM letters WHERE opened ==1 AND id==?)")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
 		return
@@ -571,7 +578,7 @@ func (d *database) diskSpaceForUser(user string) (diskSpace int64, err error) {
 }
 
 func (d *database) numLikesPerPost(idPost string) (likes int64, err error) {
-	stmt, err := d.db.Prepare("SELECT COUNT(id) FROM letters WHERE letter_purpose == '" + purpose.ActionLike + "' AND letter_content=?")
+	stmt, err := d.db.Prepare("SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ActionLike + "' AND letter_content=?")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
 		return
@@ -617,7 +624,7 @@ func (d *database) listUsers() (s []string, err error) {
 }
 
 func (d *database) getFollowing(publicKey string) (s []string, err error) {
-	query := fmt.Sprintf("SELECT DISTINCT(letter_content) FROM letters WHERE sender == '%s' AND letter_purpose == '%s';", publicKey, purpose.ActionFollow)
+	query := fmt.Sprintf("SELECT DISTINCT(letter_content) FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ;", purpose.ActionFollow, publicKey)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -652,7 +659,7 @@ func (d *database) getFollowing(publicKey string) (s []string, err error) {
 }
 
 func (d *database) getFollowers(publicKey string) (s []string, err error) {
-	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters WHERE letter_content == '%s' AND letter_purpose == '%s';", publicKey, purpose.ActionFollow)
+	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters WHERE opened==1 AND letter_purpose == '%s' AND letter_content == '%s';", purpose.ActionFollow, publicKey)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -689,7 +696,7 @@ func (d *database) getFollowers(publicKey string) (s []string, err error) {
 func (d *database) getAllVersions(id string) (s []string, err error) {
 	s = []string{id}
 	// forward propogation, find letters that replace current letter
-	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE letter_replaces==? LIMIT 1")
+	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE opened==1 AND letter_replaces==? LIMIT 1")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
 		return
@@ -706,7 +713,7 @@ func (d *database) getAllVersions(id string) (s []string, err error) {
 	stmt.Close()
 	// backward propogation, find letters that this letter has replaced
 	// forward propogation, find letters that replace current letter
-	stmt, err = d.db.Prepare("SELECT id FROM letters WHERE id IN (SELECT letter_replaces FROM letters WHERE id == ? LIMIT 1)")
+	stmt, err = d.db.Prepare("SELECT id FROM letters WHERE id IN (SELECT letter_replaces FROM letters WHERE opened==1 AND id == ? LIMIT 1)")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
 		return
@@ -726,14 +733,14 @@ func (d *database) getAllVersions(id string) (s []string, err error) {
 }
 
 func (d *database) getKeyForFriends(user string) (key keypair.KeyPair, err error) {
-	stmt, err := d.db.Prepare("SELECT letter_content FROM letters WHERE sender==? AND letter_purpose==? ORDER BY time DESC")
+	stmt, err := d.db.Prepare("SELECT letter_content FROM letters WHERE opened ==1 AND letter_purpose==? AND sender==? ORDER BY time DESC")
 	if err != nil {
 		err = errors.Wrap(err, "getKeyForFriends")
 		return
 	}
 	defer stmt.Close()
 	var keystring string
-	err = stmt.QueryRow(user, purpose.ShareKey).Scan(&keystring)
+	err = stmt.QueryRow(purpose.ShareKey, user).Scan(&keystring)
 	if err != nil {
 		err = errors.Wrap(err, "getKeyForFriends")
 		return
