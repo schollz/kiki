@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
+	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/purpose"
@@ -273,6 +274,95 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	}
 
 	return envelopes, nil
+}
+
+func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
+	var posts []feed.ApiBasicPost
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return envelopes, err
+	}
+	defer db.Close()
+
+
+	ID          string        `json:"id"`
+	Recipients  string        `json:"recipients"`
+	ReplyTo     string        `json:"reply_to"`
+	Content     template.HTML `json:"content"`
+	Date        time.Time     `json:"date"`
+	TimeAgo     string        `json:"time_ago"`
+	OwnerId     string        `json:"owner_id"`
+	Likes       int64         `json:"likes"`
+	NumComments int64         `json:"num_comments"`
+
+// num_content (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ActionLike + "')
+
+	query := `
+		SELECT
+	        '{'||
+	            '"id": "' ||  id ||'",'||
+	            '"timestamp":"' || strftime('%Y-%m-%dT%H:%M:%SZ',time) ||'",'||
+	            '"owner_id": "' ||  sender ||'",'||
+		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		        '"reply_to": "' ||  letter_replyto ||'",'||
+				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like') ||','||
+				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto IN (id))
+		    ||'}'
+		FROM letters
+		WHERE
+				opened == 1
+			AND
+		        letter_purpose = 'share-text'
+		    AND
+		        letter_content != ''
+		    AND
+		        id NOT IN (
+		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+		        )
+		    AND letter_replyto == ''
+		ORDER BY time DESC;
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return envelopes, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if nil != err {
+		return envelopes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return envelopes, err
+		}
+
+		text = strings.Replace(text, "\n", "", -1)
+
+		var post feed.ApiBasicPost
+		err = json.Unmarshal([]byte(text), &envelope)
+		if nil != err {
+			return envelopes, err
+		}
+
+		posts = append(posts, envelope)
+	}
+
+	// for i := range posts {
+	// 	posts[i].Sender, err = keypair.FromPublic(posts[i].SenderRaw)
+	// 	if nil != err {
+	// 		return posts, err
+	// 	}
+	// }
+
+	return posts, nil
 }
 
 // GetKeys will return all the keys
