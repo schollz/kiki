@@ -99,12 +99,12 @@ func initLogging() error {
 	}
 	Log = logger
 
-	Log.Trace("trace")
-	Log.Debug("debug")
-	Log.Info("info")
-	Log.Warn("warn")
-	Log.Error("error")
-	Log.Critical("critical")
+	// Log.Trace("trace")
+	// Log.Debug("debug")
+	// Log.Info("info")
+	// Log.Warn("warn")
+	// Log.Error("error")
+	// Log.Critical("critical")
 
 	return nil
 }
