@@ -11,6 +11,7 @@ func TestMakePost(t *testing.T) {
 	logging.Debug(false)
 	f, err := Open(".")
 	f.Debug(false)
+	logging.SetLoggingLevel("critical")
 	assert.Nil(t, err)
 	u := f.GetUser()
 	assert.Equal(t, "5z_8ZHf6cnZnortmafG0gsSX0Dl5jaOdCHUNoQiI5h8=", u.PublicKey)
