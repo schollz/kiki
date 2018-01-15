@@ -799,4 +799,6 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 
 func (f Feed) TestStuff() {
 	fmt.Println(f.GetUserFriends())
+	b, err := f.ShowFeed2(ShowFeedParameters{})
+	fmt.Println(b, err)
 }

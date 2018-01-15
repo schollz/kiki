@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/purpose"
 )
 
 // Publicly acessible database routines
@@ -115,7 +116,7 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 	if err != nil {
 		return
 	}
-	envelopes, err := db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_replyto IN ('%s') ORDER BY time", strings.Join(ids, "','")))
+	envelopes, err := db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE opened == 1 AND letter_purpose = '"+purpose.ShareText+"' AND letter_replyto IN ('%s') ORDER BY time", strings.Join(ids, "','")))
 	if err != nil {
 		return
 	}
@@ -143,7 +144,7 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	// should not be empty
 	// should not be replaced
 	// should not be a reply
-	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
+	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
 }
 
 func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
