@@ -18,9 +18,13 @@ type DatabaseAPI struct {
 	FileName string
 }
 
-func Setup(locationToDatabase string) (api DatabaseAPI) {
+func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) {
+	name := "kiki.sqlite3.db"
+	if len(databaseName) > 0 {
+		name = databaseName[0]
+	}
 	return DatabaseAPI{
-		FileName: path.Join(locationToDatabase, "kiki.sqlite3.db"),
+		FileName: path.Join(locationToDatabase, name),
 	}
 }
 
@@ -215,6 +219,8 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 		    ||']'
 		FROM letters
 		WHERE
+						opened == 1
+			  AND
 		        letter_purpose = 'share-text'
 		    AND
 		        letter_content != ''
