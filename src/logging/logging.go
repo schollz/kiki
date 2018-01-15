@@ -2,24 +2,39 @@ package logging
 
 import (
 	"fmt"
-	seelog "github.com/cihub/seelog"
 	"os"
+	"strings"
+
+	seelog "github.com/cihub/seelog"
 )
 
 var (
-	Verbose  bool = false
-	Log      seelog.LoggerInterface
-	LogLevel string = "debug"
+	Verbose bool = false
+	Log     seelog.LoggerInterface
+	Level   string = "debug"
 )
 
-// const (
-// 	nocolor = 0
-// 	red     = 31 // error critical
-// 	green   = 32
-// 	yellow  = 33 // warn
-// 	blue    = 36 // info
-// 	grey    = 37 // debug
-// )
+const (
+	nocolor = 0
+	red     = 31 // error critical
+	green   = 32
+	yellow  = 33 // warn
+	blue    = 36 // info
+	grey    = 37 // debug
+)
+
+func SetLoggingLevel(level string) error {
+	Level = level
+	return initLogging()
+}
+
+func formatter(message []interface{}) string {
+	var text []string
+	for i := range message {
+		text = append(text, fmt.Sprintf("%v", message[i]))
+	}
+	return strings.Join(text, " ")
+}
 
 // https://github.com/cihub/seelog/wiki/Custom-formatters
 func pidLogFormatter(params string) seelog.FormatterFunc {
@@ -29,9 +44,22 @@ func pidLogFormatter(params string) seelog.FormatterFunc {
 	}
 }
 
-func initLogging() {
+func initLogging() error {
 	if Verbose {
-		LogLevel = "trace"
+		Level = "trace"
+	}
+
+	// TODO:
+	//  - check
+	valid := false
+	levels := [6]string{"debug", "trace", "info", "critical", "error", "warn"}
+	for i := range levels {
+		if levels[i] == Level {
+			valid = true
+		}
+	}
+	if !valid {
+		return fmt.Errorf("Level is not valid")
 	}
 
 	Log = seelog.Disabled
@@ -39,7 +67,7 @@ func initLogging() {
 	// https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
 	// https://github.com/cihub/seelog/wiki/Log-levels
 	appConfig := `
-<seelog minlevel="` + LogLevel + `">
+<seelog minlevel="` + Level + `">
     <outputs formatid="stdout">
 	<filter levels="debug,trace">
 		<console formatid="debug"/>
@@ -68,31 +96,22 @@ func initLogging() {
 
 	logger, err := seelog.LoggerFromConfigAsBytes([]byte(appConfig))
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	Log = logger
-
-	// Logger.Trace("trace")
-	// Logger.Debug("debug")
-	// Logger.Info("info")
-	// Logger.Warn("warn")
-	// Logger.Error("error")
-	// Logger.Critical("critical")
-
+	return nil
 }
 
 func init() {
 	seelog.RegisterCustomFormatter("pidLogFormatter", pidLogFormatter)
-	// seelog.RegisterCustomFormatter("LLogFormatter", LLogFormatter)
 	initLogging()
 }
 
 func Debug(t bool) {
 	if t {
-		LogLevel = "debug"
+		Level = "debug"
 	} else {
-		LogLevel = "warn"
+		Level = "warn"
 	}
 	initLogging()
 }
