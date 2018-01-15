@@ -28,7 +28,7 @@ func TestGetPosts(t *testing.T) {
 	e2, err := api.GetBasicPosts2()
 	assert.Nil(t, err)
 	fmt.Println(len(e), len(e2))
-	// assert.Equal(t, len(e2), len(e))
+	assert.Equal(t, len(e2), len(e))
 }
 
 func TestOpenClose(t *testing.T) {
