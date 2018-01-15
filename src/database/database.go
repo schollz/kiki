@@ -337,8 +337,7 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	defer rows.Close()
 
 	// parse rows
-	s = make([]keypair.KeyPair, 100000)
-	sI := 0
+	sTemp := make(map[string]keypair.KeyPair)
 	// loop through rows
 	for rows.Next() {
 		var mKeyPair string
@@ -353,10 +352,15 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 		if err != nil {
 			return
 		}
-		s[sI] = kp
-		sI++
+		sTemp[mKeyPair] = kp
 	}
-	s = s[:sI]
+
+	s = make([]keypair.KeyPair, len(sTemp))
+	i := 0
+	for mKeyPair := range sTemp {
+		s[i] = sTemp[mKeyPair]
+	}
+
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getKeys")
@@ -367,7 +371,6 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 // getIDs returns all the envelope IDs
 func (d *database) getIDs() (s []string, err error) {
 	query := fmt.Sprintf("SELECT id FROM letters ORDER BY time DESC;")
-	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getIDs")
@@ -375,9 +378,7 @@ func (d *database) getIDs() (s []string, err error) {
 	}
 	defer rows.Close()
 
-	// parse rows
-	s = make([]string, 1000000)
-	sI := 0
+	sTemp := make(map[string]struct{})
 	// loop through rows
 	for rows.Next() {
 		var mID string
@@ -386,10 +387,15 @@ func (d *database) getIDs() (s []string, err error) {
 			err = errors.Wrap(err, "getIDs")
 			return
 		}
-		s[sI] = mID
-		sI++
+		sTemp[mID] = struct{}{}
 	}
-	s = s[:sI]
+
+	s = make([]string, len(sTemp))
+	i := 0
+	for mID := range sTemp {
+		s[i] = mID
+		i++
+	}
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getIDs")

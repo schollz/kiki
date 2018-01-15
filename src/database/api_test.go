@@ -24,6 +24,12 @@ func BenchmarkGetPosts(b *testing.B) {
 		api.GetBasicPosts()
 	}
 }
+func BenchmarkGetIDs(b *testing.B) {
+	api := Setup(".", "kiki.db")
+	for i := 0; i < b.N; i++ {
+		api.GetIDs()
+	}
+}
 
 func BenchmarkGetPosts2(b *testing.B) {
 	api := Setup(".", "kiki.db")
