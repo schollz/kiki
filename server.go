@@ -119,7 +119,7 @@ func Run() (err error) {
 		p.User = c.DefaultQuery("user", "")
 		p.Search = c.DefaultQuery("search", "")
 		p.Latest = c.DefaultQuery("latest", "") == "1"
-		posts, err := f.ShowFeed(p)
+		posts, err := f.ShowFeed2(p)
 		if err != nil {
 			respondWithJSON(c, "", err)
 			return

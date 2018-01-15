@@ -44,7 +44,8 @@ type Envelope struct {
 	// Timestamp is the time at which the envelope was created
 	Timestamp time.Time `json:"timestamp"`
 	// Sender is public key of the sender
-	Sender keypair.KeyPair `json:"sender"`
+	Sender    keypair.KeyPair `json:"sender"`
+	SenderRaw string          `json:"sender_raw"`
 	// Signature is the public key of the sender encrypted by
 	// the Sender private key, against the public Region key
 	// to authenticate sender. I.e., Sender == Decrypt(Signature) must be true.

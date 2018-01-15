@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -143,6 +144,120 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	// should not be replaced
 	// should not be a reply
 	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
+}
+
+func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
+	var envelopes []letter.Envelope
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return envelopes, err
+	}
+	defer db.Close()
+
+	// query := `
+	// 	SELECT
+	// 	    json_array(
+	// 	        json_object(
+	// 	            'id', id,
+	// 	            'time', time,
+	// 	            'sender', sender,
+	// 	            'signature', signature,
+	// 	            'sealed_recipients', sealed_recipients,
+	// 	            'sealed_letter', sealed_letter,
+	// 	            'opened', opened,
+	// 	            'letter_purpose', letter_purpose,
+	// 	            'letter_to', letter_to,
+	// 	            'letter_content', letter_content,
+	// 	            'letter_replaces', letter_replaces,
+	// 	            'letter_replyto', letter_replyto,
+	// 	            'comments', json_array()
+	// 	        )
+	// 	    )
+	// 	FROM letters
+	// 	WHERE
+	// 	        letter_purpose = 'share-text'
+	// 	    AND
+	// 	        letter_content != ''
+	// 	    AND
+	// 	        id NOT IN (
+	// 	            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+	// 	        )
+	// 	    AND letter_replyto == ''
+	// 	ORDER BY time DESC;
+	// `
+
+	// json1 needs to be loaded...
+	query := `
+		SELECT
+		    '['||
+		        '{'||
+		            '"id": "' ||  id ||'",'||
+		            '"time":"' ||  time ||'",'||
+		            '"sender_raw": "' ||  sender ||'",'||
+		            '"signature":"' ||  signature ||'",'||
+		            '"sealed_recipients":' ||  sealed_recipients ||','||
+		            '"sealed_letter":"' ||  sealed_letter ||'",'||
+		            '"opened":' ||
+						CASE opened
+							WHEN 0 then 'false'
+							ELSE 'true'
+						END
+					||','||
+		            '"letter_purpose":"' ||  letter_purpose ||'",'||
+		            '"letter_to": ' ||  letter_to ||','||
+		            '"letter_content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		            '"letter_replaces": "' ||  letter_replaces ||'",'||
+		            '"letter_replyto": "' ||  letter_replyto ||'",'||
+		            '"comments":[]'
+		        ||'}'
+		    ||']'
+		FROM letters
+		WHERE
+		        letter_purpose = 'share-text'
+		    AND
+		        letter_content != ''
+		    AND
+		        id NOT IN (
+		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+		        )
+		    AND letter_replyto == ''
+		ORDER BY time DESC;
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return envelopes, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if nil != err {
+		return envelopes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+
+		text = strings.Replace(text, "\n", "", -1)
+		// err = rows.Scan(&envelopes)
+
+		if nil != err {
+			return envelopes, err
+		}
+
+		// fmt.Println(text)
+
+		err = json.Unmarshal([]byte(text), &envelopes)
+		if nil != err {
+			return envelopes, err
+		}
+	}
+
+	return envelopes, nil
 }
 
 // GetKeys will return all the keys
