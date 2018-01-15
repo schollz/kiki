@@ -43,6 +43,15 @@ func TestGetVersions(t *testing.T) {
 	s, err := api.GetAllVersions("alskdjflkasjdf")
 	assert.NotNil(t, err)
 	assert.Equal(t, 0, len(s))
+	ids, err := api.GetIDs()
+	assert.Nil(t, err)
+	assert.True(t, len(ids) > 0)
+	for id := range ids {
+		s, err = api.GetAllVersions(id)
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(s))
+		break
+	}
 }
 
 func TestGettingPosts(t *testing.T) {
