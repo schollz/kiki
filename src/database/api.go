@@ -145,6 +145,75 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
 }
 
+func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
+	var envelopes []letter.Envelope
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return envelopes, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+		    json_array(
+		        json_object(
+		            'id', id,
+		            'time', time,
+		            'sender', sender,
+		            'signature', signature,
+		            'sealed_recipients', sealed_recipients,
+		            'sealed_letter', sealed_letter,
+		            'opened', opened,
+		            'letter_purpose', letter_purpose,
+		            'letter_to', letter_to,
+		            'letter_content', letter_content,
+		            'letter_replaces', letter_replaces,
+		            'letter_replyto', letter_replyto,
+		            'comments', json_array()
+		        )
+		    )
+		FROM letters
+		WHERE
+		        letter_purpose = 'share-text'
+		    AND
+		        letter_content != ''
+		    AND
+		        id NOT IN (
+		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+		        )
+		    AND letter_replyto == ''
+		ORDER BY time DESC;
+	`
+
+	// err = db.db.LoadExtension("json1", "json1")
+	// if nil != err {
+	// 	panic(err)
+	// }
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return envelopes, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if nil != err {
+		return envelopes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&envelopes)
+		if nil != err {
+			return envelopes, err
+		}
+	}
+
+	return envelopes, nil
+}
+
 // GetKeys will return all the keys
 func (api DatabaseAPI) GetKeys() (s []keypair.KeyPair, err error) {
 	db, err := open(api.FileName)
