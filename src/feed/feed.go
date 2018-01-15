@@ -25,6 +25,11 @@ import (
 	blackfriday "gopkg.in/russross/blackfriday.v2"
 )
 
+func (f *Feed) Debug(b bool) {
+	logging.Debug(b)
+	f.log = logging.Log
+}
+
 // New generates a new feed based on the location to find the identity file, the database, and the settings
 func New(location ...string) (f Feed, err error) {
 	locationToSaveData := "."

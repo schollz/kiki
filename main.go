@@ -18,9 +18,9 @@ func main() {
 	flag.StringVar(&Location, "path", ".", "path to the kiki database folder")
 	flag.Parse()
 	if *debug {
-		logging.Log.Debug(true)
+		logging.SetLoggingLevel("debug")
 	} else {
-		logging.Log.Debug(false)
+		logging.SetLoggingLevel("info")
 	}
 
 	if !*noBrowser {
