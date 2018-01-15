@@ -42,7 +42,7 @@ func New(location ...string) (f Feed, err error) {
 	}
 
 	// initialize
-	err = f.init()
+	f, err = initializeFeed(f)
 	return
 }
 
@@ -57,14 +57,14 @@ func Open(locationToFeed string) (f Feed, err error) {
 		return
 	}
 	f.storagePath = locationToFeed
-
 	// initialize
-	err = f.init()
+	f, err = initializeFeed(f)
 	return
 }
 
 // init initializes the kiki instance
-func (f *Feed) init() (err error) {
+func initializeFeed(g Feed) (f Feed, err error) {
+	f = g
 	f.log = logging.Log
 	f.log.Debug("initializing feed")
 	loc, _ := filepath.Abs(f.storagePath)
@@ -80,7 +80,6 @@ func (f *Feed) init() (err error) {
 	}
 
 	f.db = database.Setup(f.storagePath)
-
 	if f.PersonalKey.Public == "" {
 		// generate a new personal key
 		var err2 error
@@ -89,7 +88,8 @@ func (f *Feed) init() (err error) {
 		// add the friends key
 		err2 = f.AddFriendsKey()
 		if err2 != nil {
-			return errors.Wrap(err2, "add the friends key")
+			err = errors.Wrap(err2, "add the friends key")
+			return
 		}
 
 		// block the region public key from being used as a sender, ever
@@ -99,8 +99,8 @@ func (f *Feed) init() (err error) {
 			Content: f.RegionKey.Public,
 		})
 		if err2 != nil {
-			err2 = errors.Wrap(err2, "setup")
-			return err2
+			err = errors.Wrap(err2, "setup")
+			return
 		}
 	}
 
@@ -116,7 +116,8 @@ func (f *Feed) init() (err error) {
 
 	err = f.UpdateFriends()
 	if err != nil {
-		return
+		f.log.Warn(err)
+		err = nil
 	}
 	return
 }
@@ -437,7 +438,6 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		i++
 	}
 	posts = posts[:i]
-	fmt.Println(posts)
 	return
 }
 
@@ -469,7 +469,6 @@ func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) 
 		posts[i] = post
 		i++
 	}
-
 	return
 }
 

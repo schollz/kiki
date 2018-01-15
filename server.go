@@ -51,7 +51,9 @@ func Run() (err error) {
 	// Startup feed
 	log.Debug("opening feed")
 	f, err = feed.Open(Location)
+	fmt.Println(err)
 	if err != nil {
+		log.Debug(err)
 		log.Debug("feed not found, creating new one")
 		var err2 error
 		f, err2 = feed.New(Location)
@@ -59,6 +61,7 @@ func Run() (err error) {
 			return err2
 		}
 	}
+	log.Debug("opened feed")
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
