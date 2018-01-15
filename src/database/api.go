@@ -294,10 +294,10 @@ func (self DatabaseAPI) GetBasicPosts3() ([]letter.ApiBasicPost, error) {
 		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 		        '"reply_to": "' ||  letter_replyto ||'",'||
 				'"purpose":"' ||  letter_purpose ||'",'||
-				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like') ||','||
-				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto IN (id))
+				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
+				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
 		    ||'}'
-		FROM letters
+		FROM letters AS ltr
 		WHERE
 				opened == 1
 			AND
