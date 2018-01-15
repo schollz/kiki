@@ -347,12 +347,12 @@ func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
 		text = strings.Replace(text, "\n", "", -1)
 
 		var post feed.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &envelope)
+		err = json.Unmarshal([]byte(text), &post)
 		if nil != err {
 			return envelopes, err
 		}
 
-		posts = append(posts, envelope)
+		posts = append(posts, post)
 	}
 
 	// for i := range posts {
