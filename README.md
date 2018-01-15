@@ -50,6 +50,12 @@ There are limits to the amount of content stored on your computer. Those limits 
 
 When specified storage limits *are* reached, then messages begin to be purged. Again, only messages from public/friends are allows to be purged. First, old message edits are purged. Then the oldest posts are purged until the free space is no longer being exceeded.
 
+## Editing and deletion
+
+Anything on *KiKi* can be edited. All edits are saved in the database (though they will be purged on others computers if you have enough edits to exceed their storage limits). The feed shows only the most recent edit.
+
+There are two kinds of deletion in *KiKi*.
+
 ## Features
 
 - Single binary, single settings file, and a setting database.

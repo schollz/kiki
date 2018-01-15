@@ -2,8 +2,9 @@ package logging
 
 import (
 	"fmt"
-	seelog "github.com/cihub/seelog"
 	"os"
+
+	seelog "github.com/cihub/seelog"
 )
 
 var (
@@ -33,7 +34,6 @@ func initLogging() {
 	if Verbose {
 		LogLevel = "trace"
 	}
-
 	Log = seelog.Disabled
 
 	// https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
@@ -73,12 +73,12 @@ func initLogging() {
 	}
 	Log = logger
 
-	// Logger.Trace("trace")
-	// Logger.Debug("debug")
-	// Logger.Info("info")
-	// Logger.Warn("warn")
-	// Logger.Error("error")
-	// Logger.Critical("critical")
+	Log.Trace("trace")
+	Log.Debug("debug")
+	Log.Info("info")
+	Log.Warn("warn")
+	Log.Error("error")
+	Log.Critical("critical")
 
 }
 
@@ -92,7 +92,7 @@ func Debug(t bool) {
 	if t {
 		LogLevel = "debug"
 	} else {
-		LogLevel = "warn"
+		LogLevel = "critical"
 	}
 	initLogging()
 }
