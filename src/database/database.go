@@ -282,6 +282,7 @@ func (d *database) getAllFromPreparedQuery(query string, args ...interface{}) (s
 func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 	tempS := make(map[string]letter.Envelope)
 	// loop through rows
+	err = errors.New("no rows available")
 	for rows.Next() {
 		var e letter.Envelope
 		e.Letter = letter.Letter{}
@@ -301,6 +302,9 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 
 		tempS[e.ID] = e
 		err = nil
+	}
+	if err != nil {
+		return
 	}
 	s = make([]letter.Envelope, len(tempS))
 	i := 0

@@ -272,7 +272,9 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	// check if envelope already exists
 	_, errGet := f.GetEnvelope(e.ID)
 	if errGet == nil {
-		return errors.New("already have envelope")
+		f.log.Debugf("skipping %s, already have", e.ID)
+		// already have return
+		return nil
 	}
 
 	err = f.db.AddEnvelope(e)

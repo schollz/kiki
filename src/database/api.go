@@ -67,7 +67,9 @@ func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err erro
 	if err != nil {
 		err = errors.Wrap(err, "GetEnvelopeFromID("+id+")")
 	} else {
-		e = es[0]
+		if len(es) > 0 {
+			e = es[0]
+		}
 	}
 	return
 }
