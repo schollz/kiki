@@ -132,7 +132,7 @@ func (d *database) MakeTables() (err error) {
 	}
 
 	// indices
-	sqlStmt = `CREATE INDEX idx_content ON letters(opened,letter_purpose,letter_replyto);`
+	sqlStmt = `CREATE INDEX idx_replyto ON letters(opened,letter_purpose,letter_replyto);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
 		err = errors.Wrap(err, "MakeTables, letters")
