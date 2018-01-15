@@ -1,10 +1,8 @@
 # KiKi
 
-*KiKi* is a new social network like FLMPT[^1], but different. 
+*KiKi* is a new social network that's different. 
 
-[^1]: Facebook, LinkedIn, Mastodon, Patchwork, Twitter
-
-How is *KiKi* different than FLMPT? The main difference is that *the entire social network exists on your computer, all the time*. In *KiKi*, you are part of the cloud. That is, when you use *KiKi* to post a private message to a friend, everyone in the entire network will store that message for you. Secure end-to-end encryption ensures that, even though everyone has the message, only your friend can read it. 
+How is *KiKi* different? The main difference is that *the entire social network exists on your computer, all the time*. In *KiKi*, you are part of the cloud. When you use *KiKi* to post a private message to a friend, everyone in the entire network will store that message for you. Secure end-to-end encryption ensures that only your friend can read it, even though everyone has the message. 
 
 ## Quickstart
 
@@ -26,11 +24,11 @@ This will start your local server instance and open up a browser so that you can
 
 ## Privacy 
 
-Privacy is built-in with end-to-end encryption using public-key cyrptography. Even though you have all message from all other users, you cannot open any of the messages unless you have the key shared from the user to open it.
+Privacy is built-in with end-to-end encryption using public-key cyrptography. Even though you have all message from all other users, you cannot open any of the messages unless you have the key shared from the user to open it. 
 
-Anything you do in *KiKi* is private automatically, unless it is an action (see below) or if it is for **friends**. A **friend** is anyone is followed by you *and* is following you. If you write a post for friends, then only your friends can see it. 
+Anything you do in *KiKi* is private automatically, unless it is an action (see below) or if it is for **friends**. A **friend** is anyone is followed by you *and* is following you. If you write a post for friends, then only your friends can see it. Every user has friend keys - a set of keys which are specifically for friends. When you unfriend someone you public a new friends key to your friends but not to the unfriended person.
 
-An **action** helps other users determine how to handle your profile and your data. The following are all of the available actions which are always public:
+An **action** helps other users determine how to handle your profile and your data. *Actions are always public*. The following are all of the available actions:
 
 - Liking a post
 - Blocking a user
@@ -44,6 +42,14 @@ These actions are public to help other users to determine how to handle your dat
 
 You can also other posts public by choosing to share with public.
 
+## Storage
+
+The entire social network is stored on your local computer. This allows you to add entries, share photos, and make comments to others offline. Anything you do offline will be synced up later.
+
+There are limits to the amount of content stored on your computer. Those limits are set in the `feed.json` configuration file, typically 5MB for public and 50MB friends. Your own messages never apply to these limits. 
+
+When specified storage limits *are* reached, then messages begin to be purged. Again, only messages from public/friends are allows to be purged. First, old message edits are purged. Then the oldest posts are purged until the free space is no longer being exceeded.
+
 ## Features
 
 - Single binary, single settings file, and a setting database.
@@ -54,9 +60,9 @@ You can also other posts public by choosing to share with public.
 - Storage goes towards content rather than styling (unlike IPFS).
 
 
-## "*KiKi*"
+## *"KiKi"*
 
-Why the name "*KiKi*"? "*Kiki*" is [loosely defined](https://en.wikipedia.org/wiki/Kiki_(gathering)) as a gathering of friends for the purpose of chit-chat. Also, *kiki* is half of the [Bouba/kiki effect](https://en.wikipedia.org/wiki/Bouba/kiki_effect) which demonstrates that some aspects of communication and language are universal. Both are underlying principles behind the design and impelementation.
+Why the name *"KiKi"*? *"KiKi"* is [loosely defined](https://en.wikipedia.org/wiki/Kiki_(gathering)) as a gathering of friends for the purpose of chit-chat. Also, *kiki* is half of the [Bouba/kiki effect](https://en.wikipedia.org/wiki/Bouba/kiki_effect) which demonstrates that some aspects of communication and language are universal. Both are underlying principles behind the design and impelementation.
 
 
 
