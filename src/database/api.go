@@ -538,3 +538,25 @@ func (api DatabaseAPI) DeleteUsersEdits(publicKey string) (err error) {
 	defer db.Close()
 	return db.deleteUsersEdits(publicKey)
 }
+
+// DeleteOldActions will delete all the old actions of a user
+func (api DatabaseAPI) DeleteOldActions(publicKey string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	err = db.deleteUsersOldActions(publicKey, purpose.ActionName)
+	if err != nil {
+		return
+	}
+	err = db.deleteUsersOldActions(publicKey, purpose.ActionProfile)
+	if err != nil {
+		return
+	}
+	err = db.deleteUsersOldActions(publicKey, purpose.ActionImage)
+	if err != nil {
+		return
+	}
+	return
+}

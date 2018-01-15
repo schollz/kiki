@@ -531,7 +531,7 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 		return errors.Wrap(err, "deleteUsersOldestPost")
 	}
 	log.Debug(publicKey)
-	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND sender == ? ORDER BY time LIMIT 1);"
+	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND letter_purpose IN ('share-text','share-image/png','share-image/jpg') AND sender == ? ORDER BY time LIMIT 1);"
 	log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -542,6 +542,33 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 	_, err = stmt.Exec(publicKey)
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+	return
+}
+
+// deleteUsersOldActions will delete old actions and leave only the most recent action undeleted
+func (d *database) deleteUsersOldActions(publicKey string, purpose string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldActions")
+	}
+	log.Debug(publicKey, purpose)
+	query := "DELETE FROM letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND letter_purpose == ? AND sender == ? ORDER BY time DESC LIMIT 1000000000 OFFSET 1);"
+	log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldActions")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(purpose, publicKey)
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldActions")
 	}
 
 	err = tx.Commit()

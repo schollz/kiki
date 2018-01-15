@@ -808,6 +808,6 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 }
 
 func (f Feed) TestStuff() {
-	err := f.db.DeleteUsersEdits(f.PersonalKey.Public)
+	err := f.db.DeleteOldActions(f.PersonalKey.Public)
 	f.log.Debug(err)
 }
