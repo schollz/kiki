@@ -280,10 +280,8 @@ func (d *database) getAllFromPreparedQuery(query string, args ...interface{}) (s
 }
 
 func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
-	s = make([]letter.Envelope, 100000)
-	sI := 0
+	tempS := make(map[string]letter.Envelope)
 	// loop through rows
-	err = errors.New("no data available")
 	for rows.Next() {
 		var e letter.Envelope
 		e.Letter = letter.Letter{}
@@ -301,15 +299,16 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 			return
 		}
 
-		s[sI] = e
-		sI++
+		tempS[e.ID] = e
 		err = nil
 	}
-	s = s[:sI]
-
-	if err != nil {
-		return
+	s = make([]letter.Envelope, len(tempS))
+	i := 0
+	for e := range tempS {
+		s[i] = tempS[e]
+		i++
 	}
+
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getRows")
