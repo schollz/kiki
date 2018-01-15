@@ -280,8 +280,8 @@ func (d *database) getAllFromPreparedQuery(query string, args ...interface{}) (s
 }
 
 func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
-	tempS := make(map[string]letter.Envelope)
 	// loop through rows
+	s = []letter.Envelope{}
 	err = errors.New("no rows available")
 	for rows.Next() {
 		var e letter.Envelope
@@ -300,17 +300,11 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 			return
 		}
 
-		tempS[e.ID] = e
+		s = append(s, e)
 		err = nil
 	}
 	if err != nil {
 		return
-	}
-	s = make([]letter.Envelope, len(tempS))
-	i := 0
-	for e := range tempS {
-		s[i] = tempS[e]
-		i++
 	}
 
 	err = rows.Err()
@@ -322,6 +316,8 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 
 // getKeys returns all the keys shared with you in the database, which can be queried by the sender
 func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
+	s = []keypair.KeyPair{}
+
 	var query string
 	if len(sender) > 0 {
 		query = fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ShareKey, sender[0])
@@ -336,8 +332,6 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	}
 	defer rows.Close()
 
-	// parse rows
-	sTemp := make(map[string]keypair.KeyPair)
 	// loop through rows
 	for rows.Next() {
 		var mKeyPair string
@@ -352,13 +346,7 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 		if err != nil {
 			return
 		}
-		sTemp[mKeyPair] = kp
-	}
-
-	s = make([]keypair.KeyPair, len(sTemp))
-	i := 0
-	for mKeyPair := range sTemp {
-		s[i] = sTemp[mKeyPair]
+		s = append(s, kp)
 	}
 
 	err = rows.Err()
@@ -370,6 +358,7 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 
 // getIDs returns all the envelope IDs
 func (d *database) getIDs() (s []string, err error) {
+	s = []string{}
 	query := fmt.Sprintf("SELECT id FROM letters ORDER BY time DESC;")
 	rows, err := d.db.Query(query)
 	if err != nil {
@@ -378,7 +367,6 @@ func (d *database) getIDs() (s []string, err error) {
 	}
 	defer rows.Close()
 
-	sTemp := make(map[string]struct{})
 	// loop through rows
 	for rows.Next() {
 		var mID string
@@ -387,15 +375,9 @@ func (d *database) getIDs() (s []string, err error) {
 			err = errors.Wrap(err, "getIDs")
 			return
 		}
-		sTemp[mID] = struct{}{}
+		s = append(s, mID)
 	}
 
-	s = make([]string, len(sTemp))
-	i := 0
-	for mID := range sTemp {
-		s[i] = mID
-		i++
-	}
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getIDs")
