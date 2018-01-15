@@ -258,8 +258,6 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 			return envelopes, err
 		}
 
-		// fmt.Println(text)
-
 		err = json.Unmarshal([]byte(text), &envelopes)
 		if nil != err {
 			return envelopes, err
