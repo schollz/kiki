@@ -472,7 +472,7 @@ func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) 
 	return
 }
 
-func (self Feed) ShowFeed3() ([]ApiBasicPost, error) {
+func (self Feed) ShowFeed3() ([]letter.ApiBasicPost, error) {
 	posts, err := self.db.GetBasicPosts3()
 	return posts, err
 }

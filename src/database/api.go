@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
-	"github.com/schollz/kiki/src/feed"
+	// "github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/purpose"
@@ -276,12 +276,12 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	return envelopes, nil
 }
 
-func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
-	var posts []feed.ApiBasicPost
+func (self DatabaseAPI) GetBasicPosts3() ([]letter.ApiBasicPost, error) {
+	var posts []letter.ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
-		return envelopes, err
+		return posts, err
 	}
 	defer db.Close()
 
@@ -293,6 +293,7 @@ func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
 	            '"owner_id": "' ||  sender ||'",'||
 		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 		        '"reply_to": "' ||  letter_replyto ||'",'||
+				'"purpose":"' ||  letter_purpose ||'",'||
 				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like') ||','||
 				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto IN (id))
 		    ||'}'
@@ -314,13 +315,13 @@ func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
 	// prepare statement
 	stmt, err := db.db.Prepare(query)
 	if nil != err {
-		return envelopes, err
+		return posts, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if nil != err {
-		return envelopes, err
+		return posts, err
 	}
 	defer rows.Close()
 
@@ -328,26 +329,19 @@ func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
 		var text string
 		err = rows.Scan(&text)
 		if nil != err {
-			return envelopes, err
+			return posts, err
 		}
 
 		text = strings.Replace(text, "\n", "", -1)
 
-		var post feed.ApiBasicPost
+		var post letter.ApiBasicPost
 		err = json.Unmarshal([]byte(text), &post)
 		if nil != err {
-			return envelopes, err
+			return posts, err
 		}
 
 		posts = append(posts, post)
 	}
-
-	// for i := range posts {
-	// 	posts[i].Sender, err = keypair.FromPublic(posts[i].SenderRaw)
-	// 	if nil != err {
-	// 		return posts, err
-	// 	}
-	// }
 
 	return posts, nil
 }

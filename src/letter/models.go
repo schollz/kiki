@@ -15,6 +15,21 @@ import (
 	"github.com/schollz/kiki/src/symmetric"
 )
 
+// TESTING
+type ApiBasicPost struct {
+	// Depth      int           `json:"depth"`
+	ID          string    `json:"id"`
+	Recipients  string    `json:"recipients"`
+	ReplyTo     string    `json:"reply_to"`
+	Content     string    `json:"content"`
+	Date        time.Time `json:"date"`
+	TimeAgo     string    `json:"time_ago"`
+	OwnerId     string    `json:"owner_id"`
+	Likes       int64     `json:"likes"`
+	NumComments int64     `json:"num_comments"`
+	Purpose     string    `json:"purpose,omitempty"`
+}
+
 // Letter specifies the content being transfered to the self, or other users. The Letter has a purpose - either to "share" or to do an "action". You can "share" posts  or images. You action things like follows, likes, profile names, etc.
 type Letter struct {
 	// Purpose specifies the purpose of letter. Currently the purposes are:
