@@ -8,12 +8,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func BenchmarkOpening(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		db, err := open("kiki.db")
+		if err != nil {
+			panic(err)
+		}
+		db.Close()
+	}
+}
+
 func BenchmarkGetPosts(b *testing.B) {
 	api := Setup(".", "kiki.db")
 	for i := 0; i < b.N; i++ {
 		api.GetBasicPosts()
 	}
 }
+
 func BenchmarkGetPosts2(b *testing.B) {
 	api := Setup(".", "kiki.db")
 	for i := 0; i < b.N; i++ {
@@ -21,7 +32,7 @@ func BenchmarkGetPosts2(b *testing.B) {
 	}
 }
 
-func TestGetPosts(t *testing.T) {
+func TestGettingPosts(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	e, err := api.GetBasicPosts()
 	assert.Nil(t, err)
