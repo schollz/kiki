@@ -112,7 +112,7 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/feed.json", func(c *gin.Context) {
+	r.GET("/api/v1/posts.json", func(c *gin.Context) {
 		p := feed.ShowFeedParameters{}
 		p.ID = c.DefaultQuery("id", "")
 		p.Channel = c.DefaultQuery("channel", "")
@@ -124,15 +124,32 @@ func Run() (err error) {
 			respondWithJSON(c, "", err)
 			return
 		}
-		user := f.GetUser()
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{
 				"posts": posts,
-				"user":  user,
 			},
 		})
 	})
+
+	r.GET("/api/v1/user.json", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data": gin.H{
+				"user": f.GetUser(),
+			},
+		})
+	})
+
+	r.GET("/api/v1/fiends.json", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data": gin.H{
+				"friends": f.GetUserFriends(),
+			},
+		})
+	})
+
 	r.GET("/static/:file", func(c *gin.Context) {
 		file := c.Param("file")
 		filename := "static/" + file
