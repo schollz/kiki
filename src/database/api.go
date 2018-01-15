@@ -197,29 +197,27 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	// json1 needs to be loaded...
 	query := `
 		SELECT
-		    '['||
-		        '{'||
-		            '"id": "' ||  id ||'",'||
-		            '"timestamp":"' || strftime('%Y-%m-%dT%H:%M:%SZ',time) ||'",'||
-		            '"sender_raw": "' ||  sender ||'",'||
-		            '"signature":"' ||  signature ||'",'||
-		            '"sealed_recipients":' ||  sealed_recipients ||','||
-		            '"sealed_letter":"' ||  sealed_letter ||'",'||
-		            '"opened":' ||
-						CASE opened
-							WHEN 0 then 'false'
-							ELSE 'true'
-						END
-					||','||
-					'"letter": {'||
-			            '"purpose":"' ||  letter_purpose ||'",'||
-			            '"to": ' ||  letter_to ||','||
-			            '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
-			            '"replaces": "' ||  letter_replaces ||'",'||
-			            '"reply_to": "' ||  letter_replyto ||'"'
-					||'}'
-		        ||'}'
-		    ||']'
+	        '{'||
+	            '"id": "' ||  id ||'",'||
+	            '"timestamp":"' || strftime('%Y-%m-%dT%H:%M:%SZ',time) ||'",'||
+	            '"sender_raw": "' ||  sender ||'",'||
+	            '"signature":"' ||  signature ||'",'||
+	            '"sealed_recipients":' ||  sealed_recipients ||','||
+	            '"sealed_letter":"' ||  sealed_letter ||'",'||
+	            '"opened":' ||
+					CASE opened
+						WHEN 0 then 'false'
+						ELSE 'true'
+					END
+				||','||
+				'"letter": {'||
+		            '"purpose":"' ||  letter_purpose ||'",'||
+		            '"to": ' ||  letter_to ||','||
+		            '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		            '"replaces": "' ||  letter_replaces ||'",'||
+		            '"reply_to": "' ||  letter_replyto ||'"'
+				||'}'
+	        ||'}'
 		FROM letters
 		WHERE
 				opened == 1
@@ -257,10 +255,13 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 
 		text = strings.Replace(text, "\n", "", -1)
 
-		err = json.Unmarshal([]byte(text), &envelopes)
+		var envelope letter.Envelope
+		err = json.Unmarshal([]byte(text), &envelope)
 		if nil != err {
 			return envelopes, err
 		}
+
+		envelopes = append(envelopes, envelope)
 	}
 
 	for i := range envelopes {
