@@ -3,14 +3,13 @@ package feed
 import (
 	"testing"
 
-	"github.com/schollz/kiki/src/logging"
+	// "github.com/schollz/kiki/src/logging"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMakePost(t *testing.T) {
-	logging.SetLoggingLevel("warn")
 	f, err := Open(".")
-	f.Debug(false)
+	f.Debug(true)
 	assert.Nil(t, err)
 	u := f.GetUser()
 	assert.Equal(t, "5z_8ZHf6cnZnortmafG0gsSX0Dl5jaOdCHUNoQiI5h8=", u.PublicKey)
