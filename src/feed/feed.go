@@ -469,7 +469,7 @@ func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) 
 		posts[i] = post
 		i++
 	}
-	fmt.Println(posts)
+
 	return
 }
 
