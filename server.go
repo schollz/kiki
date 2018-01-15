@@ -116,13 +116,15 @@ func Run() (err error) {
 	})
 
 	r.GET("/api/v1/posts.json", func(c *gin.Context) {
-		p := feed.ShowFeedParameters{}
-		p.ID = c.DefaultQuery("id", "")
-		p.Channel = c.DefaultQuery("channel", "")
-		p.User = c.DefaultQuery("user", "")
-		p.Search = c.DefaultQuery("search", "")
-		p.Latest = c.DefaultQuery("latest", "") == "1"
-		posts, err := f.ShowFeed2(p)
+		// p := feed.ShowFeedParameters{}
+		// p.ID = c.DefaultQuery("id", "")
+		// p.Channel = c.DefaultQuery("channel", "")
+		// p.User = c.DefaultQuery("user", "")
+		// p.Search = c.DefaultQuery("search", "")
+		// p.Latest = c.DefaultQuery("latest", "") == "1"
+		// posts, err := f.ShowFeed2(p)
+		posts, err := f.ShowFeed3()
+
 		if err != nil {
 			respondWithJSON(c, "", err)
 			return

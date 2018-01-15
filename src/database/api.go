@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
+	// "github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
 	"github.com/schollz/kiki/src/purpose"
@@ -167,18 +168,19 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	// 	    json_array(
 	// 	        json_object(
 	// 	            'id', id,
-	// 	            'time', time,
+	// 	            'timestamp', strftime('%Y-%m-%dT%H:%M:%SZ',time),
 	// 	            'sender', sender,
 	// 	            'signature', signature,
 	// 	            'sealed_recipients', sealed_recipients,
 	// 	            'sealed_letter', sealed_letter,
 	// 	            'opened', opened,
-	// 	            'letter_purpose', letter_purpose,
-	// 	            'letter_to', letter_to,
-	// 	            'letter_content', letter_content,
-	// 	            'letter_replaces', letter_replaces,
-	// 	            'letter_replyto', letter_replyto,
-	// 	            'comments', json_array()
+	//				'letter', json_object(
+	// 	            	'purpose', letter_purpose,
+	// 	            	'to', letter_to,
+	// 	            	'content', letter_content,
+	// 	            	'replaces', letter_replaces,
+	// 	            	'reply_to', letter_replyto
+	//				)
 	// 	        )
 	// 	    )
 	// 	FROM letters
@@ -272,6 +274,76 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	}
 
 	return envelopes, nil
+}
+
+func (self DatabaseAPI) GetBasicPosts3() ([]letter.ApiBasicPost, error) {
+	var posts []letter.ApiBasicPost
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return posts, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+	        '{'||
+	            '"id": "' ||  id ||'",'||
+	            '"timestamp":"' || strftime('%Y-%m-%dT%H:%M:%SZ',time) ||'",'||
+	            '"owner_id": "' ||  sender ||'",'||
+		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		        '"reply_to": "' ||  letter_replyto ||'",'||
+				'"purpose":"' ||  letter_purpose ||'",'||
+				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like') ||','||
+				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto IN (id))
+		    ||'}'
+		FROM letters
+		WHERE
+				opened == 1
+			AND
+		        letter_purpose = 'share-text'
+		    AND
+		        letter_content != ''
+		    AND
+		        id NOT IN (
+		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+		        )
+		    AND letter_replyto == ''
+		ORDER BY time DESC;
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return posts, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if nil != err {
+		return posts, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return posts, err
+		}
+
+		text = strings.Replace(text, "\n", "", -1)
+
+		var post letter.ApiBasicPost
+		err = json.Unmarshal([]byte(text), &post)
+		if nil != err {
+			return posts, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
 }
 
 // GetKeys will return all the keys

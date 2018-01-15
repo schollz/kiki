@@ -472,6 +472,11 @@ func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) 
 	return
 }
 
+func (self Feed) ShowFeed3() ([]letter.ApiBasicPost, error) {
+	posts, err := self.db.GetBasicPosts3()
+	return posts, err
+}
+
 func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {
 	recipients := []string{}
 	for _, to := range e.Letter.To {
