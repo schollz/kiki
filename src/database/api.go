@@ -167,18 +167,19 @@ func (self DatabaseAPI) GetBasicPosts2() (e []letter.Envelope, err error) {
 	// 	    json_array(
 	// 	        json_object(
 	// 	            'id', id,
-	// 	            'time', time,
+	// 	            'timestamp', strftime('%Y-%m-%dT%H:%M:%SZ',time),
 	// 	            'sender', sender,
 	// 	            'signature', signature,
 	// 	            'sealed_recipients', sealed_recipients,
 	// 	            'sealed_letter', sealed_letter,
 	// 	            'opened', opened,
-	// 	            'letter_purpose', letter_purpose,
-	// 	            'letter_to', letter_to,
-	// 	            'letter_content', letter_content,
-	// 	            'letter_replaces', letter_replaces,
-	// 	            'letter_replyto', letter_replyto,
-	// 	            'comments', json_array()
+	//				'letter', json_object(
+	// 	            	'purpose', letter_purpose,
+	// 	            	'to', letter_to,
+	// 	            	'content', letter_content,
+	// 	            	'replaces', letter_replaces,
+	// 	            	'reply_to', letter_replyto
+	//				)
 	// 	        )
 	// 	    )
 	// 	FROM letters
