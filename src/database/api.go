@@ -289,7 +289,7 @@ func (self DatabaseAPI) GetBasicPosts3() ([]letter.ApiBasicPost, error) {
 		SELECT
 	        '{'||
 	            '"id": "' ||  id ||'",'||
-	            '"timestamp":"' || strftime('%Y-%m-%dT%H:%M:%SZ',time) ||'",'||
+	            '"timestamp": ' || strftime('%s',time) ||','||
 	            '"owner_id": "' ||  sender ||'",'||
 		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 		        '"reply_to": "' ||  letter_replyto ||'",'||

@@ -3,12 +3,12 @@ package feed
 import (
 	"testing"
 
+	// "github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/logging"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMakePost(t *testing.T) {
-	logging.SetLoggingLevel("warn")
 	f, err := Open(".")
 	f.Debug(false)
 	logging.SetLoggingLevel("critical")
