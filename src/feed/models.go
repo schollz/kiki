@@ -66,6 +66,7 @@ type BasicPost struct {
 	TimeAgo    string        `json:"time_ago"`
 	User       User          `json:"user"`
 	Likes      int64         `json:"likes"`
+	Comments   []BasicPost   `json:"comments"`
 }
 
 type User struct {
