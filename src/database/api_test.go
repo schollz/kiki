@@ -38,6 +38,13 @@ func BenchmarkGetPosts2(b *testing.B) {
 	}
 }
 
+func TestGetVersions(t *testing.T) {
+	api := Setup(".", "kiki.db")
+	s, err := api.GetAllVersions("alskdjflkasjdf")
+	assert.NotNil(t, err)
+	assert.Equal(t, 0, len(s))
+}
+
 func TestGettingPosts(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	e, err := api.GetBasicPosts()

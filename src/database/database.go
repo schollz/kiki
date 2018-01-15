@@ -357,9 +357,12 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 }
 
 // getIDs returns all the envelope IDs
-func (d *database) getIDs() (s []string, err error) {
+func (d *database) getIDs(sender ...string) (s []string, err error) {
 	s = []string{}
 	query := fmt.Sprintf("SELECT id FROM letters ORDER BY time DESC;")
+	if len(sender) > 0 {
+		query = fmt.Sprintf("SELECT id FROM letters WHERE sender == '%s' ORDER BY time DESC;", sender[0])
+	}
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getIDs")
@@ -500,7 +503,7 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "deleteLetterFromID")
 	}
-	query := fmt.Sprintf("DELETE FROM letters WHERE id == '%s';", id)
+	query := "DELETE FROM letters WHERE id == ?"
 	log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -544,6 +547,27 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 	err = tx.Commit()
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+	return
+}
+
+// deleteUsersEdits will delete a letter with the pertaining ID.
+func (d *database) deleteUsersEdits(publicKey string) (err error) {
+	ids, err := d.getIDs(publicKey)
+	if err != nil {
+		return
+	}
+	for _, id := range ids {
+		idVersions, err := d.getAllVersions(id)
+		if err != nil {
+			continue
+		}
+		for i, idVersion := range idVersions {
+			if i == 0 {
+				continue
+			}
+			d.deleteLetterFromID(idVersion)
+		}
 	}
 	return
 }
@@ -693,6 +717,12 @@ func (d *database) getFollowers(publicKey string) (s []string, err error) {
 }
 
 func (d *database) getAllVersions(id string) (s []string, err error) {
+	// make sure it exists first
+	_, err = d.getAllFromPreparedQuery("SELECT * FROM letters WHERE id == ? LIMIT 1", id)
+	if err != nil {
+		return
+	}
+
 	s = []string{id}
 	// forward propogation, find letters that replace current letter
 	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE opened==1 AND letter_replaces==? LIMIT 1")

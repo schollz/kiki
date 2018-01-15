@@ -528,3 +528,13 @@ func (api DatabaseAPI) DeleteUsersOldestPost(publicKey string) (err error) {
 	defer db.Close()
 	return db.deleteUsersOldestPost(publicKey)
 }
+
+// DeleteUsersEdits will delete the users edits made to posts
+func (api DatabaseAPI) DeleteUsersEdits(publicKey string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.deleteUsersEdits(publicKey)
+}

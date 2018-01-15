@@ -781,6 +781,14 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 			return err2
 		}
 
+		// first purge edits
+		if currentSpace > limit {
+			err2 = f.db.DeleteUsersEdits(user)
+			if err2 != nil {
+				return err2
+			}
+		}
+
 		for {
 			f.log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
 			if currentSpace < limit {
@@ -800,7 +808,6 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 }
 
 func (f Feed) TestStuff() {
-	fmt.Println(f.GetUserFriends())
-	b, err := f.ShowFeed2(ShowFeedParameters{})
-	fmt.Println(b, err)
+	err := f.db.DeleteUsersEdits(f.PersonalKey.Public)
+	f.log.Debug(err)
 }
