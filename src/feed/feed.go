@@ -342,7 +342,7 @@ func (f Feed) GetUser(public ...string) (u User) {
 	followers, following, friends := f.db.Friends(publicKey)
 	u = User{
 		Name:      strip.StripTags(name),
-		PublicKey: f.PersonalKey.Public,
+		PublicKey: publicKey,
 		Profile:   template.HTML(profile),
 		Image:     image,
 		Followers: followers,
