@@ -472,17 +472,9 @@ func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) 
 	return
 }
 
-func (self Feed) ShowFeed3(p ShowFeedParameters) ([]ApiBasicPost, error) {
-	return self.db.GetBasicPosts3()
-	// self.log.Debugf("Found %d envelopes", len(envelopes))
-	// posts = make([]BasicPost, len(envelopes))
-	// i := 0
-	// for _, e := range envelopes {
-	// 	post := self.MakePost(e)
-	// 	post.Comments = self.DetermineComments(post.ID)
-	// 	posts[i] = post
-	// 	i++
-	// }
+func (self Feed) ShowFeed3() ([]ApiBasicPost, error) {
+	posts, err := self.db.GetBasicPosts3()
+	return posts, err
 }
 
 func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {

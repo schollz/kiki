@@ -285,19 +285,6 @@ func (self DatabaseAPI) GetBasicPosts3([]feed.ApiBasicPost, error) {
 	}
 	defer db.Close()
 
-
-	ID          string        `json:"id"`
-	Recipients  string        `json:"recipients"`
-	ReplyTo     string        `json:"reply_to"`
-	Content     template.HTML `json:"content"`
-	Date        time.Time     `json:"date"`
-	TimeAgo     string        `json:"time_ago"`
-	OwnerId     string        `json:"owner_id"`
-	Likes       int64         `json:"likes"`
-	NumComments int64         `json:"num_comments"`
-
-// num_content (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ActionLike + "')
-
 	query := `
 		SELECT
 	        '{'||
