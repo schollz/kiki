@@ -107,58 +107,7 @@
     <div class="row">
       <div class="col-sm-9 blog-main">
 
-
-        {{ range .Posts }}
-        <div class="card">
-          <div class="card-body">
-            <div class="blog-post">
-              <p class="blog-post-meta">
-                <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .Post.User.Name }}" data-replyto="{{ .Post.ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;<a href="#!" data-usecontent="{{.Post.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.Post.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
-                <img src="/img/{{ .Post.User.Image }}" class="align-middle profile-pic">
-                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-content="{{ .Post.User.Profile }}" data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <span class="text-muted"><a href="/view/{{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
-              </p>
-              <hr>
-              <div id="{{ .Post.ID }}">
-                {{ .Post.Content }}
-              </div>
-              {{ if .Comments }}
-              <hr>
-                {{end}}
-              {{ range .Comments }}
-                <div data-children=".item"  style="font-size:80%;">
-                  <div class="row">
-                    <div class="col-{{.Depth}}"></div>
-                    <div class="col-{{ minus 12 .Depth}}">
-                        <div class="item">
-                            <div class="row">
-                              <div class="col-12">
-
-                                <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
-
-                                <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;<i class="fas fa-heart"></i> x6</span>
-                                {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
-                                <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> <span class="text-muted"><a href="/view/{{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
-
-                              </div>
-                            </div>
-                            <div role="tabpanel">
-                              <p class="mb-3">
-                                <div id="{{ .ID }}">
-                                {{ .Content }}
-                              </div>
-                              </p>
-                            </div>
-                          </div>
-                    </div>
-                  </div>
-                </div>
-              {{ end }}
-            </div>
-          </div>
-        </div>
-        {{ end }}
-
-
+         <div id="posts"></div>
 
         <!-- /.blog-post -->
         <nav class="blog-pagination">
@@ -223,7 +172,7 @@ KiKiApi.prototype.onError = function(toast_msg, callback){
         if (xhr.responseJSON.error) {
             err = xhr.responseJSON.error;
         }
-        toastr.error(err, toast_msg || 'Error');
+        toast_msg && toastr.error(err, toast_msg || 'Error');
         if (!err.stack) {
             err = new Error(err)
         }
@@ -234,14 +183,14 @@ KiKiApi.prototype.onError = function(toast_msg, callback){
 KiKiApi.prototype.onSuccess = function(toast_msg, callback){
     return function(data, status, xhr) {
         if ("ok" != data.status) {
-            toastr.error(data.error, toast_msg || 'Error');
+            toast_msg && toastr.error(data.error, toast_msg || 'Error');
             callback && callback(new Error(data.error));
         }
-        toastr.success(data.message, toast_msg);
+        toast_msg && toastr.success(data.message, toast_msg);
         callback && callback(null, data);
     }
 }
-  ``
+
 KiKiApi.prototype.submitLetter = function(letter, callback) {
     var self = this;
     var toast_msg = "Posting to KiKi";
@@ -255,19 +204,151 @@ KiKiApi.prototype.submitLetter = function(letter, callback) {
     });
 }
 
-KiKiApi.prototype.fetchFeed = function(callback) {
+KiKiApi.prototype.fetchPosts = function(callback) {
     var self = this;
     $.ajax({
-        url: "/feed.json",
+        url: "/api/v1/posts",
         method: "GET",
         error: self.onError(null, callback),
         success: self.onSuccess(null, callback)
     });
 }
 
-var app = {
-    Api: new KiKiApi()
+KiKiApi.prototype.fetchPost = function(post_id, callback) {
+    var self = this;
+    $.ajax({
+        url: "/api/v1/post/"+post_id,
+        method: "GET",
+        error: self.onError(null, callback),
+        success: self.onSuccess(null, callback)
+    });
 }
+
+KiKiApi.prototype.fetchPostComments = function(post_id, callback) {
+    var self = this;
+    $.ajax({
+        url: "/api/v1/post/"+post_id+"/comments",
+        method: "GET",
+        error: self.onError(null, callback),
+        success: self.onSuccess(null, callback)
+    });
+}
+
+
+var KiKiClient = function(api){
+    this.api = api;
+    this.posts = [];
+    this.$el = $("#posts");
+    this.init();
+}
+
+KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
+    // $('div[post_id="'+post_id'"] .post-comments')
+    this.api.fetchPostComments(post_id, function(err, res){
+        if (err) throw err;
+        console.log(res.data.posts);
+    });
+};
+
+KiKiClient.prototype.buildPostUi = function(post) {
+    var self = this;
+    return $("<div>", {post_id: post.id}).addClass("card").append(
+        $("<div>").addClass("card-body").append(
+            $("<div>").addClass("blog-post").append(
+
+                $("<p>").addClass("blog-post-meta").append(
+                    $("<span>").addClass("float-right").append(
+                        "&nbsp;",
+                        $("<a>", {
+                            'href': "#!",
+                            'title': "Reply to USERNAME",
+                            'data-title': "Reply to USERNAME",
+                            'data-replyto': post.id,
+                            'data-purpose':"share-text"
+                        }).addClass("editmodal").append(
+                            $('<i>').addClass("fas fa-reply")
+                        ),
+                        "&nbsp;",
+                        $("<a>", {
+                            'href': "#!",
+                            'title': "Edit post",
+                            'data-title':"Edit post",
+                            'data-usecontent':post.id,
+                            'data-replaces':post.id,
+                            'data-purpose':"share-text"
+
+                        }).addClass("editmodal").append(
+                            $("<i>").addClass("fas fa-edit")
+                        ),
+                        "&nbsp;",
+                        $("<a>",  {
+                            'href': "#!",
+                            "data-id":post.id
+                        }).addClass("likebutton").append(
+                            $("<i>").addClass("fas fa-heart"),
+                            "x"+(post.Likes||1)
+                        )
+                    ),
+
+                    $("<img>", {src:"/img/POSTUSERIMAGE"}).addClass("align-middle profile-pic"),
+                    $("<a>",{
+                        'href':"#!",
+                        'data-name': "POSTUSERNAME",
+                        'data-image': "/img/POSTUSERIMAGE",
+                        'data-publickey': post.owner_id,
+                        'data-content': "POSTUSERPROFILE"
+                    }).addClass("activatenamemodal").append(
+                         post.username || post.owner_id
+                    ),
+
+                    "to" + post.recipients,
+                    "<br>",
+                    $("<span>").addClass('text-muted').append(
+                        $('<a>', {href:'/?id='+post.id}).append(
+                            new Date(post.timestamp*1000)
+                        )
+                    )
+                ),
+
+                $('<hr>'),
+                $('<div>', {id:post.id}).append(post.content),
+                $('<div>').addClass('post-comments').append(
+                    (function(){
+                        if (0 == post.num_comments) return;
+                        self.buildPostCommentsUi(post.id);
+                        return;
+                    })()
+                )
+            )
+
+
+        )
+    );
+}
+
+KiKiClient.prototype.buildPostsUi = function() {
+    for (var i=0; i<this.posts.length; i++) {
+        this.$el.append(
+            this.buildPostUi(this.posts[i])
+        );
+    }
+}
+
+KiKiClient.prototype.init = function(){
+    var self = this;
+    this.api.fetchPosts(function(err,res){
+        if (err) {
+            throw err;
+        }
+        self.posts = res.data.posts;
+        self.buildPostsUi();
+    });
+}
+
+var app = {}
+app.Api = new KiKiApi();
+app.Client = new KiKiClient(app.Api);
+
 
 
 
