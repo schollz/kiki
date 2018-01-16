@@ -482,12 +482,16 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	} else if p.Channel != "" {
 
 	} else if p.User != "" {
-
+		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
+		envelopes, err = f.db.GetBasicPostsForUser(p.User)
 	} else if p.Search != "" {
 
 	} else {
 		// reteurn all envelopes
 		envelopes, err = f.db.GetBasicPosts()
+	}
+	if err != nil {
+		return
 	}
 	posts = make([]Post, len(envelopes))
 	i := 0

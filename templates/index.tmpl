@@ -97,7 +97,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-info">Message</button>
-            <button type="button" class="btn btn-info">Filter</button>
+            <a href="#!" id="filterButton"><button type="button" class="btn btn-info">Filter</button></a>
             <button type="button" class="btn btn-primary" id="followButton">Follow</button>
             <button type="button" class="btn btn-danger" id="blockButton">Block</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -415,6 +415,7 @@ var app = {
         $("#nameModal").modal();
         $("#followButton").attr("data-publickey", $(this).data("publickey"));
         $("#blockButton").attr("data-publickey", $(this).data("publickey"));
+        $("#filterButton").attr("href", "/?user="+$(this).data("publickey"));
       });
       $("#followButton").click(function(event) {
         console.log($(this).data("publickey"));
