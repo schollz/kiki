@@ -185,6 +185,12 @@ func (kp KeyPair) Signature(regionkey KeyPair) (signature string, err error) {
 
 // Validate using the specified keypair (usually should be shared region key)
 func (kp KeyPair) Validate(signature string, sender KeyPair) (err error) {
+	if signature == "" {
+		return errors.New("no signature to validate")
+	}
+	if sender.Public == "" {
+		return errors.New("no public key to validate")
+	}
 	encryptedPublicKey, err := base64.URLEncoding.DecodeString(signature)
 	if err != nil {
 		return
