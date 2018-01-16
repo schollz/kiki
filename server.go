@@ -110,21 +110,13 @@ func Run() (err error) {
 		p.Latest = c.DefaultQuery("latest", "") == "1"
 		posts, _ := f.ShowFeed(p)
 		c.HTML(http.StatusOK, "client.html", gin.H{
-			"Posts": posts,
+			"Posts": posts,s
 			"User":  f.GetUser(),
 		})
 	})
 
-	r.GET("/api/v1/posts.json", func(c *gin.Context) {
-		// p := feed.ShowFeedParameters{}
-		// p.ID = c.DefaultQuery("id", "")
-		// p.Channel = c.DefaultQuery("channel", "")
-		// p.User = c.DefaultQuery("user", "")
-		// p.Search = c.DefaultQuery("search", "")
-		// p.Latest = c.DefaultQuery("latest", "") == "1"
-		// posts, err := f.ShowFeed2(p)
-		posts, err := f.ShowFeed3()
-
+	r.GET("/api/v1/posts", func(c *gin.Context) {
+		posts, err := f.ShowFeedForApi()
 		if err != nil {
 			respondWithJSON(c, "", err)
 			return
@@ -137,7 +129,22 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/api/v1/user.json", func(c *gin.Context) {
+	r.GET("/api/v1/post/:post_id/comments", func(c *gin.Context) {
+		// post_id := c.Param("post_id")
+		posts, err := f.ShowFeedForApi()
+		if err != nil {
+			respondWithJSON(c, "", err)
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data": gin.H{
+				"posts": posts,
+			},
+		})
+	})
+
+	r.GET("/api/v1/user", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{
@@ -146,7 +153,7 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/api/v1/fiends.json", func(c *gin.Context) {
+	r.GET("/api/v1/fiends", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{

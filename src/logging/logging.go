@@ -14,6 +14,10 @@ var (
 	Level   string = "debug"
 )
 
+// func New(level) {
+//
+// }
+
 const (
 	nocolor = 0
 	red     = 31 // error critical
@@ -98,13 +102,6 @@ func initLogging() error {
 		return err
 	}
 	Log = logger
-
-	// Log.Trace("trace")
-	// Log.Debug("debug")
-	// Log.Info("info")
-	// Log.Warn("warn")
-	// Log.Error("error")
-	// Log.Critical("critical")
 
 	return nil
 }

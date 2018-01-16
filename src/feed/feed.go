@@ -446,39 +446,40 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	return
 }
 
-func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) {
-	var envelopes []letter.Envelope
-	if p.ID != "" {
-		envelopes = make([]letter.Envelope, 1)
-		if p.Latest {
-			envelopes[0], err = self.db.GetLatestEnvelopeFromID(p.ID)
-		} else {
-			envelopes[0], err = self.db.GetEnvelopeFromID(p.ID)
-		}
-	} else if p.Channel != "" {
+//
+// func (self Feed) ShowFeed2(p ShowFeedParameters) (posts []BasicPost, err error) {
+// 	var envelopes []letter.Envelope
+// 	if p.ID != "" {
+// 		envelopes = make([]letter.Envelope, 1)
+// 		if p.Latest {
+// 			envelopes[0], err = self.db.GetLatestEnvelopeFromID(p.ID)
+// 		} else {
+// 			envelopes[0], err = self.db.GetEnvelopeFromID(p.ID)
+// 		}
+// 	} else if p.Channel != "" {
+//
+// 	} else if p.User != "" {
+//
+// 	} else if p.Search != "" {
+//
+// 	} else {
+// 		// reteurn all envelopes
+// 		envelopes, err = self.db.GetBasicPosts2()
+// 	}
+// 	self.log.Debugf("Found %d envelopes", len(envelopes))
+// 	posts = make([]BasicPost, len(envelopes))
+// 	i := 0
+// 	for _, e := range envelopes {
+// 		post := self.MakePost(e)
+// 		post.Comments = self.DetermineComments(post.ID)
+// 		posts[i] = post
+// 		i++
+// 	}
+// 	return
+// }
 
-	} else if p.User != "" {
-
-	} else if p.Search != "" {
-
-	} else {
-		// reteurn all envelopes
-		envelopes, err = self.db.GetBasicPosts2()
-	}
-	self.log.Debugf("Found %d envelopes", len(envelopes))
-	posts = make([]BasicPost, len(envelopes))
-	i := 0
-	for _, e := range envelopes {
-		post := self.MakePost(e)
-		post.Comments = self.DetermineComments(post.ID)
-		posts[i] = post
-		i++
-	}
-	return
-}
-
-func (self Feed) ShowFeed3() ([]letter.ApiBasicPost, error) {
-	posts, err := self.db.GetBasicPosts3()
+func (self Feed) ShowFeedForApi() ([]letter.ApiBasicPost, error) {
+	posts, err := self.db.GetBasicPostsForApi()
 	return posts, err
 }
 
