@@ -286,7 +286,7 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	// check if envelope has a valid signature
 	err = e.Validate(f.RegionKey)
 	if err != nil {
-		return
+		return errors.Wrap(err, "ProcessEnvelope, not validated")
 	}
 
 	// check if envelope already exists
@@ -735,6 +735,9 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 	f.logger.Log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
 
 	err = f.ProcessEnvelope(target.Envelope)
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
 	return
 }
 
