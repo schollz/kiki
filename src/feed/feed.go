@@ -800,7 +800,18 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 			return err2
 		}
 
-		// first purge edits
+		// don't proceed if the current space does not exceed
+		if currentSpace < limit {
+			continue
+		}
+
+		// first purge repeated actions (changing names multiple times)
+		err2 = f.db.DeleteOldActions(user)
+		if err2 != nil {
+			return err2
+		}
+
+		// then purge edits
 		if currentSpace > limit {
 			err2 = f.db.DeleteUsersEdits(user)
 			if err2 != nil {
