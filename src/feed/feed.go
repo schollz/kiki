@@ -26,8 +26,13 @@ import (
 )
 
 func (f *Feed) Debug(b bool) {
-	logging.Debug(b)
+	if !b {
+		f.logger.SetLevel("warn")
+	} else {
+		f.logger.SetLevel("debug")
+	}
 	f.log = logging.Log
+	database.Debug(b)
 }
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
@@ -70,6 +75,7 @@ func Open(locationToFeed string) (f Feed, err error) {
 // init initializes the kiki instance
 func initializeFeed(g Feed) (f Feed, err error) {
 	f = g
+	f.logger = logging.New()
 	f.log = logging.Log
 	f.log.Debug("initializing feed")
 	loc, _ := filepath.Abs(f.storagePath)

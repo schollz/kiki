@@ -8,6 +8,7 @@ import (
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/logging"
 )
 
 type Response struct {
@@ -28,6 +29,7 @@ type Feed struct {
 	storagePath string
 	db          database.DatabaseAPI
 	log         seelog.LoggerInterface
+	logger      logging.SeelogWrapper
 }
 
 type Settings struct {

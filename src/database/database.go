@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cihub/seelog"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
@@ -17,13 +18,28 @@ import (
 )
 
 var (
-	log = logging.Log
+	logger logging.SeelogWrapper
+	log    seelog.LoggerInterface
 )
 
 type database struct {
 	name     string
 	db       *sql.DB
 	fileLock *flock.Flock
+}
+
+func init() {
+	logger = logging.New()
+	log = logger.Log
+}
+
+func Debug(verbose bool) {
+	if verbose {
+		logger.SetLevel("debug")
+	} else {
+		logger.SetLevel("warn")
+	}
+	log = logger.Log
 }
 
 // open will open the database for transactions by first aquiring a filelock.
