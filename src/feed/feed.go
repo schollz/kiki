@@ -761,7 +761,18 @@ func (f Feed) PingKikiInstance(address string) (err error) {
 	client := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := client.Get(address + "/ping")
+
+	regionSignature, _ := f.RegionKey.Signature(f.RegionKey)
+	personalSignature, _ := f.PersonalKey.Signature(f.RegionKey)
+	payload := Response{
+		PersonalPublicKey: f.PersonalKey.Public,
+		PersonalSignature: personalSignature,
+		RegionPublicKey:   f.RegionKey.Public,
+		RegionSignature:   regionSignature,
+	}
+	bPayload, _ := json.Marshal(payload)
+	body := bytes.NewReader(bPayload)
+	resp, err := client.Post(address+"/ping", "application/json", body)
 	if err != nil {
 		return
 	}
