@@ -110,13 +110,14 @@ func handleSync(c *gin.Context) (err error) {
 	var p Payload
 	err = c.BindJSON(&p)
 	if err != nil {
-		log.Critical(err)
+		log.Error(err)
 		return
 	}
 
+	log.Debug("syncing...")
 	err = f.Sync(p.Address)
 	if err != nil {
-		log.Critical(err)
+		log.Error(err)
 		return
 	}
 	return

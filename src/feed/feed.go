@@ -77,9 +77,9 @@ func initializeFeed(g Feed) (f Feed, err error) {
 	f = g
 	f.logger = logging.New()
 	f.log = logging.Log
-	f.log.Debug("initializing feed")
+	f.logger.Log.Debug("initializing feed")
 	loc, _ := filepath.Abs(f.storagePath)
-	f.log.Infof("database location: %s", loc)
+	f.logger.Log.Infof("database location: %s", loc)
 
 	if f.RegionKey.Public == "" {
 		// define region key
@@ -127,7 +127,7 @@ func initializeFeed(g Feed) (f Feed, err error) {
 
 	err = f.UpdateFriends()
 	if err != nil {
-		f.log.Warn(err)
+		f.logger.Log.Warn(err)
 		err = nil
 	}
 	return
@@ -140,21 +140,25 @@ func (f Feed) Cleanup() {
 func (f Feed) DoSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
-			f.Sync(server)
-			// unseal any new letters
-			err := f.UnsealLetters()
+			err := f.Sync(server)
 			if err != nil {
-				f.log.Warn(err)
+				f.logger.Log.Warn(err)
+				continue
+			}
+			// unseal any new letters
+			err = f.UnsealLetters()
+			if err != nil {
+				f.logger.Log.Warn(err)
 			}
 			// send out friends keys for new friends
 			err = f.UpdateFriends()
 			if err != nil {
-				f.log.Warn(err)
+				f.logger.Log.Warn(err)
 			}
 			// purge overflowing storage
 			err = f.PurgeOverflowingStorage()
 			if err != nil {
-				f.log.Warn(err)
+				f.logger.Log.Warn(err)
 			}
 		}
 		time.Sleep(3 * time.Second)
@@ -211,7 +215,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 			default:
 				_, err2 := keypair.FromPublic(to)
 				if err2 != nil {
-					f.log.Infof("Not a valid public key: '%s'", to)
+					f.logger.Log.Infof("Not a valid public key: '%s'", to)
 				} else {
 					newTo = append(newTo, to)
 				}
@@ -288,7 +292,7 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	// check if envelope already exists
 	_, errGet := f.GetEnvelope(e.ID)
 	if errGet == nil {
-		f.log.Debugf("skipping %s, already have", e.ID)
+		f.logger.Log.Debugf("skipping %s, already have", e.ID)
 		// already have return
 		return nil
 	}
@@ -318,7 +322,7 @@ func (f Feed) UnsealLetters() (err error) {
 		err = errors.Wrap(err, "UnsealLetters, getting keys")
 		return
 	}
-	f.log.Debugf("Keys from friends: %v", keysToTry)
+	f.logger.Log.Debugf("Keys from friends: %v", keysToTry)
 	// prepend public key
 	keysToTry = append([]keypair.KeyPair{f.RegionKey}, keysToTry...)
 	// add personal key last
@@ -330,13 +334,13 @@ func (f Feed) UnsealLetters() (err error) {
 		}
 		ue, err := envelope.Unseal(keysToTry, f.RegionKey)
 		if err != nil {
-			f.log.Debug(err)
+			f.logger.Log.Debug(err)
 			continue
 		}
-		f.log.Debug(ue.Letter)
+		f.logger.Log.Debug(ue.Letter)
 		err = f.db.AddEnvelope(ue)
 		if err != nil {
-			f.log.Debug(err)
+			f.logger.Log.Debug(err)
 			continue
 		}
 	}
@@ -475,7 +479,7 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 // 		// reteurn all envelopes
 // 		envelopes, err = self.db.GetBasicPosts2()
 // 	}
-// 	self.log.Debugf("Found %d envelopes", len(envelopes))
+// 	self.logger.Log.Debugf("Found %d envelopes", len(envelopes))
 // 	posts = make([]BasicPost, len(envelopes))
 // 	i := 0
 // 	for _, e := range envelopes {
@@ -542,7 +546,7 @@ func (f Feed) DetermineComments(postID string) []BasicPost {
 func (f Feed) recurseComments(postID string, comments []BasicPost, depth int) []BasicPost {
 	es, err := f.db.GetReplies(postID)
 	if err != nil {
-		f.log.Error(err)
+		f.logger.Log.Error(err)
 	}
 	for _, e := range es {
 		comment := f.MakePost(e)
@@ -601,6 +605,8 @@ func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
 
 // Sync will try to sync with the respective address
 func (f Feed) Sync(address string) (err error) {
+	f.logger.Log.Debugf("syncing with %s", address)
+
 	// make sure that its a kiki instance
 	isInstance, err := f.IsKikiInstance(address)
 	if err != nil {
@@ -610,16 +616,15 @@ func (f Feed) Sync(address string) (err error) {
 		return errors.New("not a kiki instance")
 	}
 
-	f.log.Debugf("syncing with %s", address)
-
 	// Get a list of my IDs
 	myIDs, err := f.GetIDs()
 	if err != nil {
 		return
 	}
 
+	// get the list
 	var target Response
-	f.log.Debug("getting list")
+	f.logger.Log.Debug("getting list")
 	req, err := http.NewRequest("GET", address+"/list", nil)
 	if err != nil {
 		return
@@ -629,27 +634,44 @@ func (f Feed) Sync(address string) (err error) {
 		return
 	}
 	defer resp.Body.Close()
-	f.log.Debug("unmarshaling response")
+	f.logger.Log.Debug("unmarshaling response")
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
-	f.log.Debug(target)
+	f.logger.Log.Debug(target)
 	if "ok" != target.Status {
 		return errors.New(target.Error)
 	}
-	if target.RegionPublicKey != f.RegionKey.Public {
+
+	// validate region key
+	if target.Signature == "" {
+		return errors.Wrap(err, "must report signature")
+	}
+	targetKey, err := keypair.FromPublic(target.RegionPublicKey)
+	if err != nil {
+		return errors.Wrap(err, "cannot validate region key, problem unmarshaling")
+	}
+	encryptedSignature, err := base64.URLEncoding.DecodeString(target.Signature)
+	if err != nil {
+		return errors.Wrap(err, "cannot validate region key, problem converting")
+	}
+	decryptedSignature, err := f.RegionKey.Decrypt(encryptedSignature, targetKey)
+	if err != nil {
+		return errors.Wrap(err, "cannot validate region key, problem decrypting")
+	}
+	if string(decryptedSignature) != f.RegionKey.Public {
 		return errors.New("cannot sync with another region")
 	}
 
-	f.log.Debugf("got %d IDs from %s", len(target.IDs), address)
+	f.logger.Log.Debugf("got %d IDs from %s", len(target.IDs), address)
 
 	// check whether I need any of their envelopes
 	for theirID := range target.IDs {
 		if _, ok := myIDs[theirID]; ok {
 			continue
 		}
-		f.log.Debugf("%s has new envelope: %s", address, theirID)
+		f.logger.Log.Debugf("%s has new envelope: %s", address, theirID)
 		err = f.DownloadEnvelope(address, theirID)
 		if err != nil {
 			return
@@ -661,7 +683,7 @@ func (f Feed) Sync(address string) (err error) {
 		if _, ok := target.IDs[myID]; ok {
 			continue
 		}
-		f.log.Debugf("my envelope %s is new to %s", myID, address)
+		f.logger.Log.Debugf("my envelope %s is new to %s", myID, address)
 		err = f.UploadEnvelope(address, myID)
 		if err != nil {
 			return
@@ -709,7 +731,7 @@ func (f Feed) UploadEnvelope(address, id string) (err error) {
 		return errors.New(target.Error)
 	}
 
-	f.log.Debugf("uploaded %s to %s", id, address)
+	f.logger.Log.Debugf("uploaded %s to %s", id, address)
 
 	return
 }
@@ -737,7 +759,7 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 		return errors.New(target.Error)
 	}
 
-	f.log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
+	f.logger.Log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
 
 	err = f.ProcessEnvelope(target.Envelope)
 	return
@@ -820,7 +842,7 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 		}
 
 		for {
-			f.log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
+			f.logger.Log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
 			if currentSpace < limit {
 				break
 			}
@@ -839,5 +861,5 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 
 func (f Feed) TestStuff() {
 	err := f.db.DeleteOldActions(f.PersonalKey.Public)
-	f.log.Debug(err)
+	f.logger.Log.Debug(err)
 }

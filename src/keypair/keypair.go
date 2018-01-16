@@ -172,3 +172,29 @@ func decryptWithKeyPair(enc []byte, senderPublicKey, recipientPrivateKey *[32]by
 	}
 	return
 }
+
+// Signature returns your public key encrypted by a shared region key. Anyone who has the shared region key can decrypt this and see that the contents do indeed match that public key used to make it.
+func (kp KeyPair) Signature(regionkey KeyPair) (signature string, err error) {
+	encrypted, err := kp.Encrypt([]byte(kp.Public), regionkey)
+	if err != nil {
+		return
+	}
+	signature = base64.URLEncoding.EncodeToString(encrypted)
+	return
+}
+
+// Validate using the specified keypair (usually should be shared region key)
+func (kp KeyPair) Validate(signature string, sender KeyPair) (err error) {
+	encryptedPublicKey, err := base64.URLEncoding.DecodeString(signature)
+	if err != nil {
+		return
+	}
+	decryptedPublicKey, err := kp.Decrypt(encryptedPublicKey, sender)
+	if err != nil {
+		return
+	}
+	if string(decryptedPublicKey) != sender.Public {
+		return errors.New("signature corrupted")
+	}
+	return
+}

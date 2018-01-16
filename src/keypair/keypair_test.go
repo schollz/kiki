@@ -3,6 +3,7 @@ package keypair
 import (
 	crypto_rand "crypto/rand"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"golang.org/x/crypto/nacl/box"
@@ -10,36 +11,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func BenchmarkEncrypt(b *testing.B) {
-	bob, _ := New()
-	jane, _ := New()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, err := bob.Encrypt([]byte(`hello, world. this, is 32 bytes!`), jane)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-func BenchmarkDecrypt(b *testing.B) {
-	bob, _ := New()
-	jane, _ := New()
-	enc, err := bob.Encrypt([]byte(`hello, world. this, is 32 bytes!`), jane)
-	if err != nil {
-		panic(err)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, err := jane.Decrypt(enc, bob)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
+// func BenchmarkEncrypt(b *testing.B) {
+// 	bob, _ := New()
+// 	jane, _ := New()
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		_, err := bob.Encrypt([]byte(`hello, world. this, is 32 bytes!`), jane)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 	}
+// }
+// func BenchmarkDecrypt(b *testing.B) {
+// 	bob, _ := New()
+// 	jane, _ := New()
+// 	enc, err := bob.Encrypt([]byte(`hello, world. this, is 32 bytes!`), jane)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		_, err := jane.Decrypt(enc, bob)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 	}
+// }
 func TestKeyPairEncryption(t *testing.T) {
-	bob, err := New()
-	assert.Nil(t, err)
-	jane, _ := New()
+	bob := New()
+	jane := New()
 	enc, err := bob.Encrypt([]byte(`hello, world`), jane)
 	assert.Nil(t, err)
 	dec, err := jane.Decrypt(enc, bob)
@@ -68,9 +68,7 @@ func TestKeyPairs(t *testing.T) {
 }
 
 func TestMarshaling(t *testing.T) {
-	kp, err := New()
-	assert.Nil(t, err)
-
+	kp := New()
 	kpMarshaled, err := json.Marshal(kp)
 	assert.Nil(t, err)
 
@@ -92,4 +90,19 @@ func TestMarshaling(t *testing.T) {
 	err = json.Unmarshal(kpMarshaled, &kp4)
 	assert.Nil(t, err)
 	assert.Equal(t, kp3.Public, kp4.Public)
+}
+
+func TestSigning(t *testing.T) {
+	shared := New()
+	bob := New()
+	jane := New()
+	signature, err := bob.Signature(shared)
+	assert.Nil(t, err)
+	fmt.Println(signature)
+
+	err = shared.Validate(signature, bob)
+	assert.Nil(t, err)
+
+	err = shared.Validate(signature, jane)
+	assert.NotNil(t, err)
 }

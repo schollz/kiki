@@ -12,6 +12,7 @@ import (
 )
 
 type Response struct {
+	Signature       string              `json:"signature"`
 	RegionPublicKey string              `json:"region_key"`
 	IDs             map[string]struct{} `json:"ids"`
 	Envelope        letter.Envelope     `json:"envelope"`
