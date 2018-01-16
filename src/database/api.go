@@ -158,7 +158,7 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 }
 
 // json1 needs to be loaded...
-func (self DatabaseAPI) GetBasicPostsForApi() ([]letter.ApiBasicPost, error) {
+func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 	var posts []letter.ApiBasicPost
 
 	db, err := open(self.FileName)
@@ -236,6 +236,143 @@ func (self DatabaseAPI) GetBasicPostsForApi() ([]letter.ApiBasicPost, error) {
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
+	if nil != err {
+		return posts, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return posts, err
+		}
+
+		text = strings.Replace(text, "\n", "", -1)
+
+		var post letter.ApiBasicPost
+		err = json.Unmarshal([]byte(text), &post)
+		if nil != err {
+			return posts, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasicPost, error) {
+	var posts []letter.ApiBasicPost
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return posts, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+	        '{'||
+	            '"id": "' ||  id ||'",'||
+	            '"timestamp": ' || strftime('%s',time) ||','||
+				'"recipients": ' ||  letter_to ||','||
+	            '"owner_id": "' ||  sender ||'",'||
+		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		        '"reply_to": "' ||  letter_replyto ||'",'||
+				'"purpose":"' ||  letter_purpose ||'",'||
+				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
+				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
+		    ||'}'
+		FROM letters AS ltr
+		WHERE
+				opened == 1
+			AND
+		        letter_purpose = 'share-text'
+		    AND
+		        letter_content != ''
+		    AND
+		        id NOT IN (
+		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
+		        )
+		    AND letter_replyto == ?
+		ORDER BY time DESC;
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return posts, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(post_id)
+	if nil != err {
+		return posts, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return posts, err
+		}
+
+		text = strings.Replace(text, "\n", "", -1)
+
+		var post letter.ApiBasicPost
+		err = json.Unmarshal([]byte(text), &post)
+		if nil != err {
+			return posts, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, error) {
+	var posts []letter.ApiBasicPost
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return posts, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+	        '{'||
+	            '"id": "' ||  id ||'",'||
+	            '"timestamp": ' || strftime('%s',time) ||','||
+				'"recipients": ' ||  letter_to ||','||
+	            '"owner_id": "' ||  sender ||'",'||
+		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+		        '"reply_to": "' ||  letter_replyto ||'",'||
+				'"purpose":"' ||  letter_purpose ||'",'||
+				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
+				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
+		    ||'}'
+		FROM letters AS ltr
+		WHERE
+				opened == 1
+			AND
+				letter_purpose = 'share-text'
+			AND
+				id = ?
+		ORDER BY time DESC;
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return posts, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(post_id)
 	if nil != err {
 		return posts, err
 	}
