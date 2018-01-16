@@ -40,6 +40,17 @@ func BenchmarkGetPost(b *testing.B) {
 	}
 }
 
+// func BenchmarkMakePost(b *testing.B) {
+// 	f, err := New(".")
+// 	f.Debug(false)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	for i := 0; i < b.N; i++ {
+// 		f.MakePost
+// 	}
+// }
+
 func BenchmarkGetPost2(b *testing.B) {
 	f, err := New(".")
 	f.Debug(false)
