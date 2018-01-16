@@ -2,7 +2,6 @@ package logging
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	seelog "github.com/cihub/seelog"
@@ -13,10 +12,6 @@ var (
 	Log     seelog.LoggerInterface
 	Level   string = "debug"
 )
-
-// func New(level) {
-//
-// }
 
 const (
 	nocolor = 0
@@ -40,13 +35,13 @@ func formatter(message []interface{}) string {
 	return strings.Join(text, " ")
 }
 
-// https://github.com/cihub/seelog/wiki/Custom-formatters
-func pidLogFormatter(params string) seelog.FormatterFunc {
-	return func(message string, level seelog.LogLevel, context seelog.LogContextInterface) interface{} {
-		var pid = os.Getpid()
-		return fmt.Sprintf("%v", pid)
-	}
-}
+// // https://github.com/cihub/seelog/wiki/Custom-formatters
+// func pidLogFormatter(params string) seelog.FormatterFunc {
+// 	return func(message string, level seelog.LogLevel, context seelog.LogContextInterface) interface{} {
+// 		var pid = os.Getpid()
+// 		return fmt.Sprintf("%v", pid)
+// 	}
+// }
 
 func initLogging() error {
 	if Verbose {
@@ -106,10 +101,10 @@ func initLogging() error {
 	return nil
 }
 
-func init() {
-	seelog.RegisterCustomFormatter("pidLogFormatter", pidLogFormatter)
-	initLogging()
-}
+// func init() {
+// 	seelog.RegisterCustomFormatter("pidLogFormatter", pidLogFormatter)
+// 	initLogging()
+// }
 
 func Debug(t bool) {
 	if t {

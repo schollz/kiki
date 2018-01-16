@@ -110,7 +110,7 @@ func Run() (err error) {
 		p.Latest = c.DefaultQuery("latest", "") == "1"
 		posts, _ := f.ShowFeed(p)
 		c.HTML(http.StatusOK, "client.html", gin.H{
-			"Posts": posts,s
+			"Posts": posts,
 			"User":  f.GetUser(),
 		})
 	})
