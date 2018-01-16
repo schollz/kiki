@@ -261,8 +261,8 @@ KiKiClient.prototype.buildPostUi = function(post) {
                         "&nbsp;",
                         $("<a>", {
                             'href': "#!",
-                            'title': "Reply to USERNAME",
-                            'data-title': "Reply to USERNAME",
+                            'title': "Reply to " + post.owner_name,
+                            'data-title': "Reply to " + post.owner_name,
                             'data-replyto': post.id,
                             'data-purpose':"share-text"
                         }).addClass("editmodal").append(
@@ -293,12 +293,12 @@ KiKiClient.prototype.buildPostUi = function(post) {
                     $("<img>", {src:"/img/POSTUSERIMAGE"}).addClass("align-middle profile-pic"),
                     $("<a>",{
                         'href':"#!",
-                        'data-name': "POSTUSERNAME",
+                        'data-name': post.owner_name,
                         'data-image': "/img/POSTUSERIMAGE",
                         'data-publickey': post.owner_id,
                         'data-content': "POSTUSERPROFILE"
                     }).addClass("activatenamemodal").append(
-                         post.username || post.owner_id
+                         post.owner_name || post.owner_id
                     ),
 
                     "to" + post.recipients,

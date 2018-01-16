@@ -23,9 +23,20 @@ type ApiBasicPost struct {
 	Content     string   `json:"content"`
 	Timestamp   int64    `json:"timestamp"`
 	OwnerId     string   `json:"owner_id"`
+	OwnerName   string   `json:"owner_name"`
 	Likes       int64    `json:"likes"`
 	NumComments int64    `json:"num_comments"`
 	Purpose     string   `json:"purpose,omitempty"`
+}
+
+type ApiUser struct {
+	Name      string `json:"name"`
+	PublicKey string `json:"public_key"`
+	Profile   string `json:"profile"`
+	Image     string `json:"image"`
+	// Followers
+	// Following
+	// Friends
 }
 
 // Letter specifies the content being transfered to the self, or other users. The Letter has a purpose - either to "share" or to do an "action". You can "share" posts  or images. You action things like follows, likes, profile names, etc.

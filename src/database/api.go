@@ -207,6 +207,7 @@ func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 	            '"timestamp": ' || strftime('%s',time) ||','||
 				'"recipients": ' ||  letter_to ||','||
 	            '"owner_id": "' ||  sender ||'",'||
+				'"owner_name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ltr.sender ORDER BY time DESC LIMIT 1), 'unknown') ||'",'||
 		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 		        '"reply_to": "' ||  letter_replyto ||'",'||
 				'"purpose":"' ||  letter_purpose ||'",'||
@@ -278,6 +279,7 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasic
 	            '"timestamp": ' || strftime('%s',time) ||','||
 				'"recipients": ' ||  letter_to ||','||
 	            '"owner_id": "' ||  sender ||'",'||
+				'"owner_name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ltr.sender ORDER BY time DESC LIMIT 1), 'unknown') ||'",'||
 		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 		        '"reply_to": "' ||  letter_replyto ||'",'||
 				'"purpose":"' ||  letter_purpose ||'",'||
@@ -349,6 +351,7 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 	            '"timestamp": ' || strftime('%s',time) ||','||
 				'"recipients": ' ||  letter_to ||','||
 	            '"owner_id": "' ||  sender ||'",'||
+				'"owner_name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ltr.sender ORDER BY time DESC LIMIT 1), 'unknown') ||'",'||
 		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 		        '"reply_to": "' ||  letter_replyto ||'",'||
 				'"purpose":"' ||  letter_purpose ||'",'||
@@ -397,6 +400,57 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 	}
 
 	return posts, nil
+}
+
+func (self DatabaseAPI) GetUserForApi(user_id string) (letter.ApiUser, error) {
+	var user letter.ApiUser
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return user, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+	        '{'||
+	            '"public_key": "' ||  ? ||'",'||
+				'"name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ? ORDER BY time DESC LIMIT 1), 'unknown') ||'",'||
+				'"profile": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/profile' AND sender == ? ORDER BY time DESC LIMIT 1), 'unknown') ||'",'||
+				'"image": "' || IFNULL((SELECT id FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/image' AND sender == ? ORDER BY time DESC LIMIT 1), 'unknown') ||'"'
+		    ||'}';
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return user, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(user_id, user_id, user_id, user_id)
+	if nil != err {
+		return user, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return user, err
+		}
+
+		text = strings.Replace(text, "\n", "", -1)
+
+		err = json.Unmarshal([]byte(text), &user)
+		if nil != err {
+			return user, err
+		}
+
+	}
+
+	return user, err
 }
 
 // GetKeys will return all the keys

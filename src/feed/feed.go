@@ -376,6 +376,11 @@ func (f Feed) GetUser(public ...string) (u User) {
 	return
 }
 
+func (self Feed) ShowUserForApi(user_id string) (letter.ApiUser, error) {
+	user, err := self.db.GetUserForApi(user_id)
+	return user, err
+}
+
 // GetUserFriends returns detailed friend information
 func (f Feed) GetUserFriends() (u UserFriends) {
 	followers, following, friends := f.db.Friends(f.PersonalKey.Public)
