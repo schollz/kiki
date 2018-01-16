@@ -99,7 +99,7 @@
             <button type="button" class="btn btn-info">Message</button>
             <button type="button" class="btn btn-info">Filter</button>
             <button type="button" class="btn btn-primary" id="followButton">Follow</button>
-            <button type="button" class="btn btn-danger">Block</button>
+            <button type="button" class="btn btn-danger" id="blockButton">Block</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -232,7 +232,8 @@
               {{ end }}
             </ol>
         </div>
-        
+
+
       </aside>
       <!-- /.blog-sidebar -->
     </div>
@@ -405,11 +406,22 @@ var app = {
         $("#modalNameImage").attr("src",$(this).data("image"));
         $("#nameModal").modal();
         $("#followButton").attr("data-publickey", $(this).data("publickey"));
+        $("#blockButton").attr("data-publickey", $(this).data("publickey"));
       });
       $("#followButton").click(function(event) {
         console.log($(this).data("publickey"));
         letter = {
           "purpose": "action-follow",
+          "to": ["public"],
+          "content": $(this).data("publickey"),
+        };
+        submitLetter(letter);
+        $("#nameModal").modal('hide');
+      });
+      $("#blockButton").click(function(event) {
+        console.log($(this).data("publickey"));
+        letter = {
+          "purpose": "action-block",
           "to": ["public"],
           "content": $(this).data("publickey"),
         };

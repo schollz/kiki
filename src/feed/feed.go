@@ -471,7 +471,7 @@ func (f Feed) MakePostWithComments(e letter.Envelope) (post Post) {
 		Post:     basicPost,
 		Comments: f.DetermineComments(basicPost.ID),
 	}
-	f.caching.Set(e.ID, post, 1*time.Minute)
+	f.caching.Set(e.ID, post, 3*time.Second)
 	return
 }
 

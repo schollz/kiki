@@ -19,7 +19,7 @@ type DatabaseAPI struct {
 }
 
 func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) {
-	name := "kiki.sqlite3.db"
+	name := "kiki.db"
 	if len(databaseName) > 0 {
 		name = databaseName[0]
 	}
