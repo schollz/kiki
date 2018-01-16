@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetUser(t *testing.T) {
-	f, err := Open(".")
+	f, err := New(".")
 	assert.Nil(t, err)
 	f.Debug(false)
 	u := f.GetUser()
@@ -20,7 +20,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func BenchmarkGetUser(b *testing.B) {
-	f, err := Open(".")
+	f, err := New(".")
 	if err != nil {
 		panic(err)
 	}
@@ -30,12 +30,23 @@ func BenchmarkGetUser(b *testing.B) {
 }
 
 func BenchmarkGetPost(b *testing.B) {
-	f, err := Open(".")
+	f, err := New(".")
 	f.Debug(false)
 	if err != nil {
 		panic(err)
 	}
 	for i := 0; i < b.N; i++ {
 		f.ShowFeed(ShowFeedParameters{})
+	}
+}
+
+func BenchmarkGetPost2(b *testing.B) {
+	f, err := New(".")
+	f.Debug(false)
+	if err != nil {
+		panic(err)
+	}
+	for i := 0; i < b.N; i++ {
+		f.ShowFeedForApi()
 	}
 }
