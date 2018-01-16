@@ -40,7 +40,8 @@ type Feed struct {
 }
 
 type connections struct {
-	connected map[string]User
+	connected    map[string]User
+	blockedUsers map[string]struct{}
 	sync.RWMutex
 }
 
@@ -105,6 +106,7 @@ type User struct {
 	Followers []string      `json:"followers"`
 	Following []string      `json:"following"`
 	Friends   []string      `json:"friends"`
+	Blocked   []string      `json:"blocked"`
 	Server    string        `json:"server"`
 }
 

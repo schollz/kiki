@@ -8,12 +8,12 @@ server:
 server1:
 	go-bindata static/... templates/...
 	go build
-	./kiki -path 1 -no-browser -no-sync -internal-port 8003 -external-port 8004
+	./kiki -path 1 -no-browser -internal-port 8003 -external-port 8004
 
 server2:
 	go-bindata static/... templates/...
 	go build
-	./kiki -path 2 -no-browser -no-sync -internal-port 8005 -external-port 8006
+	./kiki -path 2 -no-browser -internal-port 8005 -external-port 8006
 
 server3:
 	go-bindata static/... templates/...

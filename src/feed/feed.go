@@ -65,7 +65,7 @@ func New(params ...string) (f Feed, err error) {
 	f.servers.connected = make(map[string]User)
 	f.servers.Unlock()
 	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
-	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "feed.json"))
+	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "kiki.json"))
 	if errLoad != nil {
 		fmt.Println("generating new feed")
 
@@ -102,7 +102,7 @@ func New(params ...string) (f Feed, err error) {
 		err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{},
 			Purpose: purpose.ShareText,
-			Content: "Welcome!",
+			Content: `<p>Welcome to KiKi!</p><p>To get started, you can change your name, edit your profile, upload an image, and make posts!</p> `,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")
@@ -117,6 +117,7 @@ func New(params ...string) (f Feed, err error) {
 	}
 
 	err = f.Save()
+	f.UpdateEverything()
 	return
 }
 
@@ -134,12 +135,28 @@ func (f Feed) Save() (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path.Join(f.storagePath, "feed.json"), feedBytes, 0644)
+	err = ioutil.WriteFile(path.Join(f.storagePath, "kiki.json"), feedBytes, 0644)
 	return
 }
 
 func (f Feed) Cleanup() {
 	fmt.Println("cleaning up...")
+}
+
+func (f Feed) UpdateBlockedUsers() (err error) {
+	// update the blocked users
+	blockedUsers, err := f.db.ListBlockedUsers(f.PersonalKey.Public)
+	if err != nil {
+		return
+	}
+	f.servers.Lock()
+	f.servers.blockedUsers = make(map[string]struct{})
+	for _, blockedUser := range blockedUsers {
+		f.servers.blockedUsers[blockedUser] = struct{}{}
+		f.db.RemoveLettersForUser(blockedUser)
+	}
+	f.servers.Unlock()
+	return
 }
 
 func (f Feed) DoSyncing() {
@@ -148,25 +165,36 @@ func (f Feed) DoSyncing() {
 			err := f.Sync(server)
 			if err != nil {
 				f.logger.Log.Warn(err)
-				continue
 			}
-			// unseal any new letters
-			err = f.UnsealLetters()
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
-			// send out friends keys for new friends
-			err = f.UpdateFriends()
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
-			// purge overflowing storage
-			err = f.PurgeOverflowingStorage()
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
+			f.UpdateEverything()
 		}
 		time.Sleep(3 * time.Second)
+	}
+}
+
+func (f Feed) UpdateEverything() {
+	// unseal any new letters
+	err := f.UnsealLetters()
+	if err != nil {
+		f.logger.Log.Warn(err)
+	}
+
+	// send out friends keys for new friends
+	err = f.UpdateFriends()
+	if err != nil {
+		f.logger.Log.Warn(err)
+	}
+
+	// update blocked users
+	err = f.UpdateBlockedUsers()
+	if err != nil {
+		f.logger.Log.Warn(err)
+	}
+
+	// purge overflowing storage
+	err = f.PurgeOverflowingStorage()
+	if err != nil {
+		f.logger.Log.Warn(err)
 	}
 }
 
@@ -191,8 +219,13 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 
 	if strings.Contains(l.Purpose, "action-") {
-		// assignments are always public
+		// actions are always public
 		l.To = []string{f.RegionKey.Public}
+		if l.Purpose == purpose.ActionBlock && l.Content == f.PersonalKey.Public {
+			return errors.New("refusing to block yourself")
+		} else if l.Purpose == purpose.ActionFollow && l.Content == f.PersonalKey.Public {
+			return errors.New("refusing to follow yourself")
+		}
 	} else {
 		// rewrite the letter.To array so that it contains
 		// public keys that are valid
@@ -282,7 +315,6 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		return
 	}
 
-	err = f.UnsealLetters()
 	return
 }
 
@@ -293,6 +325,14 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "ProcessEnvelope, not validated")
 	}
+
+	// check if envelope comes from blocked user
+	f.servers.RLock()
+	if _, ok := f.servers.blockedUsers[e.Sender.Public]; ok {
+		f.servers.RUnlock()
+		return errors.New("this user has been blocked, not downloading")
+	}
+	f.servers.RUnlock()
 
 	// check if envelope already exists
 	_, errGet := f.GetEnvelope(e.ID)
@@ -308,8 +348,6 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	}
 
 	// TODO: Determine if this envelope will overflow the limits, and if so, then delete an envelope also
-
-	err = f.UnsealLetters()
 	return
 }
 
@@ -364,6 +402,7 @@ func (f Feed) GetUser(public ...string) (u User) {
 	}
 	name, profile, image := f.db.GetUser(publicKey)
 	followers, following, friends := f.db.Friends(publicKey)
+	blocked, _ := f.db.ListBlockedUsers(publicKey)
 	u = User{
 		Name:      strip.StripTags(name),
 		PublicKey: publicKey,
@@ -372,6 +411,7 @@ func (f Feed) GetUser(public ...string) (u User) {
 		Followers: followers,
 		Following: following,
 		Friends:   friends,
+		Blocked:   blocked,
 	}
 	return
 }
@@ -447,12 +487,16 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	} else if p.Channel != "" {
 
 	} else if p.User != "" {
-
+		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
+		envelopes, err = f.db.GetBasicPostsForUser(p.User)
 	} else if p.Search != "" {
 
 	} else {
 		// reteurn all envelopes
 		envelopes, err = f.db.GetBasicPosts()
+	}
+	if err != nil {
+		return
 	}
 	posts = make([]Post, len(envelopes))
 	i := 0
@@ -476,7 +520,7 @@ func (f Feed) MakePostWithComments(e letter.Envelope) (post Post) {
 		Post:     basicPost,
 		Comments: f.DetermineComments(basicPost.ID),
 	}
-	f.caching.Set(e.ID, post, 1*time.Minute)
+	f.caching.Set(e.ID, post, 3*time.Second)
 	return
 }
 

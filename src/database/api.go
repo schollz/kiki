@@ -19,7 +19,7 @@ type DatabaseAPI struct {
 }
 
 func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) {
-	name := "kiki.sqlite3.db"
+	name := "kiki.db"
 	if len(databaseName) > 0 {
 		name = databaseName[0]
 	}
@@ -155,6 +155,19 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	// should not be replaced
 	// should not be a reply
 	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
+}
+
+func (api DatabaseAPI) GetBasicPostsForUser(publickey string) (e []letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	// purpose should be to share text
+	// should not be empty
+	// should not be replaced
+	// should not be a reply
+	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND sender == ? AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC;", publickey)
 }
 
 // json1 needs to be loaded...
@@ -554,6 +567,17 @@ func (api DatabaseAPI) RemoveLetters(ids []string) (err error) {
 	return
 }
 
+// RemoveLettersForUser will delete the envelopes for a specific user
+func (api DatabaseAPI) RemoveLettersForUser(user string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	err = db.deleteLettersFromSender(user)
+	return
+}
+
 // GetIDs will delete the letter containing that ID
 func (api DatabaseAPI) GetIDs() (ids map[string]struct{}, err error) {
 	db, err := open(api.FileName)
@@ -604,6 +628,16 @@ func (api DatabaseAPI) ListUsers() (users []string, err error) {
 	}
 	defer db.Close()
 	return db.listUsers()
+}
+
+// ListBlockedUsers returns the bytes used by a user for recipients + sealed_content
+func (api DatabaseAPI) ListBlockedUsers(publickey string) (users []string, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.listBlockedUsers(publickey)
 }
 
 // GetAllVersions returns the bytes used by a user for recipients + sealed_content

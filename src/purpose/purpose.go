@@ -29,7 +29,7 @@ var (
 
 	ActionImage = "action-assign/image"
 
-	ActionBlock = "action-assign/block"
+	ActionBlock = "action-block"
 
 	// ActionErase will erase a persons profile from every carrier
 	ActionErase = "action-erase"

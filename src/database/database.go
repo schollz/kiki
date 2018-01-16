@@ -132,7 +132,7 @@ func (d *database) MakeTables() (err error) {
 	}
 
 	// indices
-	sqlStmt = `CREATE INDEX idx_sender ON letters(opened,letter_purpose,sender);`
+	sqlStmt = `CREATE INDEX idx_sender ON letters(opened,letter_purpose,sender,letter_content);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
 		err = errors.Wrap(err, "MakeTables, letters")
@@ -535,6 +535,33 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 	return
 }
 
+// deleteLettersFromSender will delete a letter with the pertaining ID.
+func (d *database) deleteLettersFromSender(sender string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteLettersFromSender")
+	}
+	query := "DELETE FROM letters WHERE sender == ?"
+	log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteLettersFromSender")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(sender)
+	if err != nil {
+		return errors.Wrap(err, "deleteLettersFromSender")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteLettersFromSender")
+	}
+
+	return
+}
+
 // deleteUsersOldestPost will delete a letter with the pertaining ID.
 func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 	tx, err := d.db.Begin()
@@ -662,10 +689,7 @@ func (d *database) listUsers() (s []string, err error) {
 	}
 	defer rows.Close()
 
-	// parse rows
-	s = make([]string, 1000000)
-	sI := 0
-	// loop through rows
+	s = []string{}
 	for rows.Next() {
 		var mID string
 		err = rows.Scan(&mID)
@@ -673,13 +697,39 @@ func (d *database) listUsers() (s []string, err error) {
 			err = errors.Wrap(err, "listUsers")
 			return
 		}
-		s[sI] = mID
-		sI++
+		s = append(s, mID)
 	}
-	s = s[:sI]
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "listUsers")
+	}
+	return
+}
+
+func (d *database) listBlockedUsers(publicKey string) (s []string, err error) {
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' AND letter_content != '';", purpose.ActionBlock, publicKey)
+	log.Debug(query)
+	rows, err := d.db.Query(query)
+	if err != nil {
+		err = errors.Wrap(err, "listBlockedUsers")
+		return
+	}
+	defer rows.Close()
+
+	s = []string{}
+	for rows.Next() {
+		var mID string
+		err = rows.Scan(&mID)
+		if err != nil {
+			err = errors.Wrap(err, "listBlockedUsers")
+			return
+		}
+		s = append(s, mID)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		err = errors.Wrap(err, "listBlockedUsers")
 	}
 	return
 }
