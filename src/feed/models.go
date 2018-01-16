@@ -106,6 +106,7 @@ type User struct {
 	Followers []string      `json:"followers"`
 	Following []string      `json:"following"`
 	Friends   []string      `json:"friends"`
+	Blocked   []string      `json:"blocked"`
 	Server    string        `json:"server"`
 }
 

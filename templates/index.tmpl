@@ -224,11 +224,19 @@
             {{ end }}
           </ol>
         </div>
-          <div class="sidebar-module">
+        <div class="sidebar-module">
             <h4>Connections ({{ len .Connected }})</h4>
             <ol class="list-unstyled">
               {{ range .Connected }}
               <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
+              {{ end }}
+            </ol>
+        </div>
+        <div class="sidebar-module">
+            <h4>Blocked ({{ len .User.Blocked }})</h4>
+            <ol class="list-unstyled">
+              {{ range .User.Blocked }}
+              <li><small>{{ . }}</small></li>
               {{ end }}
             </ol>
         </div>

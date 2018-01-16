@@ -397,6 +397,7 @@ func (f Feed) GetUser(public ...string) (u User) {
 	}
 	name, profile, image := f.db.GetUser(publicKey)
 	followers, following, friends := f.db.Friends(publicKey)
+	blocked, _ := f.db.ListBlockedUsers(publicKey)
 	u = User{
 		Name:      strip.StripTags(name),
 		PublicKey: publicKey,
@@ -405,6 +406,7 @@ func (f Feed) GetUser(public ...string) (u User) {
 		Followers: followers,
 		Following: following,
 		Friends:   friends,
+		Blocked:   blocked,
 	}
 	return
 }
