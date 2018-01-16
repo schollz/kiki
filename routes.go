@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/web"
 )
 
 // GET /img
@@ -70,6 +71,17 @@ func handlePostPing(c *gin.Context) {
 	err := c.BindJSON(&p)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem binding data"})
+		return
+	}
+	address, err := web.GetClientIPHelper(c.Request)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem determing address"})
+		return
+	}
+
+	err = f.ValidateKikiInstance(address, p)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem validating kiki instance"})
 		return
 	}
 
