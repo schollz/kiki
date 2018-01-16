@@ -164,7 +164,7 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/api/v1/fiends", func(c *gin.Context) {
+	r.GET("/api/v1/friends", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{
