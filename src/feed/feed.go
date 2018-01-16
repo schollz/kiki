@@ -221,10 +221,10 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	if strings.Contains(l.Purpose, "action-") {
 		// actions are always public
 		l.To = []string{f.RegionKey.Public}
-		if l.Purpose == purpose.ActionBlock {
-			if l.Content == f.PersonalKey.Public {
-				return errors.New("refusing to block yourself")
-			}
+		if l.Purpose == purpose.ActionBlock && l.Content == f.PersonalKey.Public {
+			return errors.New("refusing to block yourself")
+		} else if l.Purpose == purpose.ActionFollow && l.Content == f.PersonalKey.Public {
+			return errors.New("refusing to follow yourself")
 		}
 	} else {
 		// rewrite the letter.To array so that it contains
