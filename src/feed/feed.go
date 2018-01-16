@@ -614,29 +614,7 @@ func (f Feed) Sync(address string) (err error) {
 	f.logger.Log.Debugf("syncing with %s", address)
 
 	// get the information about the kiki server
-	f.servers.Lock()
-	if _, ok := f.servers.connected[address]; !ok {
-		var user User
-		user, err = f.IsKikiInstance(address)
-		if err != nil {
-			err = errors.Wrap(err, "could not validate kiki instance")
-		} else {
-			f.logger.Log.Infof("connected to new server %s: %+v", address, user)
-			f.servers.connected[address] = user
-			alreadyRecorded := false
-			for _, currentAddress := range f.Settings.AvailableServers {
-				if address == currentAddress {
-					alreadyRecorded = true
-					break
-				}
-			}
-			if !alreadyRecorded {
-				f.Settings.AvailableServers = append(f.Settings.AvailableServers, address)
-				f.Save()
-			}
-		}
-	}
-	f.servers.Unlock()
+	err = f.PingKikiInstance(address)
 	if err != nil {
 		return
 	}
@@ -770,9 +748,15 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 	return
 }
 
-// IsKikiInstance will download the specified envelope
-func (f Feed) IsKikiInstance(address string) (u User, err error) {
-	u = User{}
+// PingKikiInstance will ping a kiki instance to see if it is viable
+func (f Feed) PingKikiInstance(address string) (err error) {
+	f.servers.RLock()
+	if _, ok := f.servers.connected[address]; ok {
+		f.servers.RUnlock()
+		return
+	}
+	f.servers.RUnlock()
+
 	timeout := time.Duration(1500 * time.Millisecond)
 	client := http.Client{
 		Timeout: timeout,
@@ -793,23 +777,46 @@ func (f Feed) IsKikiInstance(address string) (u User, err error) {
 		return
 	}
 
+	err = f.ValidateKikiInstance(address, target)
+	return
+}
+
+// ValidateKikiInstance will validate whether a ping response is valid when POSTing or when recieving
+func (f *Feed) ValidateKikiInstance(address string, r Response) (err error) {
 	// validate that the same region sent the signature
-	err = f.RegionKey.Validate(target.RegionSignature, f.RegionKey)
+	err = f.RegionKey.Validate(r.RegionSignature, f.RegionKey)
 	if err != nil {
 		err = errors.Wrap(err, "could not validate region key")
 		return
 	}
-	senderKey, err := keypair.FromPublic(target.PersonalPublicKey)
+	senderKey, err := keypair.FromPublic(r.PersonalPublicKey)
 	if err != nil {
 		return
 	}
-	err = f.RegionKey.Validate(target.PersonalSignature, senderKey)
+	err = f.RegionKey.Validate(r.PersonalSignature, senderKey)
 	if err != nil {
 		err = errors.Wrap(err, "could not validate personal key")
 		return
 	}
-	u = f.GetUser(target.PersonalPublicKey)
+	u := f.GetUser(r.PersonalPublicKey)
 	u.Server = address
+
+	f.servers.Lock()
+	defer f.servers.Unlock()
+	f.logger.Log.Infof("connected to new server %s: %+v", address, u)
+	f.servers.connected[address] = u
+	alreadyRecorded := false
+	for _, currentAddress := range f.Settings.AvailableServers {
+		if address == currentAddress {
+			alreadyRecorded = true
+			break
+		}
+	}
+	if !alreadyRecorded {
+		f.Settings.AvailableServers = append(f.Settings.AvailableServers, address)
+		f.Save()
+	}
+
 	return
 }
 
