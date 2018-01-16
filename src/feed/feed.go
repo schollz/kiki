@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	cache "github.com/robfig/go-cache"
 	strip "github.com/schollz/html-strip-tags-go"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
@@ -52,6 +53,7 @@ func New(location ...string) (f Feed, err error) {
 		db:          database.Setup(locationToSaveData),
 		storagePath: locationToSaveData,
 		logger:      logging.New(),
+		caching:     cache.New(1*time.Minute, 5*time.Minute),
 	}
 	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
 	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "feed.json"))
@@ -429,14 +431,26 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	posts = make([]Post, len(envelopes))
 	i := 0
 	for _, e := range envelopes {
-		post := f.MakePost(e)
-		posts[i] = Post{
-			Post:     post,
-			Comments: f.DetermineComments(post.ID),
-		}
+		posts[i] = f.MakePostWithComments(e)
 		i++
 	}
 	posts = posts[:i]
+	return
+}
+
+func (f Feed) MakePostWithComments(e letter.Envelope) (post Post) {
+	postInterface, found := f.caching.Get(e.ID)
+	if found {
+		f.logger.Log.Debug("using cache")
+		post = postInterface.(Post)
+		return
+	}
+	basicPost := f.MakePost(e)
+	post = Post{
+		Post:     basicPost,
+		Comments: f.DetermineComments(basicPost.ID),
+	}
+	f.caching.Set(e.ID, post, 1*time.Minute)
 	return
 }
 

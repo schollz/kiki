@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/cihub/seelog"
+	cache "github.com/robfig/go-cache"
 	"github.com/schollz/kiki/src/database"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
@@ -31,6 +32,7 @@ type Feed struct {
 	db          database.DatabaseAPI
 	log         seelog.LoggerInterface
 	logger      logging.SeelogWrapper
+	caching     *cache.Cache
 }
 
 type Settings struct {
