@@ -1,0 +1,20 @@
+{
+ "region_key": {
+  "public": "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
+  "private": "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
+ },
+ "settings": {
+  "storage_per_person": 5000000,
+  "storage_per_friend": 50000000,
+  "friends_of_friends": true,
+  "block_public_photos": false,
+  "hide_public_posts": false,
+  "available_servers": [
+   "https://kiki.network"
+  ]
+ },
+ "personal_key": {
+  "public": "5z_8ZHf6cnZnortmafG0gsSX0Dl5jaOdCHUNoQiI5h8=",
+  "private": "4YZRnytoQKcixlUfz-BQAoMchZnxXjJCDAfR4xdcbxg="
+ }
+}
