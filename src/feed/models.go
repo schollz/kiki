@@ -105,6 +105,7 @@ type User struct {
 	Followers []string      `json:"followers"`
 	Following []string      `json:"following"`
 	Friends   []string      `json:"friends"`
+	Server    string        `json:"server"`
 }
 
 type UserFriends struct {

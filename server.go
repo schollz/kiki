@@ -90,9 +90,10 @@ func Run() (err error) {
 
 		posts, _ := f.ShowFeed(p)
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"Posts":   posts,
-			"User":    f.GetUser(),
-			"Friends": f.GetUserFriends(),
+			"Posts":     posts,
+			"User":      f.GetUser(),
+			"Friends":   f.GetUserFriends(),
+			"Connected": f.GetConnected(),
 		})
 	})
 

@@ -619,6 +619,18 @@ func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
 	return f.db.GetIDs()
 }
 
+// GetConnected returns the users that are currently connected to
+func (f Feed) GetConnected() (us []User) {
+	f.servers.RLock()
+	defer f.servers.RUnlock()
+	i := 0
+	us = make([]User, len(f.servers.connected))
+	for address := range f.servers.connected {
+		us[i] = f.servers.connected[address]
+	}
+	return
+}
+
 // Sync will try to sync with the respective address
 func (f Feed) Sync(address string) (err error) {
 	f.logger.Log.Debugf("syncing with %s", address)
@@ -633,6 +645,17 @@ func (f Feed) Sync(address string) (err error) {
 		} else {
 			f.logger.Log.Infof("connected to new server %s: %+v", address, user)
 			f.servers.connected[address] = user
+			alreadyRecorded := false
+			for _, currentAddress := range f.Settings.AvailableServers {
+				if address == currentAddress {
+					alreadyRecorded = true
+					break
+				}
+			}
+			if !alreadyRecorded {
+				f.Settings.AvailableServers = append(f.Settings.AvailableServers, address)
+				f.Save()
+			}
 		}
 	}
 	f.servers.Unlock()
@@ -808,6 +831,7 @@ func (f Feed) IsKikiInstance(address string) (u User, err error) {
 		return
 	}
 	u = f.GetUser(target.PersonalPublicKey)
+	u.Server = address
 	return
 }
 
