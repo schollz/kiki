@@ -200,8 +200,13 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 				if err2 != nil {
 					return err2
 				}
+				alreadyAdded := make(map[string]struct{})
 				for _, friendsKeyPair := range friendsKeyPairs {
+					if _, ok := alreadyAdded[friendsKeyPair.Public]; ok {
+						continue
+					}
 					newTo = append(newTo, friendsKeyPair.Public)
+					alreadyAdded[friendsKeyPair.Public] = struct{}{}
 				}
 			default:
 				_, err2 := keypair.FromPublic(to)
@@ -220,7 +225,6 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	if err != nil {
 		return
 	}
-	f.log.Debugf("found %d images", len(images))
 	for name := range images {
 		p := purpose.SharePNG
 		if strings.Contains(name, ".jpg") {
@@ -437,7 +441,6 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		// reteurn all envelopes
 		envelopes, err = f.db.GetBasicPosts()
 	}
-	f.log.Debugf("Found %d envelopes", len(envelopes))
 	posts = make([]Post, len(envelopes))
 	i := 0
 	for _, e := range envelopes {

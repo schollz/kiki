@@ -55,7 +55,7 @@ func (api DatabaseAPI) AddEnvelope(e letter.Envelope) (err error) {
 	return db.addEnvelope(e)
 }
 
-// GetEnvelopeFromID returns a single envelope from its ID
+// GetEnvelopeFromID returns a single envelope from its ID and returns an error if it does not exist.
 func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
 	db, err := open(api.FileName)
 	if err != nil {
@@ -69,6 +69,8 @@ func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err erro
 	} else {
 		if len(es) > 0 {
 			e = es[0]
+		} else {
+			err = errors.New("envelope does not exist")
 		}
 	}
 	return

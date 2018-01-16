@@ -298,7 +298,6 @@ func (d *database) getAllFromPreparedQuery(query string, args ...interface{}) (s
 func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 	// loop through rows
 	s = []letter.Envelope{}
-	err = errors.New("no rows available")
 	for rows.Next() {
 		var e letter.Envelope
 		e.Letter = letter.Letter{}
@@ -317,10 +316,6 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 		}
 
 		s = append(s, e)
-		err = nil
-	}
-	if err != nil {
-		return
 	}
 
 	err = rows.Err()
@@ -489,7 +484,7 @@ func (d *database) getProfileImage(person string) (imageID string, err error) {
 }
 
 func (d *database) getFriendsName(publicKey string) (name string) {
-	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ShareKey + "' AND letter_content == '" + publicKey + "' LIMIT 1;"
+	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ShareKey + "' AND letter_content LIKE '%" + publicKey + "%' LIMIT 1;"
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
