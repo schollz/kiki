@@ -102,7 +102,7 @@ func New(params ...string) (f Feed, err error) {
 		err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{},
 			Purpose: purpose.ShareText,
-			Content: "Welcome!",
+			Content: `<p>Welcome to KiKi!</p><p>To get started, you can change your name, edit your profile, upload an image, and make posts!</p> `,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")
@@ -219,8 +219,13 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 
 	if strings.Contains(l.Purpose, "action-") {
-		// assignments are always public
+		// actions are always public
 		l.To = []string{f.RegionKey.Public}
+		if l.Purpose == purpose.ActionBlock {
+			if l.Content == f.PersonalKey.Public {
+				return errors.New("refusing to block yourself")
+			}
+		}
 	} else {
 		// rewrite the letter.To array so that it contains
 		// public keys that are valid
