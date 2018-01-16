@@ -12,8 +12,8 @@ import (
 
 var (
 	// Port defines what port the carrier should listen on
-	PublicPort     = "8003"
-	PrivatePort    = "8004"
+	PrivatePort    = "8003"
+	PublicPort     = "8004"
 	RegionPublic   = "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk="
 	RegionPrivate  = "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
 	NoSync         = false
