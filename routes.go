@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/letter"
 )
 
@@ -44,7 +45,7 @@ func handleLetter(c *gin.Context) (err error) {
 	var p letter.Letter
 	err = c.BindJSON(&p)
 	if err != nil {
-		logger.Log.Debug(err)
+		logger.Log.Error(err)
 		return
 	}
 	logger.Log.Debug(p)
@@ -54,6 +55,24 @@ func handleLetter(c *gin.Context) (err error) {
 
 // GET /ping
 func handlePing(c *gin.Context) {
+	signature, err := f.RegionKey.Signature(f.RegionKey)
+	personalSignature, err2 := f.PersonalKey.Signature(f.RegionKey)
+	if err != nil || err2 != nil {
+		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem signing"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "pong", "region_key": f.RegionKey.Public, "region_signature": signature, "personal_key": f.PersonalKey.Public, "personal_signature": personalSignature})
+	}
+}
+
+// POST /ping
+func handlePostPing(c *gin.Context) {
+	var p feed.Response
+	err := c.BindJSON(&p)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem binding data"})
+		return
+	}
+
 	signature, err := f.RegionKey.Signature(f.RegionKey)
 	personalSignature, err2 := f.PersonalKey.Signature(f.RegionKey)
 	if err != nil || err2 != nil {
