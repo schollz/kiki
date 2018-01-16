@@ -75,5 +75,7 @@ func (self *SeelogWrapper) SetLevel(level string) error {
 }
 
 func New() SeelogWrapper {
-	return SeelogWrapper{Level: "debug"}
+	logger := SeelogWrapper{Level: "debug"}
+	logger.init()
+	return logger
 }
