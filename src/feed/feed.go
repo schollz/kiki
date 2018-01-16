@@ -322,7 +322,7 @@ func (f Feed) UnsealLetters() (err error) {
 		err = errors.Wrap(err, "UnsealLetters, getting keys")
 		return
 	}
-	f.logger.Log.Debugf("Keys from friends: %v", keysToTry)
+	f.logger.Log.Debugf("Have %d keys from friends", len(keysToTry))
 	// prepend public key
 	keysToTry = append([]keypair.KeyPair{f.RegionKey}, keysToTry...)
 	// add personal key last
@@ -334,13 +334,12 @@ func (f Feed) UnsealLetters() (err error) {
 		}
 		ue, err := envelope.Unseal(keysToTry, f.RegionKey)
 		if err != nil {
-			f.logger.Log.Debug(err)
+			// this user is not a recipient, just continue
 			continue
 		}
-		f.logger.Log.Debug(ue.Letter)
 		err = f.db.AddEnvelope(ue)
 		if err != nil {
-			f.logger.Log.Debug(err)
+			f.logger.Log.Error(err)
 			continue
 		}
 	}
@@ -608,12 +607,9 @@ func (f Feed) Sync(address string) (err error) {
 	f.logger.Log.Debugf("syncing with %s", address)
 
 	// make sure that its a kiki instance
-	isInstance, err := f.IsKikiInstance(address)
+	err = f.IsKikiInstance(address)
 	if err != nil {
-		return
-	}
-	if !isInstance {
-		return errors.New("not a kiki instance")
+		return errors.Wrap(err, "could not validate kiki instance")
 	}
 
 	// Get a list of my IDs
@@ -624,7 +620,6 @@ func (f Feed) Sync(address string) (err error) {
 
 	// get the list
 	var target Response
-	f.logger.Log.Debug("getting list")
 	req, err := http.NewRequest("GET", address+"/list", nil)
 	if err != nil {
 		return
@@ -634,34 +629,12 @@ func (f Feed) Sync(address string) (err error) {
 		return
 	}
 	defer resp.Body.Close()
-	f.logger.Log.Debug("unmarshaling response")
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
-	f.logger.Log.Debug(target)
 	if "ok" != target.Status {
 		return errors.New(target.Error)
-	}
-
-	// validate region key
-	if target.Signature == "" {
-		return errors.Wrap(err, "must report signature")
-	}
-	targetKey, err := keypair.FromPublic(target.RegionPublicKey)
-	if err != nil {
-		return errors.Wrap(err, "cannot validate region key, problem unmarshaling")
-	}
-	encryptedSignature, err := base64.URLEncoding.DecodeString(target.Signature)
-	if err != nil {
-		return errors.Wrap(err, "cannot validate region key, problem converting")
-	}
-	decryptedSignature, err := f.RegionKey.Decrypt(encryptedSignature, targetKey)
-	if err != nil {
-		return errors.Wrap(err, "cannot validate region key, problem decrypting")
-	}
-	if string(decryptedSignature) != f.RegionKey.Public {
-		return errors.New("cannot sync with another region")
 	}
 
 	f.logger.Log.Debugf("got %d IDs from %s", len(target.IDs), address)
@@ -766,7 +739,7 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 }
 
 // IsKikiInstance will download the specified envelope
-func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
+func (f Feed) IsKikiInstance(address string) (err error) {
 	timeout := time.Duration(1500 * time.Millisecond)
 	client := http.Client{
 		Timeout: timeout,
@@ -787,9 +760,8 @@ func (f Feed) IsKikiInstance(address string) (yes bool, err error) {
 		return
 	}
 
-	if target.Message == f.RegionKey.Public {
-		yes = true
-	}
+	// validate that the same region sent the signature
+	err = f.RegionKey.Validate(target.Signature, f.RegionKey)
 	return
 }
 
