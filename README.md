@@ -46,7 +46,7 @@ You can also other posts public by choosing to share with public.
 
 The entire social network is stored on your local computer. This allows you to add entries, share photos, and make comments to others offline. Anything you do offline will be synced up later.
 
-There are limits to the amount of content stored on your computer. Those limits are set in the `feed.json` configuration file, typically 5MB for public and 50MB friends. Your own messages never apply to these limits. 
+There are limits to the amount of content stored on your computer. Those limits are set in the `kiki.json` configuration file, typically 5MB for public and 50MB friends. Your own messages never apply to these limits. 
 
 When specified storage limits *are* reached, then messages begin to be purged. Again, only messages from public/friends are allows to be purged. First, old message edits are purged. Then the oldest posts are purged until the free space is no longer being exceeded.
 
@@ -114,7 +114,7 @@ At a minimum, each user has three key pairs - a *Personal* key pair, a *Friends*
 
 Every time you use KiKi, you will seal and sign your posts with your Personal private key. This prevents others from trying to write posts as you and enables you to send private messages to yourself (as in a diary) or to send secure messages directly to others.
 
-You can have only one Personal key. If you have two computers and need to merge the accounts, you can simply copy the Personal keys from one computer (in a file `feed.json`) to the other. All other information is stored in Letter which can be aquired by syncing with anyone.
+You can have only one Personal key. If you have two computers and need to merge the accounts, you can simply copy the Personal keys from one computer (in a file `kiki.json`) to the other. All other information is stored in Letter which can be aquired by syncing with anyone.
 
 ### Friends key pair
 

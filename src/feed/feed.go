@@ -65,7 +65,7 @@ func New(params ...string) (f Feed, err error) {
 	f.servers.connected = make(map[string]User)
 	f.servers.Unlock()
 	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
-	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "feed.json"))
+	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "kiki.json"))
 	if errLoad != nil {
 		fmt.Println("generating new feed")
 
@@ -134,7 +134,7 @@ func (f Feed) Save() (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path.Join(f.storagePath, "feed.json"), feedBytes, 0644)
+	err = ioutil.WriteFile(path.Join(f.storagePath, "kiki.json"), feedBytes, 0644)
 	return
 }
 
