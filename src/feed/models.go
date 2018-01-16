@@ -2,6 +2,7 @@ package feed
 
 import (
 	"html/template"
+	"sync"
 	"time"
 
 	"github.com/cihub/seelog"
@@ -35,6 +36,12 @@ type Feed struct {
 	log         seelog.LoggerInterface
 	logger      logging.SeelogWrapper
 	caching     *cache.Cache
+	servers     connections
+}
+
+type connections struct {
+	connected map[string]User
+	sync.RWMutex
 }
 
 type Settings struct {

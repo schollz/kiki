@@ -61,6 +61,9 @@ func New(params ...string) (f Feed, err error) {
 		logger:      logging.New(),
 		caching:     cache.New(1*time.Minute, 5*time.Minute),
 	}
+	f.servers.Lock()
+	f.servers.connected = make(map[string]User)
+	f.servers.Unlock()
 	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
 	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "feed.json"))
 	if errLoad != nil {
@@ -620,10 +623,21 @@ func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
 func (f Feed) Sync(address string) (err error) {
 	f.logger.Log.Debugf("syncing with %s", address)
 
-	// make sure that its a kiki instance
-	err = f.IsKikiInstance(address)
+	// get the information about the kiki server
+	f.servers.Lock()
+	if _, ok := f.servers.connected[address]; !ok {
+		var user User
+		user, err = f.IsKikiInstance(address)
+		if err != nil {
+			err = errors.Wrap(err, "could not validate kiki instance")
+		} else {
+			f.logger.Log.Infof("connected to new server %s: %+v", address, user)
+			f.servers.connected[address] = user
+		}
+	}
+	f.servers.Unlock()
 	if err != nil {
-		return errors.Wrap(err, "could not validate kiki instance")
+		return
 	}
 
 	// Get a list of my IDs
@@ -756,7 +770,8 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 }
 
 // IsKikiInstance will download the specified envelope
-func (f Feed) IsKikiInstance(address string) (err error) {
+func (f Feed) IsKikiInstance(address string) (u User, err error) {
+	u = User{}
 	timeout := time.Duration(1500 * time.Millisecond)
 	client := http.Client{
 		Timeout: timeout,
@@ -780,7 +795,8 @@ func (f Feed) IsKikiInstance(address string) (err error) {
 	// validate that the same region sent the signature
 	err = f.RegionKey.Validate(target.RegionSignature, f.RegionKey)
 	if err != nil {
-		return errors.Wrap(err, "could not validate region key")
+		err = errors.Wrap(err, "could not validate region key")
+		return
 	}
 	senderKey, err := keypair.FromPublic(target.PersonalPublicKey)
 	if err != nil {
@@ -788,8 +804,10 @@ func (f Feed) IsKikiInstance(address string) (err error) {
 	}
 	err = f.RegionKey.Validate(target.PersonalSignature, senderKey)
 	if err != nil {
-		return errors.Wrap(err, "could not validate personal key")
+		err = errors.Wrap(err, "could not validate personal key")
+		return
 	}
+	u = f.GetUser(target.PersonalPublicKey)
 	return
 }
 
