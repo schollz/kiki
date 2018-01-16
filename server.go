@@ -20,21 +20,14 @@ import (
 )
 
 var (
-	// Port defines what port the carrier should listen on
-	PublicPort  = "8003"
-	PrivatePort = "8004"
-
-	NoSync bool
-	// Location defines where to open up the kiki database
-	Location = "."
-	f        feed.Feed
-	log      = logging.Log
+	f      feed.Feed
+	logger = logging.New()
 )
 
 func MiddleWareHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Log request
-		log.Debug(fmt.Sprintf("%v %v %v", c.Request.RemoteAddr, c.Request.Method, c.Request.URL))
+		logger.Log.Debug(fmt.Sprintf("%v %v %v", c.Request.RemoteAddr, c.Request.Method, c.Request.URL))
 		// Add base headers
 		AddCORS(c)
 		// Run next function
@@ -49,13 +42,21 @@ func minus(a, b int) string {
 // Run will start the server listening
 func Run() (err error) {
 	// Startup feed
-	log.Debug("opening feed")
+	logger.Log.Debug("opening feed")
 	f, err = feed.New(Location)
 	if err != nil {
-		log.Error(err)
 		return
 	}
-	log.Debug("opened feed")
+	logger.Log.Debug("opened feed")
+	err = f.SetRegionKey(RegionPublic, RegionPrivate)
+	if err != nil {
+		return
+	}
+	logger.Log.Infof("Using region: %s", f.RegionKey.Public)
+	err = f.Save()
+	if err != nil {
+		return
+	}
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -188,19 +189,19 @@ func Run() (err error) {
 	publicRouter.POST("/envelope", handlerEnvelope)   // post to put into database (public)
 	publicRouter.GET("/download/:id", handleDownload) // download a specific envelope
 	go (func() {
-		log.Infof("Running public router on 0.0.0.0:%s", PublicPort)
+		logger.Log.Infof("Running public router on 0.0.0.0:%s", PublicPort)
 		err = publicRouter.Run(":" + PublicPort)
 		if err != nil {
-			log.Error(err)
+			logger.Log.Error(err)
 			panic(err)
 		}
 	})()
 
 	// private routes bind to localhost
-	log.Infof("Running private router on localhost:%s", PrivatePort)
+	logger.Log.Infof("Running private router on localhost:%s", PrivatePort)
 	err = r.Run("localhost:" + PrivatePort)
 	if nil != err {
-		log.Error(err)
+		logger.Log.Error(err)
 		return
 	}
 	return
@@ -208,13 +209,13 @@ func Run() (err error) {
 
 func respondWithJSON(c *gin.Context, message string, err error) {
 	if nil != err {
-		log.Error(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, 500))
-		log.Warn(err)
+		logger.Log.Error(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, 500))
+		logger.Log.Warn(err)
 		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		return
 	}
-	log.Info(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, 200))
-	log.Debug(message)
+	logger.Log.Info(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, 200))
+	logger.Log.Debug(message)
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": message})
 }
 
@@ -255,7 +256,7 @@ func AddCORS(c *gin.Context) {
 // 	if errIP != nil {
 // 		return
 // 	}
-// 	log.Debugf("Got IP adddress: '%s'", clientIP)
+// 	logger.Log.Debugf("Got IP adddress: '%s'", clientIP)
 // 	return clientIP == "127.0.0.1" || clientIP == "::1"
 // }
 

@@ -37,10 +37,16 @@ func (f *Feed) Debug(b bool) {
 }
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
-func New(location ...string) (f Feed, err error) {
+func New(params ...string) (f Feed, err error) {
+	regionKeyPublic := "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk="
+	regionKeyPrivate := "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
 	locationToSaveData := "."
-	if len(location) > 0 {
-		locationToSaveData = location[0]
+	if len(params) > 0 {
+		locationToSaveData = params[0]
+		if len(params) == 3 {
+			regionKeyPublic = params[1]
+			regionKeyPrivate = params[2]
+		}
 	}
 
 	locationToSaveData, err = filepath.Abs(locationToSaveData)
@@ -59,11 +65,10 @@ func New(location ...string) (f Feed, err error) {
 	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "feed.json"))
 	if errLoad != nil {
 		fmt.Println("generating new feed")
-		// generate a new feed
 
 		// define region key
-		f.RegionKey, err = keypair.FromPair("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
-			"GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q=") // define region key
+		err = f.SetRegionKey(regionKeyPublic,
+			regionKeyPrivate)
 		if err != nil {
 			return
 		}
@@ -108,6 +113,19 @@ func New(location ...string) (f Feed, err error) {
 		}
 	}
 
+	err = f.Save()
+	return
+}
+
+func (f *Feed) SetRegionKey(public, private string) (err error) {
+	f.RegionKey, err = keypair.FromPair(public, private) // define region key
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (f Feed) Save() (err error) {
 	// overwrite the feed file
 	feedBytes, err := json.MarshalIndent(f, "", " ")
 	if err != nil {

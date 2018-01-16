@@ -14,10 +14,10 @@ import (
 func handleImage(c *gin.Context) {
 	AddCORS(c)
 	id := c.Param("id")
-	log.Debugf("fetching image: %s", id)
+	logger.Log.Debugf("fetching image: %s", id)
 	e, err := f.GetEnvelope(id)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
 		return
 	}
@@ -44,10 +44,10 @@ func handleLetter(c *gin.Context) (err error) {
 	var p letter.Letter
 	err = c.BindJSON(&p)
 	if err != nil {
-		log.Debug(err)
+		logger.Log.Debug(err)
 		return
 	}
-	log.Debug(p)
+	logger.Log.Debug(p)
 	err = f.ProcessLetter(p)
 	return
 }
@@ -81,7 +81,7 @@ func handleList(c *gin.Context) {
 	AddCORS(c)
 	ids, err := f.GetIDs()
 	if err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": ids, "region_key": f.RegionKey.Public})
@@ -115,14 +115,14 @@ func handleSync(c *gin.Context) (err error) {
 	var p Payload
 	err = c.BindJSON(&p)
 	if err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 		return
 	}
 
-	log.Debug("syncing...")
+	logger.Log.Debug("syncing...")
 	err = f.Sync(p.Address)
 	if err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 		return
 	}
 	return
