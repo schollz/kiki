@@ -500,6 +500,17 @@ func (api DatabaseAPI) RemoveLetters(ids []string) (err error) {
 	return
 }
 
+// RemoveLettersForUser will delete the envelopes for a specific user
+func (api DatabaseAPI) RemoveLettersForUser(user string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	err = db.deleteLettersFromSender(user)
+	return
+}
+
 // GetIDs will delete the letter containing that ID
 func (api DatabaseAPI) GetIDs() (ids map[string]struct{}, err error) {
 	db, err := open(api.FileName)
@@ -550,6 +561,16 @@ func (api DatabaseAPI) ListUsers() (users []string, err error) {
 	}
 	defer db.Close()
 	return db.listUsers()
+}
+
+// ListBlockedUsers returns the bytes used by a user for recipients + sealed_content
+func (api DatabaseAPI) ListBlockedUsers() (users []string, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.listBlockedUsers()
 }
 
 // GetAllVersions returns the bytes used by a user for recipients + sealed_content

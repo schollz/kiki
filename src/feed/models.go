@@ -40,7 +40,8 @@ type Feed struct {
 }
 
 type connections struct {
-	connected map[string]User
+	connected    map[string]User
+	blockedUsers map[string]struct{}
 	sync.RWMutex
 }
 

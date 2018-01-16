@@ -142,31 +142,58 @@ func (f Feed) Cleanup() {
 	fmt.Println("cleaning up...")
 }
 
+func (f Feed) UpdateBlockedUsers() (err error) {
+	// update the blocked users
+	blockedUsers, err := f.db.ListBlockedUsers()
+	if err != nil {
+		return
+	}
+	f.servers.Lock()
+	f.servers.blockedUsers = make(map[string]struct{})
+	for _, blockedUser := range blockedUsers {
+		f.servers.blockedUsers[blockedUser] = struct{}{}
+		f.db.RemoveLettersForUser(blockedUser)
+	}
+	f.servers.Unlock()
+	return
+}
+
 func (f Feed) DoSyncing() {
 	for {
 		for _, server := range f.Settings.AvailableServers {
 			err := f.Sync(server)
 			if err != nil {
 				f.logger.Log.Warn(err)
-				continue
 			}
-			// unseal any new letters
-			err = f.UnsealLetters()
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
-			// send out friends keys for new friends
-			err = f.UpdateFriends()
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
-			// purge overflowing storage
-			err = f.PurgeOverflowingStorage()
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
+			f.UpdateEverything()
 		}
 		time.Sleep(3 * time.Second)
+	}
+}
+
+func (f Feed) UpdateEverything() {
+	// unseal any new letters
+	err := f.UnsealLetters()
+	if err != nil {
+		f.logger.Log.Warn(err)
+	}
+
+	// send out friends keys for new friends
+	err = f.UpdateFriends()
+	if err != nil {
+		f.logger.Log.Warn(err)
+	}
+
+	// update blocked users
+	err = f.UpdateBlockedUsers()
+	if err != nil {
+		f.logger.Log.Warn(err)
+	}
+
+	// purge overflowing storage
+	err = f.PurgeOverflowingStorage()
+	if err != nil {
+		f.logger.Log.Warn(err)
 	}
 }
 
@@ -294,6 +321,14 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 		return errors.Wrap(err, "ProcessEnvelope, not validated")
 	}
 
+	// check if envelope comes from blocked user
+	f.servers.RLock()
+	if _, ok := f.servers.blockedUsers[e.Sender.Public]; ok {
+		f.servers.RUnlock()
+		return errors.New("this user has been blocked, not downloading")
+	}
+	f.servers.RUnlock()
+
 	// check if envelope already exists
 	_, errGet := f.GetEnvelope(e.ID)
 	if errGet == nil {
@@ -308,8 +343,6 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	}
 
 	// TODO: Determine if this envelope will overflow the limits, and if so, then delete an envelope also
-
-	err = f.UnsealLetters()
 	return
 }
 
