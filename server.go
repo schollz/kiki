@@ -50,16 +50,10 @@ func minus(a, b int) string {
 func Run() (err error) {
 	// Startup feed
 	log.Debug("opening feed")
-	f, err = feed.Open(Location)
-	fmt.Println(err)
+	f, err = feed.New(Location)
 	if err != nil {
-		log.Debug(err)
-		log.Debug("feed not found, creating new one")
-		var err2 error
-		f, err2 = feed.New(Location)
-		if err2 != nil {
-			return err2
-		}
+		log.Error(err)
+		return
 	}
 	log.Debug("opened feed")
 

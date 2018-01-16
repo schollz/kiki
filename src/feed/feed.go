@@ -46,52 +46,26 @@ func New(location ...string) (f Feed, err error) {
 	if err != nil {
 		return
 	}
+
 	f = Feed{
-		storagePath: locationToSaveData,
 		Settings:    GenerateSettings(),
+		db:          database.Setup(locationToSaveData),
+		storagePath: locationToSaveData,
+		logger:      logging.New(),
 	}
+	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
+	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "feed.json"))
+	if errLoad != nil {
+		fmt.Println("generating new feed")
+		// generate a new feed
 
-	// initialize
-	f, err = initializeFeed(f)
-	return
-}
-
-// Open will load a feed from the specified location
-func Open(locationToFeed string) (f Feed, err error) {
-	bFeed, err := ioutil.ReadFile(path.Join(locationToFeed, "feed.json"))
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(bFeed, &f)
-	if err != nil {
-		return
-	}
-	f.storagePath = locationToFeed
-	// initialize
-	f, err = initializeFeed(f)
-	return
-}
-
-// init initializes the kiki instance
-func initializeFeed(g Feed) (f Feed, err error) {
-	f = g
-	f.logger = logging.New()
-	f.log = logging.Log
-	f.logger.Log.Debug("initializing feed")
-	loc, _ := filepath.Abs(f.storagePath)
-	f.logger.Log.Infof("database location: %s", loc)
-
-	if f.RegionKey.Public == "" {
 		// define region key
 		f.RegionKey, err = keypair.FromPair("rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk=",
 			"GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q=") // define region key
 		if err != nil {
 			return
 		}
-	}
 
-	f.db = database.Setup(f.storagePath)
-	if f.PersonalKey.Public == "" {
 		// generate a new personal key
 		var err2 error
 		f.PersonalKey = keypair.New()
@@ -113,6 +87,23 @@ func initializeFeed(g Feed) (f Feed, err error) {
 			err = errors.Wrap(err2, "setup")
 			return
 		}
+
+		// send welcome messasge
+		err2 = f.ProcessLetter(letter.Letter{
+			To:      []string{},
+			Purpose: purpose.ShareText,
+			Content: "Welcome!",
+		})
+		if err2 != nil {
+			err = errors.Wrap(err2, "setup")
+			return
+		}
+
+	} else {
+		err = json.Unmarshal(bFeed, &f)
+		if err != nil {
+			return
+		}
 	}
 
 	// overwrite the feed file
@@ -121,15 +112,6 @@ func initializeFeed(g Feed) (f Feed, err error) {
 		return
 	}
 	err = ioutil.WriteFile(path.Join(f.storagePath, "feed.json"), feedBytes, 0644)
-	if err != nil {
-		return
-	}
-
-	err = f.UpdateFriends()
-	if err != nil {
-		f.logger.Log.Warn(err)
-		err = nil
-	}
 	return
 }
 

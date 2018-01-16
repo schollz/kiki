@@ -23,9 +23,11 @@ func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) 
 	if len(databaseName) > 0 {
 		name = databaseName[0]
 	}
-	return DatabaseAPI{
+	api = DatabaseAPI{
 		FileName: path.Join(locationToDatabase, name),
 	}
+	fmt.Printf("setup database at '%s'\n", api.FileName)
+	return
 }
 
 func (api DatabaseAPI) Set(bucket, key string, value interface{}) (err error) {
