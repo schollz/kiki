@@ -564,13 +564,13 @@ func (api DatabaseAPI) ListUsers() (users []string, err error) {
 }
 
 // ListBlockedUsers returns the bytes used by a user for recipients + sealed_content
-func (api DatabaseAPI) ListBlockedUsers() (users []string, err error) {
+func (api DatabaseAPI) ListBlockedUsers(publickey string) (users []string, err error) {
 	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
 	defer db.Close()
-	return db.listBlockedUsers()
+	return db.listBlockedUsers(publickey)
 }
 
 // GetAllVersions returns the bytes used by a user for recipients + sealed_content

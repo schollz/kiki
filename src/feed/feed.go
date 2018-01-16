@@ -117,6 +117,7 @@ func New(params ...string) (f Feed, err error) {
 	}
 
 	err = f.Save()
+	f.UpdateEverything()
 	return
 }
 
@@ -144,7 +145,7 @@ func (f Feed) Cleanup() {
 
 func (f Feed) UpdateBlockedUsers() (err error) {
 	// update the blocked users
-	blockedUsers, err := f.db.ListBlockedUsers()
+	blockedUsers, err := f.db.ListBlockedUsers(f.PersonalKey.Public)
 	if err != nil {
 		return
 	}
@@ -309,7 +310,6 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		return
 	}
 
-	err = f.UnsealLetters()
 	return
 }
 

@@ -706,8 +706,8 @@ func (d *database) listUsers() (s []string, err error) {
 	return
 }
 
-func (d *database) listBlockedUsers() (s []string, err error) {
-	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ActionBlock + "' AND letter_content != '';")
+func (d *database) listBlockedUsers(publicKey string) (s []string, err error) {
+	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' AND letter_content != '';", purpose.ActionBlock, publicKey)
 	log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
