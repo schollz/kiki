@@ -73,3 +73,7 @@ func (self *SeelogWrapper) SetLevel(level string) error {
 	self.Level = level
 	return self.init()
 }
+
+func New() SeelogWrapper {
+	return SeelogWrapper{Level: "debug"}
+}
