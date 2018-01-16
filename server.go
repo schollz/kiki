@@ -111,7 +111,22 @@ func Run() (err error) {
 	})
 
 	r.GET("/api/v1/posts", func(c *gin.Context) {
-		posts, err := f.ShowFeedForApi()
+		posts, err := f.ShowPostsForApi()
+		if err != nil {
+			respondWithJSON(c, "", err)
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data": gin.H{
+				"posts": posts,
+			},
+		})
+	})
+
+	r.GET("/api/v1/post/:post_id", func(c *gin.Context) {
+		post_id := c.Param("post_id")
+		posts, err := f.ShowPostForApi(post_id)
 		if err != nil {
 			respondWithJSON(c, "", err)
 			return
@@ -125,8 +140,8 @@ func Run() (err error) {
 	})
 
 	r.GET("/api/v1/post/:post_id/comments", func(c *gin.Context) {
-		// post_id := c.Param("post_id")
-		posts, err := f.ShowFeedForApi()
+		post_id := c.Param("post_id")
+		posts, err := f.ShowPostCommentsForApi(post_id)
 		if err != nil {
 			respondWithJSON(c, "", err)
 			return
