@@ -13,13 +13,15 @@ import (
 )
 
 type Response struct {
-	Signature       string              `json:"signature"`
-	RegionPublicKey string              `json:"region_key"`
-	IDs             map[string]struct{} `json:"ids"`
-	Envelope        letter.Envelope     `json:"envelope"`
-	Error           string              `json:"error"`
-	Message         string              `json:"message"`
-	Status          string              `json:"status"`
+	RegionSignature   string              `json:"region_signature"`
+	RegionPublicKey   string              `json:"region_key"`
+	PersonalSignature string              `json:"personal_signature"`
+	PersonalPublicKey string              `json:"personal_key"`
+	IDs               map[string]struct{} `json:"ids"`
+	Envelope          letter.Envelope     `json:"envelope"`
+	Error             string              `json:"error"`
+	Message           string              `json:"message"`
+	Status            string              `json:"status"`
 }
 
 // Feed stores your basic data

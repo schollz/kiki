@@ -778,7 +778,18 @@ func (f Feed) IsKikiInstance(address string) (err error) {
 	}
 
 	// validate that the same region sent the signature
-	err = f.RegionKey.Validate(target.Signature, f.RegionKey)
+	err = f.RegionKey.Validate(target.RegionSignature, f.RegionKey)
+	if err != nil {
+		return errors.Wrap(err, "could not validate region key")
+	}
+	senderKey, err := keypair.FromPublic(target.PersonalPublicKey)
+	if err != nil {
+		return
+	}
+	err = f.RegionKey.Validate(target.PersonalSignature, senderKey)
+	if err != nil {
+		return errors.Wrap(err, "could not validate personal key")
+	}
 	return
 }
 
