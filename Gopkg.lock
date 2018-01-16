@@ -58,8 +58,8 @@
 [[projects]]
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
-  revision = "ed69081a91fd053f17672236b0dd52ba7485e1a3"
-  version = "v1.4.0"
+  revision = "6c771bb9887719704b210e87e934f08be014bdb1"
+  version = "v1.6.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -75,9 +75,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/robfig/go-cache"
+  packages = ["."]
+  revision = "9fc39e0dbf62c034ec4e45e6120fc69433a3ec51"
+
+[[projects]]
+  branch = "master"
   name = "github.com/schollz/html-strip-tags-go"
   packages = ["."]
   revision = "7a55ac806487a66b5d52fa2215f5d60aa33b5336"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shurcooL/sanitized_anchor_name"
+  packages = ["."]
+  revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -95,31 +107,31 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "ccfe18359b55b97855cee1d3f74e5efbda4869dc"
+  revision = "9831f2c3ac1068a78f50999a30db84270f647af6"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","nacl/box","nacl/secretbox","poly1305","salsa20/salsa"]
-  revision = "5f55bce93ad2c89f411e009659bb1fd83da36e7b"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/net"
-  packages = ["context"]
-  revision = "ab555f366c4508dbe0802550b1b20c46c5c18aa0"
+  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "810d7000345868fc619eb81f46307107118f4ae1"
+  revision = "fff93fa7cd278d84afc205751523809c464168ab"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
   version = "v8.18.2"
+
+[[projects]]
+  name = "gopkg.in/russross/blackfriday.v2"
+  packages = ["."]
+  revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "v2"
@@ -130,6 +142,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "787f3e597f7b08e1f34b08506581965b38d0bcff3fafae6720f9ac829cdc8254"
+  inputs-digest = "5b76cb02edf701e22a6f1c40ad7ea161efa882e4bee280420748732b06df3c6a"
   solver-name = "gps-cdcl"
   solver-version = 1
