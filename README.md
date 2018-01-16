@@ -54,7 +54,9 @@ When specified storage limits *are* reached, then messages begin to be purged. A
 
 Anything on *KiKi* can be edited. All edits are saved in the database (though they will be purged on others computers if you have enough edits to exceed their storage limits). The feed shows only the most recent edit.
 
-There are two kinds of deletion in *KiKi*.
+There is only one kind of deletion in *KiKi*: deleting your entire profile. Deleting messages must be synced, so its costly to delete things. When you'd like to delete your entire profile though, a message will be transmitted and propogated that alerts all *KiKi* instances to delete all your content and to suspend transfering it.
+
+If you'd like a post to no longer be available in the feed you can just edit it and erase all the content. In this way, it appears "deleted" when a user looks at the feed, although it is not actually deleted because it is still in the database as a previous edit. However, over time, if the storage of your content is exceeded in other's computers then the original post will no longer be erased and would be effectively deleted as well.
 
 ## Features
 
