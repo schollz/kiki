@@ -20,7 +20,11 @@
 
   <style>
     #posts {
-        font-size: 16px !important;
+        font-size: 16px;
+    }
+
+    .post-datetime {
+        font-size: 14px;
     }
 
     #posts img.profile-pic {
@@ -384,7 +388,7 @@ KiKiClient.prototype.buildPostElem = function(post) {
                     "data-id":post.id
                 }).addClass("likebutton").append(
                     $("<i>").addClass("fas fa-heart"),
-                    "x"+(post.Likes||1)
+                    "x"+(post.Likes||0)
                 )
             ),
 
@@ -437,7 +441,7 @@ KiKiClient.prototype.buildPostElem = function(post) {
             //.end
 
             "<br>",
-            $("<span>").addClass('text-muted').append(
+            $("<span>").addClass('text-muted post-datetime').append(
                 $('<a>', {href:'/?id='+post.id}).append(
                     new Date(post.timestamp*1000)
                 )
