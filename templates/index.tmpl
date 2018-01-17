@@ -205,7 +205,7 @@
           <h4>Following  ({{ len .Friends.Following }})</h4>
           <ol class="list-unstyled">
             {{ range .Friends.Following }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
@@ -213,7 +213,7 @@
           <h4>Followers  ({{ len .Friends.Followers }})</h4>
           <ol class="list-unstyled">
             {{ range .Friends.Followers }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
@@ -221,7 +221,8 @@
           <h4>Friends ({{ len .Friends.Friends }})</h4>
           <ol class="list-unstyled">
             {{ range .Friends.Friends }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">
+              {{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
