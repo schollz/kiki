@@ -316,16 +316,38 @@ KiKiClient.prototype.buildPostUi = function(post) {
                     $("<img>", {
                         owner_id: post.owner_id
                     }).addClass("align-middle profile-pic"),
+
+                    // activatenamemodal
                     $("<a>",{
                         'href':"#!",
                         'data-name': post.owner_name || post.owner_id,
-                        // 'data-image': "/img/POSTUSERIMAGE",
                         'data-publickey': post.owner_id,
-                        // 'data-content': "POSTUSERPROFILE"
                     }).addClass("activatenamemodal").append(
                          post.owner_name || post.owner_id
-                    ),
+                    ).on('click', function() {
+                        var user = app.Client.getUser($(this).data('publickey'));
+                        if (user) {
+                            $("#modalNameName").text(user.name || user.public_key);
 
+                            $("#modalNamePublicKey").text("");
+                            if (user.name) {
+                                $("#modalNamePublicKey").text(user.public_key);
+                            }
+
+                            $("#modalNameContent").html(user.profile);
+
+                            $("#modalNameImage").attr("src", null);
+                            if (user.image && "" != user.image) {
+                                $("#modalNameImage").attr("src", '/'+user.image);
+                            }
+
+                            $("#nameModal").modal();
+                            $("#followButton").attr("data-publickey", user.public_key);
+                        }
+                    }),
+                    //.end
+
+                    // recipients
                     " to ",
                     (function(){
                         var elems = [];
@@ -338,6 +360,8 @@ KiKiClient.prototype.buildPostUi = function(post) {
                         }
                         return elems;
                     })(),
+                    //.end
+
                     "<br>",
                     $("<span>").addClass('text-muted').append(
                         $('<a>', {href:'/?id='+post.id}).append(
@@ -356,10 +380,26 @@ KiKiClient.prototype.buildPostUi = function(post) {
     );
 }
 
-KiKiClient.prototype.addUserId = function(user_id) {
+KiKiClient.prototype.addUser = function(user_id, user_data) {
     if (!this.users[user_id]) {
-        this.users[user_id] = null;
+        this.users[user_id] = user_data;
+    } else if (user_data) {
+        this.users[user_id] = user_data;
     }
+    // add/update ui info
+    if (user_data) {
+        if (user_data && "" == user_data.image) {
+            $('img.profile-pic[owner_id="'+user_data.public_key+'"]').attr('src', '/img/'+user_data.image);
+        }
+        $('span.recipient[owner_id="'+user_data.public_key+'"]').text(
+            user_data.name || user_data.public_key
+        );
+    }
+}
+
+KiKiClient.prototype.getUser = function(user_id) {
+    if (!this.users[user_id]) return null;
+    return this.users[user_id];
 }
 
 KiKiClient.prototype.buildPostsUi = function(callback) {
@@ -372,11 +412,11 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
             this.buildPostCommentsUi(this.posts[i].id);
         }
 
-        this.addUserId(this.posts[i].owner_id);
+        this.addUser(this.posts[i].owner_id);
 
         if (this.posts[i].recipients) {
             for (var j=0; j<this.posts[i].recipients.length; j++) {
-                this.addUserId(this.posts[i].recipients[j]);
+                this.addUser(this.posts[i].recipients[j]);
             }
         }
 
@@ -391,10 +431,8 @@ KiKiClient.prototype.buildUsersUi = function() {
         if (!this.users[i]) {
             this.api.fetchUser(i, function(err,res){
                 if (err) throw err;
-                $('img.profile-pic[owner_id="'+res.data.user.public_key+'"]').attr('src', '/img/'+res.data.user.image);
-                $('span.recipient[owner_id="'+res.data.user.public_key+'"]').text(
-                    res.data.user.name || res.data.user.public_key
-                );
+                var user_data = res.data.user;
+                self.addUser(user_data.public_key, user_data);
             });
         }
     }
@@ -503,15 +541,7 @@ app.Client = new KiKiClient(app.Api);
         }
         $("#letterPurpose").val($(this).data("purpose"));
       });
-      $(".activatenamemodal").click(function() {
-        console.log($(this).data("name"));
-        $("#modalNameName").text($(this).data("name"));
-        $("#modalNamePublicKey").text($(this).data("publickey"));
-        $("#modalNameContent").html($(this).data("content"));
-        $("#modalNameImage").attr("src",$(this).data("image"));
-        $("#nameModal").modal();
-        $("#followButton").attr("data-publickey", $(this).data("publickey"));
-      });
+
       $("#followButton").click(function() {
         console.log($(this).data("publickey"));
         // TODO: MAKE A FOLLOW!

@@ -384,7 +384,7 @@ func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
 	            '"public_key": "' ||  ? ||'",'||
 				'"name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'",'||
 				'"profile": "' || IFNULL((SELECT replace(letter_content, '"',  '''') FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/profile' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'",'||
-				'"image": "' || IFNULL((SELECT id FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/image' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'"'
+				'"image": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/image' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'"'
 		    ||'}';
 `
 
