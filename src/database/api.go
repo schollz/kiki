@@ -244,12 +244,7 @@ func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 		text = self.jsonFormatting(text)
 
 		var post ApiBasicPost
-		// err = json.Unmarshal([]byte(text), &post)
-		// if nil != err {
-		// 	return posts, err
-		// }
-		err = post.Unmarshal(text)
-		if nil != err {
+		if err = post.Unmarshal(text); nil != err {
 			return posts, err
 		}
 
@@ -309,14 +304,9 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, e
 		text = self.jsonFormatting(text)
 
 		var post ApiBasicPost
-		err = post.Unmarshal(text)
-		if nil != err {
+		if err = post.Unmarshal(text); nil != err {
 			return posts, err
 		}
-		// err = json.Unmarshal([]byte(text), &post)
-		// if nil != err {
-		// 	return posts, err
-		// }
 
 		posts = append(posts, post)
 	}
@@ -369,14 +359,9 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
 		text = self.jsonFormatting(text)
 
 		var post ApiBasicPost
-		err = post.Unmarshal(text)
-		if nil != err {
+		if err = post.Unmarshal(text); nil != err {
 			return posts, err
 		}
-		// err = json.Unmarshal([]byte(text), &post)
-		// if nil != err {
-		// 	return posts, err
-		// }
 
 		posts = append(posts, post)
 	}
@@ -424,15 +409,9 @@ func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
 		}
 
 		text = self.jsonFormatting(text)
-		err = user.Unmarshal(text)
-		if nil != err {
+		if err = user.Unmarshal(text); nil != err {
 			return user, err
 		}
-		// err = json.Unmarshal([]byte(text), &user)
-		// if nil != err {
-		// 	return user, err
-		// }
-
 	}
 
 	return user, err
