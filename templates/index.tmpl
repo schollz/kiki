@@ -238,7 +238,7 @@
           <h4>Blocked ({{ len .User.Blocked }})</h4>
           <ol class="list-unstyled">
             {{ range .User.Blocked }}
-            <li><small>{{ . }}</small></li>
+            <li><div class="publickey"><small>{{ . }}</small></div></li>
             {{ end }}
           </ol>
         </div>
