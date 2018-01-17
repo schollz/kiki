@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -31,13 +30,6 @@ func BenchmarkGetIDs(b *testing.B) {
 	}
 }
 
-func BenchmarkGetPosts2(b *testing.B) {
-	api := Setup(".", "kiki.db")
-	for i := 0; i < b.N; i++ {
-		api.GetBasicPosts2()
-	}
-}
-
 func TestGetVersions(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	s, err := api.GetAllVersions("alskdjflkasjdf")
@@ -58,10 +50,6 @@ func TestGettingPosts(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	e, err := api.GetBasicPosts()
 	assert.Nil(t, err)
-	e2, err := api.GetBasicPosts2()
-	assert.Nil(t, err)
-	fmt.Println(len(e), len(e2))
-	assert.Equal(t, len(e2), len(e))
 }
 
 func TestOpenClose(t *testing.T) {
