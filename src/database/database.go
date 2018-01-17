@@ -598,12 +598,12 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 }
 
 // deleteUser will delete everything except the ActionErases
-func (d *database) deleteUser(publicKey string) (err error) {
+func (d *database) deleteUsers() (err error) {
 	tx, err := d.db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "deleteUser")
 	}
-	query := "DELETE from letters WHERE sender == ? AND letter_purpose != '" + purpose.ActionErase + "';"
+	query := "DELETE FROM letters WHERE sender IN (SELECT sender FROM letters WHERE letter_purpose == '" + purpose.ActionErase + "');"
 	log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -611,7 +611,7 @@ func (d *database) deleteUser(publicKey string) (err error) {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(publicKey)
+	_, err = stmt.Exec()
 	if err != nil {
 		return errors.Wrap(err, "deleteUser")
 	}

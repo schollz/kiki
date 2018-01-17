@@ -749,12 +749,12 @@ func (api DatabaseAPI) DeleteOldActions(publicKey string) (err error) {
 	return
 }
 
-// DeleteProfile will delete everything for a user except the ActionErase
-func (api DatabaseAPI) DeleteProfile(publicKey string) (err error) {
+// DeleteProfiles will delete everything for all users that have submitted an action-erase
+func (api DatabaseAPI) DeleteProfiles() (err error) {
 	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
 	defer db.Close()
-	return db.deleteUser(publicKey)
+	return db.deleteUsers()
 }

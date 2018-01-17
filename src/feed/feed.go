@@ -196,6 +196,13 @@ func (f Feed) UpdateEverything() {
 	if err != nil {
 		f.logger.Log.Warn(err)
 	}
+
+	// erase erased profiles
+	err = f.db.DeleteProfiles()
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
+
 }
 
 // ProcessLetter will determine where to put the letter
@@ -387,16 +394,6 @@ func (f Feed) UnsealLetters() (err error) {
 		if err != nil {
 			f.logger.Log.Error(err)
 			continue
-		}
-
-		// perform all the actions of the opened envelope
-		switch ue.Letter.Purpose {
-		case purpose.ActionErase:
-			err = f.db.DeleteProfile(ue.Sender.Public)
-			if err != nil {
-				f.logger.Log.Error(err)
-			}
-		default:
 		}
 	}
 

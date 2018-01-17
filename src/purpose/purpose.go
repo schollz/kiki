@@ -36,7 +36,7 @@ var (
 )
 
 func Valid(purpose string) bool {
-	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, ActionFollow, ActionName, ActionBlock, ActionProfile, ActionLike, ActionImage} {
+	for _, p := range []string{ShareJPG, SharePNG, ShareText, ShareKey, ActionFollow, ActionName, ActionBlock, ActionProfile, ActionLike, ActionImage, ActionErase} {
 		if purpose == p {
 			return true
 		}
