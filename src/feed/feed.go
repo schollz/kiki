@@ -490,6 +490,7 @@ type ShowFeedParameters struct {
 }
 
 func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
+	t := time.Now()
 	var envelopes []letter.Envelope
 	if p.ID != "" {
 		envelopes = make([]letter.Envelope, 1)
@@ -520,6 +521,7 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		i++
 	}
 	posts = posts[:i]
+	f.logger.Log.Info(time.Since(t))
 	return
 }
 
