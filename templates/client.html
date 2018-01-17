@@ -627,6 +627,39 @@ app.Client = new KiKiClient(app.Api);
         $("img:not(.img-fluid)").addClass("img-fluid");
       }
       editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
+
+
+
+
+
+
+      // SCROLL TO TOP
+      $('body').append(
+          $('<div>', {id: 'toTop'})
+                .css({
+                    'position': 'fixed',
+                    'bottom': '20px',
+                    'right': '40px',
+                    'cursor': 'pointer',
+                    'display': 'none'
+                })
+                .addClass('btn btn-info')
+                .append(
+                    $('<i>').addClass('fa fa-chevron-up')
+                ).on('click', function(){
+                    $("html, body").animate({ scrollTop: 0 }, 600);
+                })
+      );
+        $(window).scroll(function () {
+            if ($(this).scrollTop() != 0) {
+                $('#toTop').fadeIn();
+            } else {
+                $('#toTop').fadeOut();
+            }
+        });
+
+
+
     });
   </script>
 </body>
