@@ -16,6 +16,16 @@
   <link href="/static/toastr.css" rel="stylesheet" />
   <link rel="stylesheet" href="/static/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
   <link href="/static/bootstrap.medium.css" rel="stylesheet" />
+
+
+  <style>
+    .recipient {
+        margin-left: 2px;
+        margin-right: 2px;
+        font-size: 12px !important;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -234,10 +244,22 @@ KiKiApi.prototype.fetchPostComments = function(post_id, callback) {
     });
 }
 
+KiKiApi.prototype.fetchUser = function(user_id, callback) {
+    var self = this;
+    $.ajax({
+        url: "/api/v1/user/"+user_id,
+        method: "GET",
+        error: self.onError(null, callback),
+        success: self.onSuccess(null, callback)
+    });
+}
+
+
 
 var KiKiClient = function(api){
     this.api = api;
     this.posts = [];
+    this.users = {};
     this.$el = $("#posts");
     this.init();
 }
@@ -246,6 +268,7 @@ KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
     // $('div[post_id="'+post_id'"] .post-comments')
     this.api.fetchPostComments(post_id, function(err, res){
         if (err) throw err;
+        // recursive build
         console.log(res.data.posts);
     });
 };
@@ -290,18 +313,31 @@ KiKiClient.prototype.buildPostUi = function(post) {
                         )
                     ),
 
-                    $("<img>", {src:"/img/POSTUSERIMAGE"}).addClass("align-middle profile-pic"),
+                    $("<img>", {
+                        owner_id: post.owner_id
+                    }).addClass("align-middle profile-pic"),
                     $("<a>",{
                         'href':"#!",
-                        'data-name': post.owner_name,
-                        'data-image': "/img/POSTUSERIMAGE",
+                        'data-name': post.owner_name || post.owner_id,
+                        // 'data-image': "/img/POSTUSERIMAGE",
                         'data-publickey': post.owner_id,
-                        'data-content': "POSTUSERPROFILE"
+                        // 'data-content': "POSTUSERPROFILE"
                     }).addClass("activatenamemodal").append(
                          post.owner_name || post.owner_id
                     ),
 
-                    "to" + post.recipients,
+                    " to ",
+                    (function(){
+                        var elems = [];
+                        for (var i=0; i<post.recipients.length; i++) {
+                            elems.push(
+                                $("<span>", {
+                                    owner_id: post.recipients[i]
+                                }).addClass('recipient').append(post.recipients[i])
+                            );
+                        }
+                        return elems;
+                    })(),
                     "<br>",
                     $("<span>").addClass('text-muted').append(
                         $('<a>', {href:'/?id='+post.id}).append(
@@ -312,13 +348,7 @@ KiKiClient.prototype.buildPostUi = function(post) {
 
                 $('<hr>'),
                 $('<div>', {id:post.id}).append(post.content),
-                $('<div>').addClass('post-comments').append(
-                    (function(){
-                        if (0 == post.num_comments) return;
-                        self.buildPostCommentsUi(post.id);
-                        return;
-                    })()
-                )
+                $('<div>').addClass('post-comments')
             )
 
 
@@ -326,11 +356,47 @@ KiKiClient.prototype.buildPostUi = function(post) {
     );
 }
 
-KiKiClient.prototype.buildPostsUi = function() {
+KiKiClient.prototype.addUserId = function(user_id) {
+    if (!this.users[user_id]) {
+        this.users[user_id] = null;
+    }
+}
+
+KiKiClient.prototype.buildPostsUi = function(callback) {
     for (var i=0; i<this.posts.length; i++) {
         this.$el.append(
             this.buildPostUi(this.posts[i])
         );
+
+        if (0 != this.posts[i].num_comments) {
+            this.buildPostCommentsUi(this.posts[i].id);
+        }
+
+        this.addUserId(this.posts[i].owner_id);
+
+        if (this.posts[i].recipients) {
+            for (var j=0; j<this.posts[i].recipients.length; j++) {
+                this.addUserId(this.posts[i].recipients[j]);
+            }
+        }
+
+    }
+
+    this.buildUsersUi();
+}
+
+KiKiClient.prototype.buildUsersUi = function() {
+    var self = this;
+    for (var i in this.users) {
+        if (!this.users[i]) {
+            this.api.fetchUser(i, function(err,res){
+                if (err) throw err;
+                $('img.profile-pic[owner_id="'+res.data.user.public_key+'"]').attr('src', '/img/'+res.data.user.image);
+                $('span.recipient[owner_id="'+res.data.user.public_key+'"]').text(
+                    res.data.user.name || res.data.user.public_key
+                );
+            });
+        }
     }
 }
 
