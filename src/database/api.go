@@ -1,7 +1,7 @@
 package database
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -194,8 +194,8 @@ func (self DatabaseAPI) postJsonSql() string {
 }
 
 // json1 needs to be loaded...
-func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
-	var posts []letter.ApiBasicPost
+func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -243,8 +243,12 @@ func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 
 		text = self.jsonFormatting(text)
 
-		var post letter.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &post)
+		var post ApiBasicPost
+		// err = json.Unmarshal([]byte(text), &post)
+		// if nil != err {
+		// 	return posts, err
+		// }
+		err = post.Unmarshal(text)
 		if nil != err {
 			return posts, err
 		}
@@ -255,8 +259,8 @@ func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 	return posts, nil
 }
 
-func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasicPost, error) {
-	var posts []letter.ApiBasicPost
+func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -304,11 +308,15 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasic
 
 		text = self.jsonFormatting(text)
 
-		var post letter.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &post)
+		var post ApiBasicPost
+		err = post.Unmarshal(text)
 		if nil != err {
 			return posts, err
 		}
+		// err = json.Unmarshal([]byte(text), &post)
+		// if nil != err {
+		// 	return posts, err
+		// }
 
 		posts = append(posts, post)
 	}
@@ -316,8 +324,8 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasic
 	return posts, nil
 }
 
-func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, error) {
-	var posts []letter.ApiBasicPost
+func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -360,11 +368,15 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 
 		text = self.jsonFormatting(text)
 
-		var post letter.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &post)
+		var post ApiBasicPost
+		err = post.Unmarshal(text)
 		if nil != err {
 			return posts, err
 		}
+		// err = json.Unmarshal([]byte(text), &post)
+		// if nil != err {
+		// 	return posts, err
+		// }
 
 		posts = append(posts, post)
 	}
@@ -372,8 +384,8 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 	return posts, nil
 }
 
-func (self DatabaseAPI) GetUserForApi(user_id string) (letter.ApiUser, error) {
-	var user letter.ApiUser
+func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
+	var user ApiUser
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -412,11 +424,14 @@ func (self DatabaseAPI) GetUserForApi(user_id string) (letter.ApiUser, error) {
 		}
 
 		text = self.jsonFormatting(text)
-
-		err = json.Unmarshal([]byte(text), &user)
+		err = user.Unmarshal(text)
 		if nil != err {
 			return user, err
 		}
+		// err = json.Unmarshal([]byte(text), &user)
+		// if nil != err {
+		// 	return user, err
+		// }
 
 	}
 
