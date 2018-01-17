@@ -57,17 +57,11 @@ func handleLetter(c *gin.Context) (err error) {
 
 // GET /ping
 func handlePing(c *gin.Context) {
-	signature, err := f.RegionKey.Signature(f.RegionKey)
-	personalSignature, err2 := f.PersonalKey.Signature(f.RegionKey)
-	if err != nil || err2 != nil {
-		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem signing"})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "pong", "region_key": f.RegionKey.Public, "region_signature": signature, "personal_key": f.PersonalKey.Public, "personal_signature": personalSignature})
-	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "pong"})
 }
 
-// POST /ping
-func handlePostPing(c *gin.Context) {
+// POST /handshake
+func handleHandshake(c *gin.Context) {
 	var p feed.Response
 	err := c.BindJSON(&p)
 	if err != nil {

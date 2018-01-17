@@ -156,7 +156,7 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/api/v1/friends", func(c *gin.Context) {
+	r.GET("/api/v1/friendsrout", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{
@@ -176,7 +176,7 @@ func Run() (err error) {
 		}
 	})
 	r.GET("/ping", handlePing)
-	r.POST("/ping", handlePostPing)
+	r.POST("/handshake", handleHandshake)
 	r.GET("/img/:id", handleImage)
 	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
 	r.OPTIONS("/letter", handlePing)       // post to put in letter (local only)
@@ -194,7 +194,7 @@ func Run() (err error) {
 	publicRouter := gin.New()
 	publicRouter.Use(MiddleWareHandler(), gin.Recovery())
 	publicRouter.GET("/ping", handlePing) // PING a kiki server to see if it is available
-	publicRouter.POST("/ping", handlePostPing)
+	publicRouter.POST("/ping", handleHandshake)
 	publicRouter.GET("/list", handleList)             // GET list of all envelope IDs
 	publicRouter.POST("/envelope", handlerEnvelope)   // post to put into database (public)
 	publicRouter.GET("/download/:id", handleDownload) // download a specific envelope

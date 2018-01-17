@@ -831,7 +831,7 @@ func (f Feed) PingKikiInstance(address string) (err error) {
 	}
 	bPayload, _ := json.Marshal(payload)
 	body := bytes.NewReader(bPayload)
-	resp, err := client.Post(address+"/ping", "application/json", body)
+	resp, err := client.Post(address+"/handshake", "application/json", body)
 	if err != nil {
 		return
 	}
