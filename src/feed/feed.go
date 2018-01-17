@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/microcosm-cc/bluemonday"
+
 	"github.com/pkg/errors"
 	cache "github.com/robfig/go-cache"
 	strip "github.com/schollz/html-strip-tags-go"
@@ -302,6 +304,8 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 	l.Content = newHTML
 	if l.Purpose == purpose.ShareText {
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
+		p := bluemonday.UGCPolicy()
+		l.Content = p.Sanitize(l.Content)
 	}
 
 	// remove tags from name change
