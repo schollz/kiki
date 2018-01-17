@@ -163,6 +163,14 @@ func (d *database) MakeTables() (err error) {
 		return
 	}
 
+	// indices
+	sqlStmt = `CREATE INDEX idx_purpose ON letters(sender,letter_purpose);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables, letters")
+		return
+	}
+
 	return
 }
 
@@ -585,6 +593,32 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 	err = tx.Commit()
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldestPost")
+	}
+	return
+}
+
+// deleteUser will delete everything except the ActionErases
+func (d *database) deleteUser(publicKey string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+	query := "DELETE from letters WHERE sender == ? AND letter_purpose != '" + purpose.ActionErase + "';"
+	log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(publicKey)
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
 	}
 	return
 }

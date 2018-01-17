@@ -334,6 +334,10 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	}
 	f.servers.RUnlock()
 
+	// check if the storage limits are exceeded for this envelope
+	// and then only accept if it is a newer envelope
+	// TODO
+
 	// check if envelope already exists
 	_, errGet := f.GetEnvelope(e.ID)
 	if errGet == nil {

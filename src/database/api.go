@@ -154,7 +154,7 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	// should not be empty
 	// should not be replaced
 	// should not be a reply
-	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
+	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE leGetBasicPostLatesttter_replaces != '') AND letter_replyto == '' ORDER BY time DESC")
 }
 
 func (api DatabaseAPI) GetBasicPostsForUser(publickey string) (e []letter.Envelope, err error) {
@@ -168,6 +168,30 @@ func (api DatabaseAPI) GetBasicPostsForUser(publickey string) (e []letter.Envelo
 	// should not be replaced
 	// should not be a reply
 	return db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND sender == ? AND letter_content != '' AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC;", publickey)
+}
+
+// GetBasicPostLatest returns the latest post for a person
+func (api DatabaseAPI) GetBasicPostLatest(publickey string) (e letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	// purpose should be to share text
+	// should not be empty
+	// should not be replaced
+	// should not be a reply
+	es, err := db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND sender == ? ORDER BY time DESC LIMIT 1;", publickey)
+	if err != nil {
+		return
+	}
+	if len(es) == 0 {
+		err = errors.New("no posts")
+	} else {
+		e = es[0]
+	}
+	e = es[0]
+	return
 }
 
 // json1 needs to be loaded...
