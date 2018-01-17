@@ -515,12 +515,12 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 }
 
 func (f Feed) MakePostWithComments(e letter.Envelope) (post Post) {
-	postInterface, found := f.caching.Get(e.ID)
-	if found {
-		f.logger.Log.Debug("using cache")
-		post = postInterface.(Post)
-		return
-	}
+	// postInterface, found := f.caching.Get(e.ID)
+	// if found {
+	// 	f.logger.Log.Debug("using cache")
+	// 	post = postInterface.(Post)
+	// 	return
+	// }
 	basicPost := f.MakePost(e)
 	post = Post{
 		Post:     basicPost,
