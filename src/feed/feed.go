@@ -351,7 +351,6 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 		return
 	}
 
-	// TODO: Determine if this envelope will overflow the limits, and if so, then delete an envelope also
 	return
 }
 
@@ -388,6 +387,16 @@ func (f Feed) UnsealLetters() (err error) {
 		if err != nil {
 			f.logger.Log.Error(err)
 			continue
+		}
+
+		// perform all the actions of the opened envelope
+		switch ue.Letter.Purpose {
+		case purpose.ActionErase:
+			err = f.db.DeleteProfile(ue.Sender.Public)
+			if err != nil {
+				f.logger.Log.Error(err)
+			}
+		default:
 		}
 	}
 
@@ -491,7 +500,8 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	} else if p.Search != "" {
 
 	} else {
-		// reteurn all envelopes
+		f.logger.Log.Debug("getting all envelopes")
+		// return all envelopes
 		envelopes, err = f.db.GetBasicPosts()
 	}
 	if err != nil {
@@ -946,6 +956,6 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 }
 
 func (f Feed) TestStuff() {
-	err := f.db.DeleteOldActions(f.PersonalKey.Public)
-	f.logger.Log.Debug(err)
+	posts, _ := f.ShowFeed(ShowFeedParameters{})
+	fmt.Println(posts)
 }

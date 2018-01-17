@@ -550,7 +550,7 @@ func (d *database) deleteLettersFromSender(sender string) (err error) {
 		return errors.Wrap(err, "deleteLettersFromSender")
 	}
 	query := "DELETE FROM letters WHERE sender == ?"
-	log.Debug(query)
+	log.Debug(query, sender)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteLettersFromSender")
