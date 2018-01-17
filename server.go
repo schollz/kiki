@@ -147,11 +147,17 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/api/v1/user", func(c *gin.Context) {
+	r.GET("/api/v1/user/:user_id", func(c *gin.Context) {
+		user_id := c.Param("user_id")
+		user, err := f.ShowUserForApi(user_id)
+		if err != nil {
+			respondWithJSON(c, "", err)
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data": gin.H{
-				"user": f.GetUser(),
+				"user": user,
 			},
 		})
 	})

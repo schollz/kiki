@@ -16,6 +16,57 @@
   <link href="/static/toastr.css" rel="stylesheet" />
   <link rel="stylesheet" href="/static/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
   <link href="/static/bootstrap.medium.css" rel="stylesheet" />
+
+
+  <style>
+    #posts {
+        font-size: 16px;
+    }
+
+    .post-datetime {
+        font-size: 14px;
+    }
+
+    #posts img.profile-pic {
+        max-width: 25px;
+        max-height: 25px;
+    }
+
+    #posts .card-body {
+        padding: 0.75rem;
+    }
+
+    #posts .card {
+        margin-bottom: 0.75rem;
+    }
+
+    .recipient {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+
+    .post-comments {
+        padding-left: 16px;
+    }
+
+    .post-container {
+        width: 100%;
+    }
+
+    /*.post-header {
+        background-color: lightgrey;
+        margin-left: -14px;
+        padding-left: 14px;
+        margin-right: -14px;
+        padding-right: 14px;
+        margin-top: -14px;
+        padding-top: 14px;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+    }*/
+
+  </style>
+
 </head>
 
 <body>
@@ -130,7 +181,7 @@
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
             <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="assign-profile" data-usecontent="current-profile">Edit profile</a></li>
             <li><a href="#"  class="editmodal" data-title="Update image" data-purpose="assign-image" data-makecontent="Drag and drop an image...">Upload image</a></li>
-            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="assign-name" data-usecontent="current-name">Change name</a></li>
+            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name">Change name</a></li>
           </ol>
         </div>
         <div class="sidebar-module">
@@ -234,103 +285,234 @@ KiKiApi.prototype.fetchPostComments = function(post_id, callback) {
     });
 }
 
+KiKiApi.prototype.fetchUser = function(user_id, callback) {
+    var self = this;
+    $.ajax({
+        url: "/api/v1/user/"+user_id,
+        method: "GET",
+        error: self.onError(null, callback),
+        success: self.onSuccess(null, callback)
+    });
+}
+
+
 
 var KiKiClient = function(api){
     this.api = api;
     this.posts = [];
+    this.users = {};
     this.$el = $("#posts");
     this.init();
 }
 
+KiKiClient.prototype.collectUsersFromPost = function(post) {
+    this.addUser(post.owner_id);
+    if (post.recipients) {
+        for (var i=0; i<post.recipients.length; i++) {
+            this.addUser(post.recipients[i]);
+        }
+    }
+}
+
 KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
-    // $('div[post_id="'+post_id'"] .post-comments')
+    var self = this;
     this.api.fetchPostComments(post_id, function(err, res){
         if (err) throw err;
-        console.log(res.data.posts);
+        // recursive build
+        var post_comments = [];
+        $('.post-container[post_id="'+post_id+'"] .post-comments').html('');
+        $('.post-container[post_id="'+post_id+'"] .post-comments').append(
+            (function(){
+                var elems = [];
+                for (var i=0; i<res.data.posts.length; i++) {
+                    var post = res.data.posts[i];
+                    if (0 != post.num_comments) {
+                        post_comments.push(post.id);
+                    }
+
+                    self.collectUsersFromPost(post);
+
+                    elems.push(
+                        $("<div>", {post_id: post.id}).addClass('post-container').append(
+                            $('<div>').addClass('col-12').append(
+                                self.buildPostElem(post)
+                            )
+                        )
+                    );
+                }
+                return elems;
+            })()
+        );
+
+        // fetch posts comment comments
+        for (var i=0; i<post_comments.length; i++) {
+            self.buildPostCommentsUi(post_comments[i]);
+        }
+
+        self.buildUsersUi();
+
     });
 };
 
-KiKiClient.prototype.buildPostUi = function(post) {
-    var self = this;
-    return $("<div>", {post_id: post.id}).addClass("card").append(
-        $("<div>").addClass("card-body").append(
-            $("<div>").addClass("blog-post").append(
-
-                $("<p>").addClass("blog-post-meta").append(
-                    $("<span>").addClass("float-right").append(
-                        "&nbsp;",
-                        $("<a>", {
-                            'href': "#!",
-                            'title': "Reply to USERNAME",
-                            'data-title': "Reply to USERNAME",
-                            'data-replyto': post.id,
-                            'data-purpose':"share-text"
-                        }).addClass("editmodal").append(
-                            $('<i>').addClass("fas fa-reply")
-                        ),
-                        "&nbsp;",
-                        $("<a>", {
-                            'href': "#!",
-                            'title': "Edit post",
-                            'data-title':"Edit post",
-                            'data-usecontent':post.id,
-                            'data-replaces':post.id,
-                            'data-purpose':"share-text"
-
-                        }).addClass("editmodal").append(
-                            $("<i>").addClass("fas fa-edit")
-                        ),
-                        "&nbsp;",
-                        $("<a>",  {
-                            'href': "#!",
-                            "data-id":post.id
-                        }).addClass("likebutton").append(
-                            $("<i>").addClass("fas fa-heart"),
-                            "x"+(post.Likes||1)
-                        )
-                    ),
-
-                    $("<img>", {src:"/img/POSTUSERIMAGE"}).addClass("align-middle profile-pic"),
-                    $("<a>",{
-                        'href':"#!",
-                        'data-name': "POSTUSERNAME",
-                        'data-image': "/img/POSTUSERIMAGE",
-                        'data-publickey': post.owner_id,
-                        'data-content': "POSTUSERPROFILE"
-                    }).addClass("activatenamemodal").append(
-                         post.username || post.owner_id
-                    ),
-
-                    "to" + post.recipients,
-                    "<br>",
-                    $("<span>").addClass('text-muted').append(
-                        $('<a>', {href:'/?id='+post.id}).append(
-                            new Date(post.timestamp*1000)
-                        )
-                    )
+KiKiClient.prototype.buildPostElem = function(post) {
+    // return $("<div>").addClass("blog-post").append(
+        // $("<div>").addClass("blog-post-meta").append(
+    return $("<div>").append(
+        $("<div>").addClass("post-header").append(
+            $("<span>").addClass("float-right").append(
+                "&nbsp;",
+                $("<a>", {
+                    'href': "#!",
+                    'title': "Reply to " + post.owner_name,
+                    'data-title': "Reply to " + post.owner_name,
+                    'data-replyto': post.id,
+                    'data-purpose':"share-text"
+                }).addClass("editmodal").append(
+                    $('<i>').addClass("fas fa-reply")
                 ),
+                "&nbsp;",
+                $("<a>", {
+                    'href': "#!",
+                    'title': "Edit post",
+                    'data-title':"Edit post",
+                    'data-usecontent':post.id,
+                    'data-replaces':post.id,
+                    'data-purpose':"share-text"
 
-                $('<hr>'),
-                $('<div>', {id:post.id}).append(post.content),
-                $('<div>').addClass('post-comments').append(
-                    (function(){
-                        if (0 == post.num_comments) return;
-                        self.buildPostCommentsUi(post.id);
-                        return;
-                    })()
+                }).addClass("editmodal").append(
+                    $("<i>").addClass("fas fa-edit")
+                ),
+                "&nbsp;",
+                $("<a>",  {
+                    'href': "#!",
+                    "data-id":post.id
+                }).addClass("likebutton").append(
+                    $("<i>").addClass("fas fa-heart"),
+                    "x"+(post.Likes||0)
+                )
+            ),
+
+            $("<img>", {
+                owner_id: post.owner_id
+            }).addClass("align-middle profile-pic"),
+
+            // activatenamemodal
+            $("<a>",{
+                'href':"#!",
+                'data-publickey': post.owner_id,
+            }).addClass("activatenamemodal").append(
+                 post.owner_name || post.owner_id
+            ).on('click', function() {
+                var user = app.Client.getUser($(this).data('publickey'));
+                if (user) {
+                    $("#modalNameName").text(user.name || user.public_key);
+
+                    $("#modalNamePublicKey").text("");
+                    if (user.name) {
+                        $("#modalNamePublicKey").text(user.public_key);
+                    }
+
+                    $("#modalNameContent").html(user.profile);
+
+                    $("#modalNameImage").attr("src", null);
+                    if (user.image && "" != user.image) {
+                        $("#modalNameImage").attr("src", '/img/'+user.image);
+                    }
+
+                    $("#nameModal").modal();
+                    $("#followButton").attr("data-publickey", user.public_key);
+                }
+            }),
+            //.end
+
+            // recipients
+            " to ",
+            (function(){
+                var elems = [];
+                for (var i=0; i<post.recipients.length; i++) {
+                    elems.push(
+                        $("<span>", {
+                            owner_id: post.recipients[i]
+                        }).addClass('recipient').append(post.recipients[i])
+                    );
+                }
+                return elems;
+            })(),
+            //.end
+
+            "<br>",
+            $("<span>").addClass('text-muted post-datetime').append(
+                $('<a>', {href:'/?id='+post.id}).append(
+                    new Date(post.timestamp*1000)
                 )
             )
+        ),
+
+        // $('<hr>'),
+        $('<div>', {id:post.id}).append(post.content),
+        $('<div>').addClass('post-comments row')
+    );
+}
 
 
+KiKiClient.prototype.buildPostUi = function(post) {
+    var self = this;
+    return $("<div>", {post_id: post.id}).addClass("card post-container").append(
+        $("<div>").addClass("card-body").append(
+            self.buildPostElem(post)
         )
     );
 }
 
-KiKiClient.prototype.buildPostsUi = function() {
-    for (var i=0; i<this.posts.length; i++) {
-        this.$el.append(
-            this.buildPostUi(this.posts[i])
+KiKiClient.prototype.addUser = function(user_id, user_data) {
+    if (!this.users[user_id]) {
+        this.users[user_id] = user_data;
+    } else if (user_data) {
+        this.users[user_id] = user_data;
+    }
+    // add/update ui info
+    if (user_data) {
+        if (user_data && "" != user_data.image) {
+            $('img.profile-pic[owner_id="'+user_data.public_key+'"]').attr('src', '/img/'+user_data.image);
+        }
+        $('span.recipient[owner_id="'+user_data.public_key+'"]').text(
+            user_data.name || user_data.public_key
         );
+    }
+}
+
+KiKiClient.prototype.getUser = function(user_id) {
+    if (!this.users[user_id]) return null;
+    return this.users[user_id];
+}
+
+KiKiClient.prototype.buildPostsUi = function(callback) {
+    for (var i=0; i<this.posts.length; i++) {
+        var post = this.posts[i];
+        this.$el.append(
+            this.buildPostUi(post)
+        );
+
+        if (0 != post.num_comments) {
+            this.buildPostCommentsUi(post.id);
+        }
+
+        this.collectUsersFromPost(post);
+    }
+
+    this.buildUsersUi();
+}
+
+KiKiClient.prototype.buildUsersUi = function() {
+    var self = this;
+    for (var i in this.users) {
+        if (!this.users[i]) {
+            this.api.fetchUser(i, function(err,res){
+                if (err) throw err;
+                var user_data = res.data.user;
+                self.addUser(user_data.public_key, user_data);
+            });
+        }
     }
 }
 
@@ -409,6 +591,8 @@ app.Client = new KiKiClient(app.Api);
         console.log(letter);
         app.Api.submitLetter(letter);
       });
+
+
       $(".editmodal").click(function() {
         $("#writingModal").modal();
         console.log($(this).data('title'));
@@ -437,15 +621,8 @@ app.Client = new KiKiClient(app.Api);
         }
         $("#letterPurpose").val($(this).data("purpose"));
       });
-      $(".activatenamemodal").click(function() {
-        console.log($(this).data("name"));
-        $("#modalNameName").text($(this).data("name"));
-        $("#modalNamePublicKey").text($(this).data("publickey"));
-        $("#modalNameContent").html($(this).data("content"));
-        $("#modalNameImage").attr("src",$(this).data("image"));
-        $("#nameModal").modal();
-        $("#followButton").attr("data-publickey", $(this).data("publickey"));
-      });
+
+
       $("#followButton").click(function() {
         console.log($(this).data("publickey"));
         // TODO: MAKE A FOLLOW!
@@ -454,6 +631,39 @@ app.Client = new KiKiClient(app.Api);
         $("img:not(.img-fluid)").addClass("img-fluid");
       }
       editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
+
+
+
+
+
+
+      // SCROLL TO TOP
+      $('body').append(
+          $('<div>', {id: 'toTop'})
+                .css({
+                    'position': 'fixed',
+                    'bottom': '20px',
+                    'right': '40px',
+                    'cursor': 'pointer',
+                    'display': 'none'
+                })
+                .addClass('btn btn-info')
+                .append(
+                    $('<i>').addClass('fa fa-chevron-up')
+                ).on('click', function(){
+                    $("html, body").animate({ scrollTop: 0 }, 600);
+                })
+      );
+        $(window).scroll(function () {
+            if ($(this).scrollTop() != 0) {
+                $('#toTop').fadeIn();
+            } else {
+                $('#toTop').fadeOut();
+            }
+        });
+
+
+
     });
   </script>
 </body>

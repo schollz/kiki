@@ -430,6 +430,11 @@ func (f Feed) GetUser(public ...string) (u User) {
 	return
 }
 
+func (self Feed) ShowUserForApi(user_id string) (database.ApiUser, error) {
+	user, err := self.db.GetUserForApi(user_id)
+	return user, err
+}
+
 // GetUserFriends returns detailed friend information
 func (f Feed) GetUserFriends() (u UserFriends) {
 	followers, following, friends := f.db.Friends(f.PersonalKey.Public)
@@ -534,17 +539,17 @@ func (f Feed) MakePostWithComments(e letter.Envelope) (post Post) {
 	return
 }
 
-func (self Feed) ShowPostsForApi() ([]letter.ApiBasicPost, error) {
+func (self Feed) ShowPostsForApi() ([]database.ApiBasicPost, error) {
 	posts, err := self.db.GetPostsForApi()
 	return posts, err
 }
 
-func (self Feed) ShowPostCommentsForApi(post_id string) ([]letter.ApiBasicPost, error) {
+func (self Feed) ShowPostCommentsForApi(post_id string) ([]database.ApiBasicPost, error) {
 	posts, err := self.db.GetPostCommentsForApi(post_id)
 	return posts, err
 }
 
-func (self Feed) ShowPostForApi(post_id string) ([]letter.ApiBasicPost, error) {
+func (self Feed) ShowPostForApi(post_id string) ([]database.ApiBasicPost, error) {
 	posts, err := self.db.GetPostForApi(post_id)
 	return posts, err
 }

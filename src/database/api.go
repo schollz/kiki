@@ -1,7 +1,7 @@
 package database
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -194,9 +194,32 @@ func (api DatabaseAPI) GetBasicPostLatest(publickey string) (e letter.Envelope, 
 	return
 }
 
+func (self DatabaseAPI) jsonFormatting(payload string) string {
+	payload = strings.Replace(payload, "\n", "", -1)
+	payload = strings.Replace(payload, "\"null\"", "null", -1)
+	return payload
+}
+
+func (self DatabaseAPI) postJsonSql() string {
+	return `
+		'{'||
+			'"id": "' ||  id ||'",'||
+			'"timestamp": ' || strftime('%s',time) ||','||
+			'"recipients": ' ||  letter_to ||','||
+			'"owner_id": "' ||  sender ||'",'||
+			'"owner_name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ltr.sender ORDER BY time DESC LIMIT 1), 'null') ||'",'||
+			'"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
+			'"reply_to": "' ||  letter_replyto ||'",'||
+			'"purpose":"' ||  letter_purpose ||'",'||
+			'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
+			'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
+		||'}'
+	`
+}
+
 // json1 needs to be loaded...
-func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
-	var posts []letter.ApiBasicPost
+func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -204,52 +227,9 @@ func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 	}
 	defer db.Close()
 
-	// query := `
-	// 	SELECT
-	// 	    json_array(
-	// 	        json_object(
-	// 	            'id', id,
-	// 	            'timestamp', strftime('%Y-%m-%dT%H:%M:%SZ',time),
-	// 	            'sender', sender,
-	// 	            'signature', signature,
-	// 	            'sealed_recipients', sealed_recipients,
-	// 	            'sealed_letter', sealed_letter,
-	// 	            'opened', opened,
-	//				'letter', json_object(
-	// 	            	'purpose', letter_purpose,
-	// 	            	'to', letter_to,
-	// 	            	'content', letter_content,
-	// 	            	'replaces', letter_replaces,
-	// 	            	'reply_to', letter_replyto
-	//				)
-	// 	        )
-	// 	    )
-	// 	FROM letters
-	// 	WHERE
-	// 	        letter_purpose = 'share-text'
-	// 	    AND
-	// 	        letter_content != ''
-	// 	    AND
-	// 	        id NOT IN (
-	// 	            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
-	// 	        )
-	// 	    AND letter_replyto == ''
-	// 	ORDER BY time DESC;
-	// `
-
 	query := `
 		SELECT
-	        '{'||
-	            '"id": "' ||  id ||'",'||
-	            '"timestamp": ' || strftime('%s',time) ||','||
-				'"recipients": ' ||  letter_to ||','||
-	            '"owner_id": "' ||  sender ||'",'||
-		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
-		        '"reply_to": "' ||  letter_replyto ||'",'||
-				'"purpose":"' ||  letter_purpose ||'",'||
-				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
-				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
-		    ||'}'
+	        ` + self.postJsonSql() + `
 		FROM letters AS ltr
 		WHERE
 				opened == 1
@@ -285,11 +265,10 @@ func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 			return posts, err
 		}
 
-		text = strings.Replace(text, "\n", "", -1)
+		text = self.jsonFormatting(text)
 
-		var post letter.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &post)
-		if nil != err {
+		var post ApiBasicPost
+		if err = post.Unmarshal(text); nil != err {
 			return posts, err
 		}
 
@@ -299,8 +278,8 @@ func (self DatabaseAPI) GetPostsForApi() ([]letter.ApiBasicPost, error) {
 	return posts, nil
 }
 
-func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasicPost, error) {
-	var posts []letter.ApiBasicPost
+func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -310,17 +289,7 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasic
 
 	query := `
 		SELECT
-	        '{'||
-	            '"id": "' ||  id ||'",'||
-	            '"timestamp": ' || strftime('%s',time) ||','||
-				'"recipients": ' ||  letter_to ||','||
-	            '"owner_id": "' ||  sender ||'",'||
-		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
-		        '"reply_to": "' ||  letter_replyto ||'",'||
-				'"purpose":"' ||  letter_purpose ||'",'||
-				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
-				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
-		    ||'}'
+			` + self.postJsonSql() + `
 		FROM letters AS ltr
 		WHERE
 				opened == 1
@@ -356,11 +325,10 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasic
 			return posts, err
 		}
 
-		text = strings.Replace(text, "\n", "", -1)
+		text = self.jsonFormatting(text)
 
-		var post letter.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &post)
-		if nil != err {
+		var post ApiBasicPost
+		if err = post.Unmarshal(text); nil != err {
 			return posts, err
 		}
 
@@ -370,8 +338,8 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]letter.ApiBasic
 	return posts, nil
 }
 
-func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, error) {
-	var posts []letter.ApiBasicPost
+func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -381,17 +349,7 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 
 	query := `
 		SELECT
-	        '{'||
-	            '"id": "' ||  id ||'",'||
-	            '"timestamp": ' || strftime('%s',time) ||','||
-				'"recipients": ' ||  letter_to ||','||
-	            '"owner_id": "' ||  sender ||'",'||
-		        '"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
-		        '"reply_to": "' ||  letter_replyto ||'",'||
-				'"purpose":"' ||  letter_purpose ||'",'||
-				'"likes": '|| (SELECT COUNT(id) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
-				'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
-		    ||'}'
+			` + self.postJsonSql() + `
 		FROM letters AS ltr
 		WHERE
 				opened == 1
@@ -422,11 +380,10 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 			return posts, err
 		}
 
-		text = strings.Replace(text, "\n", "", -1)
+		text = self.jsonFormatting(text)
 
-		var post letter.ApiBasicPost
-		err = json.Unmarshal([]byte(text), &post)
-		if nil != err {
+		var post ApiBasicPost
+		if err = post.Unmarshal(text); nil != err {
 			return posts, err
 		}
 
@@ -434,6 +391,54 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]letter.ApiBasicPost, er
 	}
 
 	return posts, nil
+}
+
+func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
+	var user ApiUser
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return user, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+	        '{'||
+	            '"public_key": "' ||  ? ||'",'||
+				'"name": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/name' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'",'||
+				'"profile": "' || IFNULL((SELECT replace(letter_content, '"',  '''') FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/profile' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'",'||
+				'"image": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/image' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'"'
+		    ||'}';
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return user, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(user_id, user_id, user_id, user_id)
+	if nil != err {
+		return user, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return user, err
+		}
+
+		text = self.jsonFormatting(text)
+		if err = user.Unmarshal(text); nil != err {
+			return user, err
+		}
+	}
+
+	return user, err
 }
 
 // GetKeys will return all the keys
