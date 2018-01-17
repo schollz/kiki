@@ -7,6 +7,13 @@
   }
 }
 
+.publickey {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 8rem;
+}
+
 img.img-fluid {
   padding-bottom: 1em;
 }
