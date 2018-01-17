@@ -41,11 +41,12 @@
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterReplaces" value="" />
+    <input type=hidden id="letterTo" value="" />
     <!-- begin medium modal -->
     <!-- Modal -->
     <div class="modal fade" id="writingModal" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
       <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content"  id="writingModalBody">
+        <div class="modal-content" id="writingModalBody">
           <div class="modal-header">
             <h5 class="modal-title" id="writingModalLabel"></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -63,13 +64,13 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-info">
+              <label class="btn btn-info" id="writingToSelfLabel">
                                         <input type="radio" name="options" id="writingToSelf" autocomplete="off">Self
                                     </label>
-              <label class="btn btn-info">
+              <label class="btn btn-info" id="writingToFriendsLabel">
                                         <input type="radio" name="options" id="writingToFriends" autocomplete="off"> Friends
                                     </label>
-              <label class="btn btn-info active">
+              <label class="btn btn-info active" id="writingToPublicLabel">
                                         <input type="radio" name="options" id="writingToPublic" autocomplete="off" checked> Public
                                     </label>
             </div>
@@ -96,7 +97,7 @@
                                 </span>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-info">Message</button>
+            <button type="button" class="btn btn-info editmodal" id="messageButton">Message</button>
             <a href="#!" id="filterButton"><button type="button" class="btn btn-info">Filter</button></a>
             <button type="button" class="btn btn-primary" id="followButton">Follow</button>
             <button type="button" class="btn btn-danger" id="blockButton">Block</button>
@@ -130,43 +131,39 @@
                 {{ .Post.Content }}
               </div>
               {{ if .Comments }}
-              <hr>
-                {{end}}
-              {{ range .Comments }}
-                <!-- simple comments -->
-                <div data-children=".item"  style="font-size:80%;">
-                  <!-- a single simple comment begins -->
-                  <div class="row">
-                    <div class="col-{{.Depth}}"></div>
-                    <div class="col-{{ minus 12 .Depth}}">
-                        <div class="item">
-                            <div class="row">
-                              <div class="col-12">
+              <hr> {{end}} {{ range .Comments }}
+              <!-- simple comments -->
+              <div data-children=".item" style="font-size:80%;">
+                <!-- a single simple comment begins -->
+                <div class="row">
+                  <div class="col-{{.Depth}}"></div>
+                  <div class="col-{{ minus 12 .Depth}}">
+                    <div class="item">
+                      <div class="row">
+                        <div class="col-12">
 
-                                <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
+                          <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
 
                                 <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
                               <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
-                            </span>
+                            </span> {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
+                          <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
 
-                                {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
-                                <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
-
-                              </div>
-                            </div>
-                            <div role="tabpanel">
-                              <p class="mb-3">
-                                <div id="{{ .ID }}">
-                                {{ .Content }}
-                              </div>
-                              </p>
-                            </div>
+                        </div>
+                      </div>
+                      <div role="tabpanel">
+                        <p class="mb-3">
+                          <div id="{{ .ID }}">
+                            {{ .Content }}
                           </div>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <!-- a single simple comment ends -->
                 </div>
-                <!-- end simple comments -->
+                <!-- a single simple comment ends -->
+              </div>
+              <!-- end simple comments -->
               {{ end }}
             </div>
           </div>
@@ -198,7 +195,7 @@
           <ol class="list-unstyled">
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
             <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">Edit profile</a></li>
-            <li><a href="#"  class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">Upload image</a></li>
+            <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">Upload image</a></li>
             <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name">Change name</a></li>
           </ol>
         </div>
@@ -227,20 +224,20 @@
           </ol>
         </div>
         <div class="sidebar-module">
-            <h4>Connections ({{ len .Connected }})</h4>
-            <ol class="list-unstyled">
-              {{ range .Connected }}
-              <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
-              {{ end }}
-            </ol>
+          <h4>Connections ({{ len .Connected }})</h4>
+          <ol class="list-unstyled">
+            {{ range .Connected }}
+            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
+            {{ end }}
+          </ol>
         </div>
         <div class="sidebar-module">
-            <h4>Blocked ({{ len .User.Blocked }})</h4>
-            <ol class="list-unstyled">
-              {{ range .User.Blocked }}
-              <li><small>{{ . }}</small></li>
-              {{ end }}
-            </ol>
+          <h4>Blocked ({{ len .User.Blocked }})</h4>
+          <ol class="list-unstyled">
+            {{ range .User.Blocked }}
+            <li><small>{{ . }}</small></li>
+            {{ end }}
+          </ol>
         </div>
 
 
@@ -265,59 +262,58 @@
   <script src="/static/medium-editor.min.js"></script>
   <script src="/static/toastr.min.js"></script>
   <script>
-  function submitLetter(letter, callback) {
+    function submitLetter(letter, callback) {
 
       function onError(data) {
-          toastr["error"](data.error, "Posting to KiKi")
+        toastr["error"](data.error, "Posting to KiKi")
       }
 
       $.ajax({
-          url: "/letter",
-          method: "POST",
-          data: JSON.stringify(letter),
-          contentType: "application/json",
-          error: function(xhr, status, err) {
-              try {
-                  var err_json = xhr.responseJSON.error;
-                  toastr["error"](err_json, "Posting to KiKi");
-                  callback && callback(new Error(err_json));
-              }
-              catch(error) {
-                  toastr["error"](err, "Posting to KiKi");
-                  callback && callback(err);
-              }
-          },
-          success: function(data, status, xhr) {
-              if ("ok" != data.status) {
-                  // hhtp headers
-                  callback && callback(new Error(data.error));
-                  return onError(data);
-              }
-              toastr["success"](data['message'], "Posting to KiKi");
-              callback && callback(null, data);
+        url: "/letter",
+        method: "POST",
+        data: JSON.stringify(letter),
+        contentType: "application/json",
+        error: function(xhr, status, err) {
+          try {
+            var err_json = xhr.responseJSON.error;
+            toastr["error"](err_json, "Posting to KiKi");
+            callback && callback(new Error(err_json));
+          } catch (error) {
+            toastr["error"](err, "Posting to KiKi");
+            callback && callback(err);
           }
+        },
+        success: function(data, status, xhr) {
+          if ("ok" != data.status) {
+            // hhtp headers
+            callback && callback(new Error(data.error));
+            return onError(data);
+          }
+          toastr["success"](data['message'], "Posting to KiKi");
+          callback && callback(null, data);
+        }
       });
 
-  }
+    }
 
 
-var KiKiApi = function() {}
+    var KiKiApi = function() {}
 
-KiKiApi.prototype.fetch = function(ajaxObj, callback){
-    $.ajax(ajaxObj);
-}
+    KiKiApi.prototype.fetch = function(ajaxObj, callback) {
+      $.ajax(ajaxObj);
+    }
 
-KiKiApi.prototype.onError = function(){}
+    KiKiApi.prototype.onError = function() {}
 
-KiKiApi.prototype.onSuccess = function(){}
+    KiKiApi.prototype.onSuccess = function() {}
 
-KiKiApi.prototype.submitLetter = function(letter, callback) {
+    KiKiApi.prototype.submitLetter = function(letter, callback) {
 
-}
+    }
 
-var app = {
-    Api: new KiKiApi()
-}
+    var app = {
+      Api: new KiKiApi()
+    }
 
 
 
@@ -375,11 +371,15 @@ var app = {
         if ($("#writingToFriends").is(":checked") == true) {
           letter["to"] = ["friends"];
         }
+        if ($("#letterTo").val() != "") {
+          letter["to"] = [$("#letterTo").val()];
+        }
         console.log(letter);
         submitLetter(letter);
-	      $("#writingModal").modal('hide');
+        $("#writingModal").modal('hide');
       });
       $(".editmodal").click(function() {
+        $("#nameModal").modal('hide');
         $("#writingModal").modal();
         console.log($(this).data('title'));
         $("#writingModalLabel").text($(this).data('title'));
@@ -390,7 +390,7 @@ var app = {
         if ($(this).data("usecontent")) {
           $(".editable").html($("#" + $(this).data("usecontent")).html())
         } else {
-          $(".editable").text("Write your post...");
+          $(".editable").text("Write your post");
         }
         if ($(this).data("makecontent")) {
           $(".editable").html($(this).data("makecontent"));
@@ -405,6 +405,17 @@ var app = {
         } else {
           $("#letterReplaces").val("");
         }
+        if ($(this).data("letterto")) {
+          $("#letterTo").val($(this).data("letterto"));
+          $("#writingToSelfLabel").hide();
+          $("#writingToFriendsLabel").hide();
+          $("#writingToPublicLabel").hide();
+        } else {
+          $("#letterTo").val("");
+          $("#writingToSelfLabel").show();
+          $("#writingToFriendsLabel").show();
+          $("#writingToPublicLabel").show();
+        }
         $("#letterPurpose").val($(this).data("purpose"));
       });
       $(".activatenamemodal").click(function(event) {
@@ -413,11 +424,16 @@ var app = {
         $("#modalNameName").text($(this).data("name"));
         $("#modalNamePublicKey").text($(this).data("publickey"));
         $("#modalNameContent").html($(this).data("content"));
-        $("#modalNameImage").attr("src",$(this).data("image"));
+        $("#modalNameImage").attr("src", $(this).data("image"));
         $("#nameModal").modal();
         $("#followButton").attr("data-publickey", $(this).data("publickey"));
         $("#blockButton").attr("data-publickey", $(this).data("publickey"));
-        $("#filterButton").attr("href", "/?user="+$(this).data("publickey"));
+        $("#filterButton").attr("href", "/?user=" + $(this).data("publickey"));
+        $("#messageButton").attr("data-publickey", $(this).data("publickey"));
+        $("#messageButton").attr("data-name", $(this).data("name"));
+        $("#messageButton").attr("data-letterto", $(this).data("publickey"));
+        $("#messageButton").attr("data-title", "Message to " + $(this).data("name"));
+        $("#messageButton").attr("data-purpose", "share-text");
       });
       $("#followButton").click(function(event) {
         console.log($(this).data("publickey"));
