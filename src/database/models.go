@@ -30,7 +30,7 @@ type ApiUser struct {
 	Followers []string `json:"followers"`
 	Following []string `json:"following"`
 	Blocked   []string `json:"blocked"`
-	// Friends
+	Friends   []string `json:"friends"`
 }
 
 func (self *ApiUser) Unmarshal(text string) error {

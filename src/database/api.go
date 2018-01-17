@@ -412,7 +412,14 @@ func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
 				'"image": "' || IFNULL((SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == 'action-assign/image' AND sender == ? ORDER BY time DESC LIMIT 1), 'null') ||'",'||
 				'"followers": [' || IFNULL((SELECT '"'||sender||'",' FROM letters WHERE letter_purpose = 'action-follow' AND letter_content = ?), '') ||'],'||
 				'"following": [' || IFNULL((SELECT '"'||letter_content||'",' FROM letters WHERE letter_purpose = 'action-follow' AND sender = ?), '') ||'],'||
-				'"blocked": [' || IFNULL((SELECT '"'||letter_content||'",' FROM letters WHERE letter_purpose = 'action-block' AND sender = ?), '') ||']'
+				'"blocked": [' || IFNULL((SELECT '"'||letter_content||'",' FROM letters WHERE letter_purpose = 'action-block' AND sender = ?), '') ||'],'||
+				'"friends": ['||
+		            IFNULL((
+		                SELECT '"'||sender||'",' FROM letters WHERE letter_purpose = 'action-follow' AND letter_content = ?
+		                INTERSECT
+		                SELECT '"'||letter_content||'",' FROM letters WHERE letter_purpose = 'action-follow' AND sender = ?
+		            ), '')
+		        ||']'
 			||'}';
 `
 
@@ -423,7 +430,7 @@ func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(user_id, user_id, user_id, user_id, user_id, user_id, user_id)
+	rows, err := stmt.Query(user_id, user_id, user_id, user_id, user_id, user_id, user_id, user_id, user_id)
 	if nil != err {
 		return user, err
 	}
