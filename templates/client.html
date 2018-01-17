@@ -18,54 +18,45 @@
   <link href="/static/bootstrap.medium.css" rel="stylesheet" />
 
 
-  <style>
-    #posts {
-        font-size: 16px;
-    }
+    <style>
+        #posts {
+            font-size: 16px;
+        }
 
-    .post-datetime {
-        font-size: 14px;
-    }
+        .post-datetime {
+            font-size: 14px;
+        }
 
-    #posts img.profile-pic {
-        max-width: 25px;
-        max-height: 25px;
-    }
+        #posts img.profile-pic {
+            max-width: 25px;
+            max-height: 25px;
+        }
 
-    #posts .card-body {
-        padding: 0.75rem;
-    }
+        #posts .card-body {
+            padding: 0.75rem;
+        }
 
-    #posts .card {
-        margin-bottom: 0.75rem;
-    }
+        #posts .card {
+            margin-bottom: 0.75rem;
+        }
 
-    .recipient {
-        margin-left: 2px;
-        margin-right: 2px;
-    }
+        .recipient {
+            margin-left: 2px;
+            margin-right: 2px;
+        }
 
-    .post-comments {
-        padding-left: 16px;
-    }
+        .post-comments {
+            padding-left: 16px;
+        }
 
-    .post-container {
-        width: 100%;
-    }
+        .post-container {
+            width: 100%;
+        }
 
-    /*.post-header {
-        background-color: lightgrey;
-        margin-left: -14px;
-        padding-left: 14px;
-        margin-right: -14px;
-        padding-right: 14px;
-        margin-top: -14px;
-        padding-top: 14px;
-        border-top-left-radius: 0.25rem;
-        border-top-right-radius: 0.25rem;
-    }*/
-
-  </style>
+        #posts a {
+            text-decoration: none;
+        }
+    </style>
 
 </head>
 
@@ -142,9 +133,7 @@
                                 </button>
           </div>
           <div class="modal-body">
-            <span id="modalNameContent">
-                                    I enjoy skiing and driving around!
-                                </span>
+            <span id="modalNameContent"></span>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-info">Filter</button>
@@ -405,18 +394,28 @@ KiKiClient.prototype.buildPostElem = function(post) {
                     $('<i>').addClass("fas fa-reply")
                 ).on('click', this.openModal),
                 "&nbsp;",
-                $("<a>", {
-                    'href': "#!",
-                    'title': "Edit post",
-                    'data-title':"Edit post",
-                    'data-usecontent':post.id,
-                    'data-replaces':post.id,
-                    'data-purpose':"share-text"
 
-                }).addClass("editmodal").append(
-                    $("<i>").addClass("fas fa-edit")
-                ).on('click', this.openModal),
-                "&nbsp;",
+                // edit button
+                (function() {
+                    // only display if current user owns the post
+                    if (post.owner_id == app.User.public_key) {
+                        return [
+                                $("<a>", {
+                                'href': "#!",
+                                'title': "Edit post",
+                                'data-title':"Edit post",
+                                'data-usecontent':post.id,
+                                'data-replaces':post.id,
+                                'data-purpose':"share-text"
+
+                            }).addClass("editmodal").append(
+                                $("<i>").addClass("fas fa-edit")
+                            ).on('click', this.openModal),
+                            "&nbsp;"
+                        ];
+                    }
+                })(),
+                //.end
 
                 // like button
                 $("<a>",  {
@@ -567,7 +566,9 @@ KiKiClient.prototype.init = function(){
     });
 }
 
-var app = {}
+var app = {
+    User: {{ .User }}
+}
 app.Api = new KiKiApi();
 app.Client = new KiKiClient(app.Api);
 

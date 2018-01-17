@@ -23,12 +23,13 @@ func (self *ApiBasicPost) Unmarshal(text string) error {
 }
 
 type ApiUser struct {
-	Name      string `json:"name"`
-	PublicKey string `json:"public_key"`
-	Profile   string `json:"profile"`
-	Image     string `json:"image"`
-	// Followers
-	// Following
+	Name      string   `json:"name"`
+	PublicKey string   `json:"public_key"`
+	Profile   string   `json:"profile"`
+	Image     string   `json:"image"`
+	Followers []string `json:"followers"`
+	Following []string `json:"following"`
+	Blocked   []string `json:"blocked"`
 	// Friends
 }
 
