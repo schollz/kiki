@@ -175,7 +175,7 @@
             {{ .User.Profile }}
           </div>
         </div>
-        <div class="sidebar-module">
+        <div class="sidebar-module user-info">
           <h4>Actions</h4>
           <ol class="list-unstyled">
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
@@ -252,6 +252,14 @@ KiKiApi.prototype.submitLetter = function(letter, callback) {
         contentType: "application/json",
         error: self.onError(toast_msg, callback),
         success: self.onSuccess(toast_msg, callback)
+    });
+}
+
+KiKiApi.prototype.likePost = function(post_id) {
+    this.submitLetter({
+        "purpose": "action-like",
+        "to": ["public"],
+        "content": post_id,
     });
 }
 
@@ -354,9 +362,35 @@ KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
     });
 };
 
+KiKiClient.prototype.openModal = function(event) {
+    $("#writingModal").modal();
+    $("#writingModalLabel").text($(this).data('title'));
+    $(".editable").focus(function() {
+        $(this).select();
+    });
+    if ($(this).data("usecontent")) {
+        $(".editable").html($("#" + $(this).data("usecontent")).html())
+    } else {
+        $(".editable").text("Write your post...");
+    }
+    if ($(this).data("makecontent")) {
+        $(".editable").html($(this).data("makecontent"));
+    }
+    if ($(this).data("replyto")) {
+        $("#letterReplyTo").val($(this).data("replyto"));
+    } else {
+        $("#letterReplyTo").val("");
+    }
+    if ($(this).data("replaces")) {
+        $("#letterReplaces").val($(this).data("replaces"));
+    } else {
+        $("#letterReplaces").val("");
+    }
+    $("#letterPurpose").val($(this).data("purpose"));
+}
+
 KiKiClient.prototype.buildPostElem = function(post) {
-    // return $("<div>").addClass("blog-post").append(
-        // $("<div>").addClass("blog-post-meta").append(
+    var self = this;
     return $("<div>").append(
         $("<div>").addClass("post-header").append(
             $("<span>").addClass("float-right").append(
@@ -369,7 +403,7 @@ KiKiClient.prototype.buildPostElem = function(post) {
                     'data-purpose':"share-text"
                 }).addClass("editmodal").append(
                     $('<i>').addClass("fas fa-reply")
-                ),
+                ).on('click', this.openModal),
                 "&nbsp;",
                 $("<a>", {
                     'href': "#!",
@@ -381,15 +415,21 @@ KiKiClient.prototype.buildPostElem = function(post) {
 
                 }).addClass("editmodal").append(
                     $("<i>").addClass("fas fa-edit")
-                ),
+                ).on('click', this.openModal),
                 "&nbsp;",
+
+                // like button
                 $("<a>",  {
-                    'href': "#!",
-                    "data-id":post.id
-                }).addClass("likebutton").append(
-                    $("<i>").addClass("fas fa-heart"),
-                    "x"+(post.Likes||0)
-                )
+                        'href': "#!",
+                        "data-id":post.id
+                    }).addClass("likebutton").append(
+                        $("<i>").addClass("fas fa-heart"),
+                        "x"+(post.likes||0)
+                    ).on('click', function() {
+                        self.api.likePost(post.id);
+                    })
+                //.end
+
             ),
 
             $("<img>", {
@@ -448,7 +488,6 @@ KiKiClient.prototype.buildPostElem = function(post) {
             )
         ),
 
-        // $('<hr>'),
         $('<div>', {id:post.id}).append(post.content),
         $('<div>').addClass('post-comments row')
     );
@@ -518,6 +557,7 @@ KiKiClient.prototype.buildUsersUi = function() {
 
 KiKiClient.prototype.init = function(){
     var self = this;
+    $('.user-info .editmodal').on('click', this.openModal);
     this.api.fetchPosts(function(err,res){
         if (err) {
             throw err;
@@ -593,34 +633,34 @@ app.Client = new KiKiClient(app.Api);
       });
 
 
-      $(".editmodal").click(function() {
-        $("#writingModal").modal();
-        console.log($(this).data('title'));
-        $("#writingModalLabel").text($(this).data('title'));
-        $(".editable").focus(function() {
-          $(this).select();
-        });
-        console.log($(this).data("usecontent"));
-        if ($(this).data("usecontent")) {
-          $(".editable").html($("#" + $(this).data("usecontent")).html())
-        } else {
-          $(".editable").text("Write your post...");
-        }
-        if ($(this).data("makecontent")) {
-          $(".editable").html($(this).data("makecontent"));
-        }
-        if ($(this).data("replyto")) {
-          $("#letterReplyTo").val($(this).data("replyto"));
-        } else {
-          $("#letterReplyTo").val("");
-        }
-        if ($(this).data("replaces")) {
-          $("#letterReplaces").val($(this).data("replaces"));
-        } else {
-          $("#letterReplaces").val("");
-        }
-        $("#letterPurpose").val($(this).data("purpose"));
-      });
+    // $(".editmodal").click(function() {
+    //     $("#writingModal").modal();
+    //     console.log($(this).data('title'));
+    //     $("#writingModalLabel").text($(this).data('title'));
+    //     $(".editable").focus(function() {
+    //         $(this).select();
+    //     });
+    //     console.log($(this).data("usecontent"));
+    //     if ($(this).data("usecontent")) {
+    //         $(".editable").html($("#" + $(this).data("usecontent")).html())
+    //     } else {
+    //         $(".editable").text("Write your post...");
+    //     }
+    //     if ($(this).data("makecontent")) {
+    //         $(".editable").html($(this).data("makecontent"));
+    //     }
+    //     if ($(this).data("replyto")) {
+    //         $("#letterReplyTo").val($(this).data("replyto"));
+    //     } else {
+    //         $("#letterReplyTo").val("");
+    //     }
+    //     if ($(this).data("replaces")) {
+    //         $("#letterReplaces").val($(this).data("replaces"));
+    //     } else {
+    //         $("#letterReplaces").val("");
+    //     }
+    //     $("#letterPurpose").val($(this).data("purpose"));
+    // });
 
 
       $("#followButton").click(function() {
