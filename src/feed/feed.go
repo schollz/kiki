@@ -89,12 +89,6 @@ func New(params ...string) (f Feed, err error) {
 			return
 		}
 
-		// block the region public key from being used as a sender, ever
-		err2 = f.ProcessLetter(letter.Letter{
-			To:      []string{"public"},
-			Purpose: purpose.ActionBlock,
-			Content: f.RegionKey.Public,
-		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")
 			return
@@ -263,6 +257,8 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 				_, err2 := keypair.FromPublic(to)
 				if err2 != nil {
 					f.logger.Log.Infof("Not a valid public key: '%s'", to)
+				} else if to == f.RegionKey.Public {
+					f.logger.Log.Info("cannot post as public!")
 				} else {
 					newTo = append(newTo, to)
 				}
@@ -639,12 +635,6 @@ func (f Feed) AddFriendsKey() (err error) {
 		return
 	}
 
-	// block the friends public key from being used as a sender, ever
-	err = f.ProcessLetter(letter.Letter{
-		To:      []string{"public"},
-		Purpose: purpose.ActionBlock,
-		Content: myfriends.Public,
-	})
 	if err != nil {
 		err = errors.Wrap(err, "AddFriendsKey, processing public letter")
 		return
