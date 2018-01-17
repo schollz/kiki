@@ -763,3 +763,13 @@ func (api DatabaseAPI) DeleteProfiles() (err error) {
 	defer db.Close()
 	return db.deleteUsers()
 }
+
+// DeleteUser will delete everything for all users that have submitted an action-erase
+func (api DatabaseAPI) DeleteUser(publicKey string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.deleteUser(publicKey)
+}

@@ -199,6 +199,16 @@ func (f Feed) UpdateEverything() {
 		f.logger.Log.Error(err)
 	}
 
+	// erase things that are posted as shared keys or as region key
+	f.db.DeleteUser(f.RegionKey.Public)
+	keys, _ := f.db.GetKeys()
+	for _, key := range keys {
+		err2 := f.db.DeleteUser(key.Public)
+		if err2 != nil {
+			f.logger.Log.Error(err)
+		}
+	}
+
 }
 
 // ProcessLetter will determine where to put the letter

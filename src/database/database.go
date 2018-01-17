@@ -623,6 +623,32 @@ func (d *database) deleteUsers() (err error) {
 	return
 }
 
+// deleteUser will delete everything except the ActionErases
+func (d *database) deleteUser(publicKey string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+	query := "DELETE FROM letters WHERE sender == ?;"
+	log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(publicKey)
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteUser")
+	}
+	return
+}
+
 // deleteUsersOldActions will delete old actions and leave only the most recent action undeleted
 func (d *database) deleteUsersOldActions(publicKey string, purpose string) (err error) {
 	tx, err := d.db.Begin()
