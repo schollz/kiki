@@ -55,7 +55,7 @@
             width: 100%;
         }
 
-        #posts a {
+        #posts a, .user-actions a {
             text-decoration: none;
         }
 
@@ -165,64 +165,97 @@
       </div>
       <!-- /.blog-main -->
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
-        <div class="sidebar-module sidebar-module-inset">
-          <img id="user-profile-image" class="user-profile-image">
-          <h4><div id="user-name"></div></h4>
-          <div id="user-profile"></div>
-        </div>
-        <div class="sidebar-module user-info user-actions">
-          <div><label>Actions</label></div>
-          <ol class="list-unstyled">
-            <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text"><i class="fas fa-pencil-alt"></i>&nbsp; Share</a></li>
-            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile"><i class="fas fa-child"></i>&nbsp;
-            Edit profile</a></li>
-            <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image..."><i class="fas fa-upload"></i>&nbsp;
-            Change profile image</a></li>
-            <li>
-                <a href="#!" class="user-action change-name">
-                    <i class="fas fa-comment-alt"></i> Change name
-                </a>
-            </li>
-            <li>
-                <a href="#!" class="addserver">
-                    <i class="fas fa-plus-circle"></i> Add server
-                </a>
-            </li>
-            <li>
-                <a href="#!" class="syncup">
-                    <i class="fas fa-sync-alt"></i> Sync
-                </a>
-            </li>
-            <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
-            Follow someone</a></li>
-            <li><a href="#!" class="blocksomeone"><i class="fas fa-user-times"></i>&nbsp;
-            Block someone</a></li>
-            <li><a href="#!" class="eraseprofile"><i class="fas fa-trash-alt"></i>&nbsp;
-            Erase profile</a></li>
 
-          </ol>
+    <!-- User profile -->
+        <div class="sidebar-module sidebar-module-inset">
+            <div>
+                <img id="user-profile-image" class="user-profile-image">
+            </div>
+            <div>
+                <h5 id="user-name"></h5>
+            </div>
+            <div id="user-profile"></div>
         </div>
+    <!--.end User profile -->
+
+    <!-- User actions -->
+        <div class="sidebar-module user-info user-actions">
+            <div><label>Actions</label></div>
+            <ol class="list-unstyled">
+                <li>
+                    <a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">
+                        <i class="fas fa-pencil-alt"></i> Share
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
+                        <i class="fas fa-child"></i> Edit profile
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
+                        <i class="fas fa-upload"></i> Change profile image
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="#!" class="user-action change-name">
+                        <i class="fas fa-comment-alt"></i> Change name
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="addserver">
+                        <i class="fas fa-plus-circle"></i> Add server
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="syncup">
+                        <i class="fas fa-sync-alt"></i> Sync
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="#!" class="followsomeone">
+                        <i class="fas fa-user-plus"></i> Follow someone
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="blocksomeone">
+                        <i class="fas fa-user-times"></i> Block someone
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="eraseprofile">
+                        <i class="fas fa-trash-alt"></i> Erase profile
+                    </a>
+                </li>
+
+            </ol>
+        </div>
+    <!--.end User actions -->
 
 
         <div class="sidebar-module following">
-          <div><label>Following</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
+            <div><label>Following</label> (<span>0</span>)</div>
+            <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module followers">
-          <div><label>Followers</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
+            <div><label>Followers</label> (<span>0</span>)</div>
+            <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module friends">
-          <div><label>Friends</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
+            <div><label>Friends</label> (<span>0</span>)</div>
+            <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module connections">
-          <div><label>Connections</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
+            <div><label>Connections</label> (<span>0</span>)</div>
+            <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module blocked">
-          <div><label>Blocked</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
+            <div><label>Blocked</label> (<span>0</span>)</div>
+            <ol class="list-unstyled users-list"></ol>
         </div>
 
 
