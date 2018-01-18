@@ -1,6 +1,6 @@
 <p align="center">
 <img
-    src="https://user-images.githubusercontent.com/6550035/31846899-2b8a7034-b5cf-11e7-9643-afe552226c59.png"
+    src=""
     width="100%" border="0" alt="kiki">
 <br>
 <a href="https://travis-ci.org/schollz/kiki"><img src="https://travis-ci.org/schollz/kiki.svg?branch=master" alt="Build Status"></a>
@@ -31,6 +31,20 @@ kiki
 ```
 
 This will start your local server instance and open up a browser so that you can interact with the network.
+
+
+## Features
+
+- Single binary, single settings file, and a setting database.
+- Cross-platform (binaries for every OS/architecture)
+- Easily federated (just a command line flag to federate)
+- You have total control. You can easily edit/delete posts and profiles (unlike Facebook).
+- You can comment on posts so that only friends can see (unlike all other social media)
+- Storage goes towards content rather than styling (unlike IPFS).
+
+# Overview
+
+This *kiki* server is a barebones social media service, the main features are described below.
 
 ## Privacy 
 
@@ -67,15 +81,6 @@ Anything on *kiki* can be edited. All edits are saved in the database (though th
 There is only one kind of deletion in *kiki*: deleting your entire profile. Deleting messages must be synced, so its costly to delete things. When you'd like to delete your entire profile though, a message will be transmitted and propogated that alerts all *kiki* instances to delete all your content and to suspend transfering it.
 
 If you'd like a post to no longer be available in the feed you can just edit it and erase all the content. In this way, it appears "deleted" when a user looks at the feed, although it is not actually deleted because it is still in the database as a previous edit. However, over time, if the storage of your content is exceeded in other's computers then the original post will no longer be erased and would be effectively deleted as well.
-
-## Features
-
-- Single binary, single settings file, and a setting database.
-- Cross-platform (binaries for every OS/architecture)
-- Easily federated (just a command line flag to federate)
-- You have total control. You can easily edit/delete posts and profiles (unlike Facebook).
-- You can comment on posts so that only friends can see (unlike all other social media)
-- Storage goes towards content rather than styling (unlike IPFS).
 
 
 ## *"kiki"*
