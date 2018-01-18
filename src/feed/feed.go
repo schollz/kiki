@@ -65,6 +65,8 @@ func New(params ...string) (f Feed, err error) {
 	}
 	f.servers.Lock()
 	f.servers.connected = make(map[string]User)
+	f.servers.blockedUsers = make(map[string]struct{})
+	f.servers.syncingCount = 0
 	f.servers.Unlock()
 	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
 	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "kiki.json"))
@@ -114,6 +116,8 @@ func New(params ...string) (f Feed, err error) {
 
 	err = f.Save()
 	f.UpdateEverything()
+
+	go f.DoSyncing()
 	return
 }
 
@@ -155,14 +159,55 @@ func (f Feed) UpdateBlockedUsers() (err error) {
 	return
 }
 
+func (f Feed) signalSyncing() {
+	f.logger.Log.Info("signaling")
+	f.servers.Lock()
+	f.logger.Log.Debug(f.servers.syncingCount)
+	f.servers.syncingCount = 10
+	f.logger.Log.Debug(f.servers.syncingCount)
+	f.servers.Unlock()
+}
+
 func (f Feed) DoSyncing() {
-	for _, server := range f.Settings.AvailableServers {
-		err := f.Sync(server)
-		if err != nil {
-			f.logger.Log.Warn(err)
+	for {
+		time.Sleep(1 * time.Second)
+		currentCount := 0
+		f.servers.RLock()
+		f.logger.Log.Debug(f.servers.syncingCount)
+		currentCount = f.servers.syncingCount
+		f.servers.RUnlock()
+		f.logger.Log.Debug(currentCount)
+		if currentCount > 0 {
+			f.logger.Log.Debug("going to try to sync!")
+			// wait three seconds and see if we have the same current count
+			time.Sleep(3 * time.Second)
+			f.servers.RLock()
+			currentCount2 := f.servers.syncingCount
+			f.servers.RUnlock()
+			if currentCount != currentCount2 {
+				continue
+			}
+			// if the count is stabilized, then do syncing
+			f.doSyncing()
+			f.servers.Lock()
+			f.servers.syncingCount = 0
+			f.servers.Unlock()
 		}
 	}
-	f.UpdateEverything()
+}
+
+func (f Feed) doSyncing() {
+	f.logger.Log.Info("Starting syncing")
+	for {
+		for _, server := range f.Settings.AvailableServers {
+			err := f.Sync(server)
+			if err != nil {
+				f.logger.Log.Warn(err)
+			}
+		}
+		f.UpdateEverything()
+		time.Sleep(1 * time.Second)
+	}
 }
 
 func (f Feed) UpdateEverything() {
@@ -329,6 +374,7 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		return
 	}
 
+	f.signalSyncing()
 	return
 }
 
@@ -365,6 +411,7 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 		return
 	}
 
+	f.signalSyncing()
 	return
 }
 
