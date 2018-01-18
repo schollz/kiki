@@ -93,6 +93,7 @@ func Run() (err error) {
 		})
 	})
 
+	// REST Api
 	r.GET("/client", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "client.html", gin.H{
 			"User": f.GetUser(),
@@ -101,76 +102,30 @@ func Run() (err error) {
 
 	r.GET("/api/v1/posts", func(c *gin.Context) {
 		posts, err := f.ShowPostsForApi()
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"data": gin.H{
-				"posts": posts,
-			},
-		})
+		apiPostsHandler(c, posts, err)
 	})
 
 	r.GET("/api/v1/post/:post_id", func(c *gin.Context) {
 		post_id := c.Param("post_id")
 		posts, err := f.ShowPostForApi(post_id)
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"data": gin.H{
-				"posts": posts,
-			},
-		})
+		apiPostsHandler(c, posts, err)
 	})
 
 	r.GET("/api/v1/post/:post_id/comments", func(c *gin.Context) {
 		post_id := c.Param("post_id")
 		posts, err := f.ShowPostCommentsForApi(post_id)
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"data": gin.H{
-				"posts": posts,
-			},
-		})
+		apiPostsHandler(c, posts, err)
 	})
 
 	r.GET("/api/v1/user", func(c *gin.Context) {
 		user_id := f.PersonalKey.Public
-		user, err := f.ShowUserForApi(user_id)
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"data": gin.H{
-				"user": user,
-			},
-		})
+		apiFetchUserHandler(c, user_id)
 	})
 	r.GET("/api/v1/user/:user_id", func(c *gin.Context) {
 		user_id := c.Param("user_id")
-		user, err := f.ShowUserForApi(user_id)
-		if err != nil {
-			respondWithJSON(c, "", err)
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"data": gin.H{
-				"user": user,
-			},
-		})
+		apiFetchUserHandler(c, user_id)
 	})
+	//.end
 
 	// /api/v1/friendsrout is depricated. Please use /api/v1/user or /api/v1/user/:user_id.
 	r.GET("/api/v1/friendsrout", func(c *gin.Context) {
