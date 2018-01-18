@@ -156,16 +156,13 @@ func (f Feed) UpdateBlockedUsers() (err error) {
 }
 
 func (f Feed) DoSyncing() {
-	for {
-		for _, server := range f.Settings.AvailableServers {
-			err := f.Sync(server)
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
-			f.UpdateEverything()
+	for _, server := range f.Settings.AvailableServers {
+		err := f.Sync(server)
+		if err != nil {
+			f.logger.Log.Warn(err)
 		}
-		time.Sleep(3 * time.Second)
 	}
+	f.UpdateEverything()
 }
 
 func (f Feed) UpdateEverything() {

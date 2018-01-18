@@ -14,7 +14,6 @@ import (
 
 // GET /img
 func handleImage(c *gin.Context) {
-	AddCORS(c)
 	id := c.Param("id")
 	logger.Log.Debugf("fetching image: %s", id)
 	e, err := f.GetEnvelope(id)
@@ -40,8 +39,6 @@ func handleImage(c *gin.Context) {
 
 // POST /letter
 func handleLetter(c *gin.Context) (err error) {
-	AddCORS(c)
-
 	// bind the payload
 	var p letter.Letter
 	err = c.BindJSON(&p)
@@ -91,8 +88,6 @@ func handleHandshake(c *gin.Context) {
 
 // POST /envelope
 func handleEnvelope(c *gin.Context) (err error) {
-	AddCORS(c)
-
 	// bind the payload
 	var p letter.Envelope
 	err = c.BindJSON(&p)
@@ -105,7 +100,6 @@ func handleEnvelope(c *gin.Context) (err error) {
 
 // GET /list
 func handleList(c *gin.Context) {
-	AddCORS(c)
 	ids, err := f.GetIDs()
 	if err != nil {
 		logger.Log.Error(err)
@@ -133,8 +127,6 @@ func handleDownload(c *gin.Context) {
 
 // POST /sync
 func handleSync(c *gin.Context) (err error) {
-	AddCORS(c)
-
 	// bind the payload
 	type Payload struct {
 		Address string `json:"address" binding"required"`
