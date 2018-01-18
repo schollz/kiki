@@ -202,6 +202,22 @@ func (f *Feed) SyncServers() {
 	f.UpdateEverything()
 }
 
+func (f *Feed) UpdateEverythingAndSync() {
+	f.servers.Lock()
+	if f.servers.updating {
+		f.servers.Unlock()
+		return
+	} else {
+		f.servers.updating = true
+		f.servers.Unlock()
+	}
+	f.UpdateEverything()
+	f.SyncServers()
+	f.servers.Lock()
+	f.servers.updating = false
+	f.servers.Unlock()
+}
+
 func (f *Feed) UpdateEverything() {
 	f.logger.Log.Info("updating everything")
 	// unseal any new letters

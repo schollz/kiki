@@ -48,8 +48,9 @@ func handleLetter(c *gin.Context) (err error) {
 	}
 	logger.Log.Debug(p)
 	err = f.ProcessLetter(p)
-	go f.UpdateEverything()
-	go f.SyncServers()
+
+	// when a new letter arrives, update everything and then sync servers
+	go f.UpdateEverythingAndSync()
 	return
 }
 

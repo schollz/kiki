@@ -43,6 +43,7 @@ type connections struct {
 	connected    map[string]User
 	blockedUsers map[string]struct{}
 	syncingCount int
+	updating     bool
 	sync.RWMutex
 }
 
