@@ -169,7 +169,7 @@
           <div id="user-profile"></div>
         </div>
         <div class="sidebar-module user-info">
-          <h4>Actions</h4>
+          <div><label>Actions</label></div>
           <ol class="list-unstyled">
             <!-- <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
             <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">Edit profile</a></li>
@@ -200,25 +200,25 @@
 
 
         <div class="sidebar-module following">
-          <h5>Following (<span>0</span>)</h5>
+          <div><label>Following</label> (<span>0</span>)</div>
           <ol class="list-unstyled users-list">
             <!-- <li><a href="#!" class="activatenamemodal publickey" data-name="Name" data-publickey="PublicKey" data-content="Profile" data-image="/img/"><div class="publickey"><img src="/img/Image" class="align-middle profile-pic">Name<small>PublicKey</small></div></a></li> -->
           </ol>
         </div>
         <div class="sidebar-module followers">
-          <h5>Followers (<span>0</span>)</h5>
+          <div><label>Followers</label> (<span>0</span>)</div>
           <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module friends">
-          <h5>Friends (<span>0</span>)</h5>
+          <div><label>Friends</label> (<span>0</span>)</div>
           <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module connections">
-          <h5>Connections (<span>0</span>)</h5>
+          <div><label>Connections</label> (<span>0</span>)</div>
           <ol class="list-unstyled users-list"></ol>
         </div>
         <div class="sidebar-module blocked">
-          <h5>Blocked (<span>0</span>)</h5>
+          <div><label>Blocked</label> (<span>0</span>)</div>
           <ol class="list-unstyled users-list"></ol>
         </div>
 
@@ -355,17 +355,28 @@ KiKiApi.prototype.fetchUser = function(user_id, callback) {
 var KiKiClient = function(api, callback){
     this.api = api;
     this.posts = [];
-    this.users = {};
     this.primary = {};
     this.$el = $("#posts");
     this.init(callback);
 }
 
 KiKiClient.prototype.collectUsersFromPost = function(post) {
-    this.addUser(post.owner_id);
+
+    var _clbk = function(err, user){
+        if (user) {
+            if (user && "" != user.image) {
+                $('img.profile-pic[owner_id="'+user.public_key+'"]').attr('src', '/img/'+user.image);
+            }
+            $('span.recipient[owner_id="'+user.public_key+'"]').text(
+                user.name || user.public_key
+            );
+        }
+    }
+
+    app.Users.fetchUser(post.owner_id, _clbk);
     if (post.recipients) {
         for (var i=0; i<post.recipients.length; i++) {
-            this.addUser(post.recipients[i]);
+            app.Users.fetchUser(post.recipients[i], _clbk);
         }
     }
 }
@@ -404,9 +415,6 @@ KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
         for (var i=0; i<post_comments.length; i++) {
             self.buildPostCommentsUi(post_comments[i]);
         }
-
-        self.buildUsersUi();
-
     });
 };
 
@@ -501,25 +509,29 @@ KiKiClient.prototype.buildPostElem = function(post) {
             }).addClass("activatenamemodal").append(
                  post.owner_name || post.owner_id
             ).on('click', function() {
-                var user = app.Client.getUser($(this).data('publickey'));
-                if (user) {
-                    $("#modalNameName").text(user.name || user.public_key);
+                var self = this;
+                var user_id = $(this).data('publickey');
+                app.Users.fetchUser(user_id, function(err, user){
+                    if (err) throw err;
+                    if (user) {
+                        $("#modalNameName").text(user.name || user.public_key);
 
-                    $("#modalNamePublicKey").text("");
-                    if (user.name) {
-                        $("#modalNamePublicKey").text(user.public_key);
+                        $("#modalNamePublicKey").text("");
+                        if (user.name) {
+                            $("#modalNamePublicKey").text(user.public_key);
+                        }
+
+                        $("#modalNameContent").html(user.profile);
+
+                        $("#modalNameImage").attr("src", null);
+                        if (user.image && "" != user.image) {
+                            $("#modalNameImage").attr("src", '/img/'+user.image);
+                        }
+
+                        $("#nameModal").modal();
+                        $("#followButton").attr("data-publickey", user.public_key);
                     }
-
-                    $("#modalNameContent").html(user.profile);
-
-                    $("#modalNameImage").attr("src", null);
-                    if (user.image && "" != user.image) {
-                        $("#modalNameImage").attr("src", '/img/'+user.image);
-                    }
-
-                    $("#nameModal").modal();
-                    $("#followButton").attr("data-publickey", user.public_key);
-                }
+                });
             }),
             //.end
 
@@ -561,28 +573,6 @@ KiKiClient.prototype.buildPostUi = function(post) {
     );
 }
 
-KiKiClient.prototype.addUser = function(user_id, user_data) {
-    if (!this.users[user_id]) {
-        this.users[user_id] = user_data;
-    } else if (user_data) {
-        this.users[user_id] = user_data;
-    }
-    // add/update ui info
-    if (user_data) {
-        if (user_data && "" != user_data.image) {
-            $('img.profile-pic[owner_id="'+user_data.public_key+'"]').attr('src', '/img/'+user_data.image);
-        }
-        $('span.recipient[owner_id="'+user_data.public_key+'"]').text(
-            user_data.name || user_data.public_key
-        );
-    }
-}
-
-KiKiClient.prototype.getUser = function(user_id) {
-    if (!this.users[user_id]) return null;
-    return this.users[user_id];
-}
-
 KiKiClient.prototype.buildPostsUi = function(callback) {
     for (var i=0; i<this.posts.length; i++) {
         var post = this.posts[i];
@@ -595,21 +585,6 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
         }
 
         this.collectUsersFromPost(post);
-    }
-
-    this.buildUsersUi();
-}
-
-KiKiClient.prototype.buildUsersUi = function() {
-    var self = this;
-    for (var i in this.users) {
-        if (!this.users[i]) {
-            this.api.fetchUser(i, function(err,res){
-                if (err) throw err;
-                var user_data = res.data.user;
-                self.addUser(user_data.public_key, user_data);
-            });
-        }
     }
 }
 
@@ -647,7 +622,31 @@ UserClient.prototype.init = function() {
     });
 }
 
+UserClient.prototype.buildUserListItem = function(user) {
+    return $('<li>').append(
+            $('<a>', {
+                'href': "#!",
+                'data-name': user.name,
+                'data-publickey': user.public_key,
+                'data-content': user.profile
+            }).addClass('activatenamemodal publickey').append(
+                $('<div>').addClass('publickey').append(
+                    $("<img>",{
+                        src: (function(){
+                            if (user.image && "" != user.image) {
+                                return "/img/" + user.image;
+                            }
+                            return null;
+                        })()
+                    }).addClass('align-middle profile-pic'),
+                    $('<small>').append(user.name || user.public_key)
+                )
+            )
+    );
+}
+
 UserClient.prototype.buildUserUi = function(){
+    var self = this;
     if (this.data) {
         $("#user-name").text( this.data.name || this.data.public_key );
         $("#user-profile").html("");
@@ -660,25 +659,49 @@ UserClient.prototype.buildUserUi = function(){
         $(".followers span").text(this.data.followers.length);
         $(".friends span").text(this.data.friends.length);
         $(".blocked span").text(this.data.blocked.length);
-        // $(".connections span").text(this.data.connections.length);
 
-        // <li><a href="#!" class="activatenamemodal publickey" data-name="Name" data-publickey="PublicKey" data-content="Profile" data-image="/img/"><div class="publickey"><img src="/img/Image" class="align-middle profile-pic">Name<small>PublicKey</small></div></a></li>
-        // <div class="sidebar-module followers">
-        //   <h5>Followers (<span>0</span>)</h5>
-        //   <ol class="list-unstyled"></ol>
-        // </div>
-        // <div class="sidebar-module friends">
-        //   <h5>Friends (<span>0</span>)</h5>
-        //   <ol class="list-unstyled"></ol>
-        // </div>
-        // <div class="sidebar-module connections">
-        //   <h5>Connections (<span>0</span>)</h5>
-        //   <ol class="list-unstyled"></ol>
-        // </div>
-        // <div class="sidebar-module blocked">
-        //   <h5>Blocked (<span>0</span>)</h5>
-        //   <ol class="list-unstyled"></ol>
-        // </div>
+
+        for (var i=0; i<this.data.following.length; i++) {
+            var user_id = this.data.following[i];
+            app.Users.fetchUser(user_id, function(err, user){
+                if (err) throw err;
+                $(".following ol").append(
+                    self.buildUserListItem(user)
+                )
+            });
+        }
+
+        for (var i=0; i<this.data.followers.length; i++) {
+            var user_id = this.data.followers[i];
+            app.Users.fetchUser(user_id, function(err, user){
+                if (err) throw err;
+                $(".followers ol").append(
+                    self.buildUserListItem(user)
+                )
+            });
+        }
+
+        for (var i=0; i<this.data.friends.length; i++) {
+            var user_id = this.data.friends[i];
+            app.Users.fetchUser(user_id, function(err, user){
+                if (err) throw err;
+                $(".friends ol").append(
+                    self.buildUserListItem(user)
+                )
+            });
+        }
+
+        for (var i=0; i<this.data.blocked.length; i++) {
+            var user_id = this.data.blocked[i];
+            app.Users.fetchUser(user_id, function(err, user){
+                if (err) throw err;
+                $(".blocked ol").append(
+                    self.buildUserListItem(user)
+                )
+            });
+        }
+
+        // $(".connections span").text(this.data.connections.length);
 
     }
 }
@@ -686,15 +709,51 @@ UserClient.prototype.buildUserUi = function(){
 
 
 
+var UsersCollection = function(api) {
+    this.api = api;
+    this.data = {};
+    this.callbacks = {};
+    // this.queue =
+}
 
+UsersCollection.prototype.fetchUser = function(user_id, callback) {
+    var self = this;
+    if (this.data[user_id]) {
+        return callback(null, this.data[user_id]);
+    }
+    if (!this.callbacks[user_id]) {
+        this.callbacks[user_id] = [];
+    }
+    this.callbacks[user_id].push(callback);
+    // only fire one request
+    if (1 < this.callbacks[user_id].length){
+        return
+    };
+    // fetch from api
+    this.api.fetchUser(user_id, function(err, res){
+        if (err) {
+            self.runCallbacks(err, user_id);
+            return;
+        }
+        self.data[user_id] = res.data.user;
+        self.runCallbacks(null, user_id);
+    });
 
+}
 
+UsersCollection.prototype.runCallbacks = function(err, user_id) {
+    while (this.callbacks[user_id].length) {
+        var callback = this.callbacks[user_id].shift();
+        callback && callback(err, this.data[user_id]);
+    }
+}
 
 
 var app = {}
 app.Api = new KiKiApi();
-app.Client = new KiKiClient(app.Api);
-app.User = new User(app.Api);
+app.Users = new UsersCollection(app.Api);
+app.Posts = new KiKiClient(app.Api);
+app.User = new UserClient(app.Api);
 
 
 var updateInterval = setInterval(function(){
