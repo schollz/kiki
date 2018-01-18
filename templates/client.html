@@ -183,10 +183,16 @@
                     <i class="fas fa-comment-alt"></i> Change name
                 </a>
             </li>
-            <li><a href="#!" class="addserver"><i class="fas fa-plus-circle"></i>&nbsp;
-            Add server</a></li>
-            <li><a href="#!" class="syncup"><i class="fas fa-sync-alt"></i>&nbsp;
-            Sync</a></li>
+            <li>
+                <a href="#!" class="addserver">
+                    <i class="fas fa-plus-circle"></i> Add server
+                </a>
+            </li>
+            <li>
+                <a href="#!" class="syncup">
+                    <i class="fas fa-sync-alt"></i> Sync
+                </a>
+            </li>
             <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
             Follow someone</a></li>
             <li><a href="#!" class="blocksomeone"><i class="fas fa-user-times"></i>&nbsp;
@@ -650,8 +656,40 @@ UserClient.prototype.addListeners = function() {
                 });
             }
         });
-
     });
+
+    $(".syncup").on("click", function(){
+        // event.preventDefault();
+        var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
+        posting.done(function( data ) {
+            toastr.success(data.message, "Updating Kiki");
+        });
+    });
+
+
+    $(".addserver").on("click", function(){
+        //   event.preventDefault();
+        swal({
+            title: 'Server connection',
+            text: 'Enter a server to connect to:',
+            type: 'warning',
+            input: 'url',
+            inputPlaceholder: 'https://kiki.network',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        }).then(function(result) {
+            if (result.value) {
+                var posting = $.post( "/sync", JSON.stringify({ "address": result.value }) );
+                posting.done(function( data ) {
+                    toastr.success(data.message, "Updating Kiki");
+                });
+            }
+        });
+    });
+
+
+
 }
 
 UserClient.prototype.buildUserListItem = function(user) {
@@ -855,28 +893,6 @@ var updateInterval = setInterval(function(){
         app.Api.submitLetter(letter);
       });
 
-
-      $(".syncup").click(function(event){
-        event.preventDefault();
-        var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
-        posting.done(function( data ) {
-          toastr["success"](data['message'], "Updating Kiki");
-        });
-      })
-
-      $(".addserver").click(function(event){
-        event.preventDefault();
-        var server = prompt("Enter a server to connect to", "https://kiki.network");
-        if (server != null) {
-          // Send the data using post
-         var posting = $.post( "/sync", JSON.stringify({ "address": server }) );
-         // Put the results in a div
-         posting.done(function( data ) {
-           console.log(data);
-           toastr["success"](data['message'], "Updating Kiki");
-         });
-        }
-      })
 
 
 
