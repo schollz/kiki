@@ -191,28 +191,18 @@ func (f *Feed) UpdateOnUpload() {
 	}
 }
 
-func (f *Feed) SyncServers() {
-	f.logger.Log.Info("Starting syncing")
-	for _, server := range f.Settings.AvailableServers {
-		err := f.Sync(server)
-		if err != nil {
-			f.logger.Log.Warn(err)
-		}
-	}
-	f.UpdateEverything()
-}
-
 func (f *Feed) UpdateEverythingAndSync() {
 	f.servers.Lock()
 	if f.servers.updating {
 		f.servers.Unlock()
 		return
-	} else {
-		f.servers.updating = true
-		f.servers.Unlock()
 	}
+	f.servers.updating = true
+	f.servers.Unlock()
+
 	f.UpdateEverything()
 	f.SyncServers()
+
 	f.servers.Lock()
 	f.servers.updating = false
 	f.servers.Unlock()
@@ -260,6 +250,17 @@ func (f *Feed) UpdateEverything() {
 		}
 	}
 
+}
+
+func (f *Feed) SyncServers() {
+	f.logger.Log.Info("Starting syncing")
+	for _, server := range f.Settings.AvailableServers {
+		err := f.Sync(server)
+		if err != nil {
+			f.logger.Log.Warn(err)
+		}
+	}
+	f.UpdateEverything()
 }
 
 // ProcessLetter will determine where to put the letter
