@@ -158,11 +158,9 @@
       <!-- /.blog-main -->
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
-          <img src="/img/{{ .User.Image }}">
-          <h4><div id="current-name">{{ .User.Name }}</div></h4>
-          <div id="current-profile">
-            {{ .User.Profile }}
-          </div>
+          <img id="user-profile-image" class="user-profile-image">
+          <h4><div id="user-name"></div></h4>
+          <div id="user-profile"></div>
         </div>
         <div class="sidebar-module user-info">
           <h4>Actions</h4>
@@ -292,8 +290,12 @@ KiKiApi.prototype.fetchPostComments = function(post_id, callback) {
 
 KiKiApi.prototype.fetchUser = function(user_id, callback) {
     var self = this;
+    var url = "/api/v1/user"
+    if (user_id) {
+        url += "/"+user_id
+    }
     $.ajax({
-        url: "/api/v1/user/"+user_id,
+        url: url,
         method: "GET",
         error: self.onError(null, callback),
         success: self.onSuccess(null, callback)
@@ -302,12 +304,14 @@ KiKiApi.prototype.fetchUser = function(user_id, callback) {
 
 
 
-var KiKiClient = function(api){
+
+var KiKiClient = function(api, callback){
     this.api = api;
     this.posts = [];
     this.users = {};
+    this.primary = {};
     this.$el = $("#posts");
-    this.init();
+    this.init(callback);
 }
 
 KiKiClient.prototype.collectUsersFromPost = function(post) {
@@ -562,7 +566,18 @@ KiKiClient.prototype.buildUsersUi = function() {
     }
 }
 
-KiKiClient.prototype.init = function(){
+KiKiClient.prototype.buildPrimaryUserUi = function(){
+    if (app.User) {
+        $("#user-name").text( app.User.name || app.User.public_key );
+        $("#user-profile").html("");
+        $("#user-profile").append( app.User.profile );
+        if (app.User.image && "" != app.User.image) {
+            $("#user-profile-image").attr("src", "/img/"+ app.User.image);
+        }
+    }
+}
+
+KiKiClient.prototype.init = function(callback){
     var self = this;
     $('.user-info .editmodal').on('click', this.openModal);
     $("#followButton").click(function() {
@@ -575,14 +590,21 @@ KiKiClient.prototype.init = function(){
         self.posts = res.data.posts;
         self.buildPostsUi();
     });
+    callback && callback();
 }
 
 var app = {
-    User: {{ .User }}
+    User: {}
 }
 app.Api = new KiKiApi();
-app.Client = new KiKiClient(app.Api);
-
+app.Client = new KiKiClient(app.Api, function(){
+    app.Api.fetchUser(null, function(err,res){
+        if (err) throw err;
+        app.User = res.data.user;
+        console.log(app.User);
+        app.Client.buildPrimaryUserUi();
+    });
+});
 
 
 
