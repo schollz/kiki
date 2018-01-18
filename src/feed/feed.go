@@ -234,7 +234,7 @@ func (f *Feed) UpdateEverything() {
 		f.logger.Log.Warn(err)
 	}
 
-	// erase erased profiles
+	// erase profiles that want to be deleted
 	err = f.db.DeleteProfiles()
 	if err != nil {
 		f.logger.Log.Error(err)
@@ -254,13 +254,18 @@ func (f *Feed) UpdateEverything() {
 
 func (f *Feed) SyncServers() {
 	f.logger.Log.Info("Starting syncing")
+	needToUpdate := false
 	for _, server := range f.Settings.AvailableServers {
 		err := f.Sync(server)
 		if err != nil {
 			f.logger.Log.Warn(err)
+		} else {
+			needToUpdate = true
 		}
 	}
-	f.UpdateEverything()
+	if needToUpdate {
+		f.UpdateEverything()
+	}
 }
 
 // ProcessLetter will determine where to put the letter
