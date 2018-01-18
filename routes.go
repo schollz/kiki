@@ -49,6 +49,7 @@ func handleLetter(c *gin.Context) (err error) {
 	logger.Log.Debug(p)
 	err = f.ProcessLetter(p)
 	go f.UpdateEverything()
+	go f.SyncServers()
 	return
 }
 
@@ -95,6 +96,7 @@ func handleEnvelope(c *gin.Context) (err error) {
 		return
 	}
 	err = f.ProcessEnvelope(p)
+	f.SignalUpdate()
 	return
 }
 

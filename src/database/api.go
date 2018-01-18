@@ -49,6 +49,19 @@ func (api DatabaseAPI) Get(bucket, key string, value interface{}) (err error) {
 }
 
 func (api DatabaseAPI) AddEnvelope(e letter.Envelope) (err error) {
+	_, err = api.GetEnvelopeFromID(e.ID)
+	if err == nil {
+		return errors.New("envelope already exists")
+	}
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.addEnvelope(e)
+}
+
+func (api DatabaseAPI) UpdateEnvelope(e letter.Envelope) (err error) {
 	db, err := open(api.FileName)
 	if err != nil {
 		return

@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	f      feed.Feed
+	f      *feed.Feed
 	logger = logging.New()
 )
 
@@ -60,7 +60,7 @@ func Run() (err error) {
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func(f feed.Feed) {
+	go func(f *feed.Feed) {
 		<-c
 		f.Cleanup()
 		os.Exit(1)

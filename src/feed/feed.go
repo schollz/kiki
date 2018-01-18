@@ -39,7 +39,7 @@ func (f *Feed) Debug(b bool) {
 }
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
-func New(params ...string) (f Feed, err error) {
+func New(params ...string) (f *Feed, err error) {
 	regionKeyPublic := "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk="
 	regionKeyPrivate := "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
 	locationToSaveData := "."
@@ -56,13 +56,12 @@ func New(params ...string) (f Feed, err error) {
 		return
 	}
 
-	f = Feed{
-		Settings:    GenerateSettings(),
-		db:          database.Setup(locationToSaveData),
-		storagePath: locationToSaveData,
-		logger:      logging.New(),
-		caching:     cache.New(1*time.Minute, 5*time.Minute),
-	}
+	f = new(Feed)
+	f.Settings = GenerateSettings()
+	f.db = database.Setup(locationToSaveData)
+	f.storagePath = locationToSaveData
+	f.logger = logging.New()
+	f.caching = cache.New(1*time.Minute, 5*time.Minute)
 	f.servers.Lock()
 	f.servers.connected = make(map[string]User)
 	f.servers.blockedUsers = make(map[string]struct{})
@@ -117,7 +116,7 @@ func New(params ...string) (f Feed, err error) {
 	err = f.Save()
 	f.UpdateEverything()
 
-	go f.DoSyncing()
+	go f.UpdateOnUpload()
 	return
 }
 
@@ -129,7 +128,7 @@ func (f *Feed) SetRegionKey(public, private string) (err error) {
 	return
 }
 
-func (f Feed) Save() (err error) {
+func (f *Feed) Save() (err error) {
 	// overwrite the feed file
 	feedBytes, err := json.MarshalIndent(f, "", " ")
 	if err != nil {
@@ -139,7 +138,7 @@ func (f Feed) Save() (err error) {
 	return
 }
 
-func (f Feed) Cleanup() {
+func (f *Feed) Cleanup() {
 	fmt.Println("cleaning up...")
 }
 
@@ -159,24 +158,20 @@ func (f *Feed) UpdateBlockedUsers() (err error) {
 	return
 }
 
-func (f *Feed) signalSyncing() {
+func (f *Feed) SignalUpdate() {
 	f.logger.Log.Info("signaling")
 	f.servers.Lock()
-	f.logger.Log.Debug(f.servers.syncingCount)
-	f.servers.syncingCount = 10
-	f.logger.Log.Debug(f.servers.syncingCount)
+	f.servers.syncingCount++
 	f.servers.Unlock()
 }
 
-func (f *Feed) DoSyncing() {
+func (f *Feed) UpdateOnUpload() {
 	for {
 		time.Sleep(1 * time.Second)
 		currentCount := 0
 		f.servers.RLock()
-		f.logger.Log.Debug(f.servers.syncingCount)
 		currentCount = f.servers.syncingCount
 		f.servers.RUnlock()
-		f.logger.Log.Debug(currentCount)
 		if currentCount > 0 {
 			f.logger.Log.Debug("going to try to sync!")
 			// wait three seconds and see if we have the same current count
@@ -188,7 +183,7 @@ func (f *Feed) DoSyncing() {
 				continue
 			}
 			// if the count is stabilized, then do syncing
-			f.doSyncing()
+			f.UpdateEverything()
 			f.servers.Lock()
 			f.servers.syncingCount = 0
 			f.servers.Unlock()
@@ -196,21 +191,19 @@ func (f *Feed) DoSyncing() {
 	}
 }
 
-func (f Feed) doSyncing() {
+func (f *Feed) SyncServers() {
 	f.logger.Log.Info("Starting syncing")
-	for {
-		for _, server := range f.Settings.AvailableServers {
-			err := f.Sync(server)
-			if err != nil {
-				f.logger.Log.Warn(err)
-			}
+	for _, server := range f.Settings.AvailableServers {
+		err := f.Sync(server)
+		if err != nil {
+			f.logger.Log.Warn(err)
 		}
-		f.UpdateEverything()
-		time.Sleep(1 * time.Second)
 	}
+	f.UpdateEverything()
 }
 
-func (f Feed) UpdateEverything() {
+func (f *Feed) UpdateEverything() {
+	f.logger.Log.Info("updating everything")
 	// unseal any new letters
 	err := f.UnsealLetters()
 	if err != nil {
@@ -254,7 +247,7 @@ func (f Feed) UpdateEverything() {
 }
 
 // ProcessLetter will determine where to put the letter
-func (f Feed) ProcessLetter(l letter.Letter) (err error) {
+func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	if !purpose.Valid(l.Purpose) {
 		err = errors.New("invalid purpose")
 		return
@@ -374,12 +367,11 @@ func (f Feed) ProcessLetter(l letter.Letter) (err error) {
 		return
 	}
 
-	f.signalSyncing()
 	return
 }
 
 // ProcessEnvelope will determine whether the incoming letter is valid and can be submitted to the database.
-func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
+func (f *Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 	// check if envelope has a valid signature
 	err = e.Validate(f.RegionKey)
 	if err != nil {
@@ -411,12 +403,11 @@ func (f Feed) ProcessEnvelope(e letter.Envelope) (err error) {
 		return
 	}
 
-	f.signalSyncing()
 	return
 }
 
 // UnsealLetters will go through unopened envelopes and open them and then add them to the f.db. Also go through and purge bad letters (invalidated letters)
-func (f Feed) UnsealLetters() (err error) {
+func (f *Feed) UnsealLetters() (err error) {
 	lettersToPurge := []string{}
 	envelopes, err := f.db.GetAllEnvelopes(false)
 	if err != nil {
@@ -444,9 +435,8 @@ func (f Feed) UnsealLetters() (err error) {
 			// this user is not a recipient, just continue
 			continue
 		}
-		err = f.db.AddEnvelope(ue)
+		err = f.db.UpdateEnvelope(ue)
 		if err != nil {
-			f.logger.Log.Error(err)
 			continue
 		}
 	}
@@ -459,7 +449,7 @@ func (f Feed) UnsealLetters() (err error) {
 }
 
 // GetUser returns the information for a specific user
-func (f Feed) GetUser(public ...string) (u User) {
+func (f *Feed) GetUser(public ...string) (u User) {
 	publicKey := f.PersonalKey.Public
 	if len(public) > 0 {
 		publicKey = public[0]
@@ -486,7 +476,7 @@ func (self Feed) ShowUserForApi(user_id string) (database.ApiUser, error) {
 }
 
 // GetUserFriends returns detailed friend information
-func (f Feed) GetUserFriends() (u UserFriends) {
+func (f *Feed) GetUserFriends() (u UserFriends) {
 	followers, following, friends := f.db.Friends(f.PersonalKey.Public)
 	u.Followers = make([]User, len(followers))
 	for i := range followers {
@@ -504,7 +494,7 @@ func (f Feed) GetUserFriends() (u UserFriends) {
 }
 
 // UpdateFriends will post keys to friends
-func (f Feed) UpdateFriends() (err error) {
+func (f *Feed) UpdateFriends() (err error) {
 	friendsKey, err := f.db.GetLatestKeyForFriends(f.PersonalKey.Public)
 	if err != nil {
 		err = errors.Wrap(err, "UpdateFriends")
@@ -522,11 +512,8 @@ func (f Feed) UpdateFriends() (err error) {
 			Purpose: purpose.ShareKey,
 			Content: string(bFriendsKey),
 		}
-		err = f.ProcessLetter(l)
-		if err != nil {
-			err = errors.Wrap(err, "UpdateFriends")
-			return
-		}
+		f.logger.Log.Debugf("Adding letter for friend %s", friend)
+		f.ProcessLetter(l)
 	}
 	return
 }
@@ -539,7 +526,7 @@ type ShowFeedParameters struct {
 	Latest  bool   // get the latest
 }
 
-func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
+func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	t := time.Now()
 	var envelopes []letter.Envelope
 	if p.ID != "" {
@@ -575,7 +562,7 @@ func (f Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	return
 }
 
-func (f Feed) MakePostWithComments(e letter.Envelope) (post Post) {
+func (f *Feed) MakePostWithComments(e letter.Envelope) (post Post) {
 	// postInterface, found := f.caching.Get(e.ID)
 	// if found {
 	// 	f.logger.Log.Debug("using cache")
@@ -606,7 +593,7 @@ func (self Feed) ShowPostForApi(post_id string) ([]database.ApiBasicPost, error)
 	return posts, err
 }
 
-func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {
+func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 	recipients := []string{}
 	for _, to := range e.Letter.To {
 		if to == f.RegionKey.Public {
@@ -649,11 +636,11 @@ func (f Feed) MakePost(e letter.Envelope) (post BasicPost) {
 	return
 }
 
-func (f Feed) DetermineComments(postID string) []BasicPost {
+func (f *Feed) DetermineComments(postID string) []BasicPost {
 	return f.recurseComments(postID, []BasicPost{}, 0)
 }
 
-func (f Feed) recurseComments(postID string, comments []BasicPost, depth int) []BasicPost {
+func (f *Feed) recurseComments(postID string, comments []BasicPost, depth int) []BasicPost {
 	es, err := f.db.GetReplies(postID)
 	if err != nil {
 		f.logger.Log.Error(err)
@@ -669,7 +656,7 @@ func (f Feed) recurseComments(postID string, comments []BasicPost, depth int) []
 }
 
 // AddFriendsKey will generate a new friends key and post it to the feed
-func (f Feed) AddFriendsKey() (err error) {
+func (f *Feed) AddFriendsKey() (err error) {
 	// generate a key for friends
 	myfriends := keypair.New()
 	if err != nil {
@@ -698,17 +685,17 @@ func (f Feed) AddFriendsKey() (err error) {
 }
 
 // GetEnvelope will return an envelope with the given ID
-func (f Feed) GetEnvelope(id string) (e letter.Envelope, err error) {
+func (f *Feed) GetEnvelope(id string) (e letter.Envelope, err error) {
 	return f.db.GetEnvelopeFromID(id)
 }
 
 // GetIDs will return an envelope with the given ID
-func (f Feed) GetIDs() (ids map[string]struct{}, err error) {
+func (f *Feed) GetIDs() (ids map[string]struct{}, err error) {
 	return f.db.GetIDs()
 }
 
 // GetConnected returns the users that are currently connected to
-func (f Feed) GetConnected() (us []User) {
+func (f *Feed) GetConnected() (us []User) {
 	f.servers.RLock()
 	defer f.servers.RUnlock()
 	i := 0
@@ -720,7 +707,7 @@ func (f Feed) GetConnected() (us []User) {
 }
 
 // Sync will try to sync with the respective address
-func (f Feed) Sync(address string) (err error) {
+func (f *Feed) Sync(address string) (err error) {
 	f.logger.Log.Debugf("syncing with %s", address)
 
 	// get the information about the kiki server
@@ -780,11 +767,12 @@ func (f Feed) Sync(address string) (err error) {
 		}
 	}
 
+	f.UpdateEverything()
 	return
 }
 
 // UploadEnvelope will upload the specified envelope
-func (f Feed) UploadEnvelope(address, id string) (err error) {
+func (f *Feed) UploadEnvelope(address, id string) (err error) {
 	// get envelope
 	e, err := f.GetEnvelope(id)
 	if err != nil {
@@ -827,7 +815,7 @@ func (f Feed) UploadEnvelope(address, id string) (err error) {
 }
 
 // DownloadEnvelope will download the specified envelope
-func (f Feed) DownloadEnvelope(address, id string) (err error) {
+func (f *Feed) DownloadEnvelope(address, id string) (err error) {
 	req, err := http.NewRequest("GET", address+"/download/"+id, nil)
 	if err != nil {
 		return
@@ -859,7 +847,7 @@ func (f Feed) DownloadEnvelope(address, id string) (err error) {
 }
 
 // PingKikiInstance will ping a kiki instance to see if it is viable
-func (f Feed) PingKikiInstance(address string) (err error) {
+func (f *Feed) PingKikiInstance(address string) (err error) {
 	f.servers.RLock()
 	if _, ok := f.servers.connected[address]; ok {
 		f.servers.RUnlock()
@@ -942,7 +930,7 @@ func (f *Feed) ValidateKikiInstance(address string, r Response) (err error) {
 }
 
 // PurgeOverflowingStorage will delete old messages
-func (f Feed) PurgeOverflowingStorage() (err error) {
+func (f *Feed) PurgeOverflowingStorage() (err error) {
 	users, err := f.db.ListUsers()
 	if err != nil {
 		return
@@ -1007,7 +995,7 @@ func (f Feed) PurgeOverflowingStorage() (err error) {
 	return
 }
 
-func (f Feed) TestStuff() {
+func (f *Feed) TestStuff() {
 	posts, _ := f.ShowFeed(ShowFeedParameters{})
 	fmt.Println(posts)
 }
