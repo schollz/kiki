@@ -252,6 +252,14 @@ KiKiApi.prototype.likePost = function(post_id) {
     });
 }
 
+KiKiApi.prototype.followUser = function(user_id) {
+    this.submitLetter({
+        "purpose": "action-follow",
+        "to": ["public"],
+        "content": user_id,
+    });
+}
+
 KiKiApi.prototype.fetchPosts = function(callback) {
     var self = this;
     $.ajax({
@@ -557,6 +565,9 @@ KiKiClient.prototype.buildUsersUi = function() {
 KiKiClient.prototype.init = function(){
     var self = this;
     $('.user-info .editmodal').on('click', this.openModal);
+    $("#followButton").click(function() {
+        self.api.followUser($(this).data("publickey"));
+    });
     this.api.fetchPosts(function(err,res){
         if (err) {
             throw err;
@@ -664,10 +675,7 @@ app.Client = new KiKiClient(app.Api);
     // });
 
 
-      $("#followButton").click(function() {
-        console.log($(this).data("publickey"));
-        // TODO: MAKE A FOLLOW!
-      });
+
       var restrictInput = function(event) {
         $("img:not(.img-fluid)").addClass("img-fluid");
       }
