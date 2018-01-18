@@ -183,6 +183,7 @@ func Run() (err error) {
 	r.POST("/letter", handlerLetter)       // post to put in letter (local only)
 	r.OPTIONS("/letter", handlePing)       // post to put in letter (local only)
 	r.POST("/sync", handlerSync)           // tell server to sync with another server (local only)
+	r.OPTIONS("/sync", handlePing)         // post to put in letter (local only)
 	r.GET("/list", handleList)             // GET list of all envelope IDs
 	r.POST("/envelope", handlerEnvelope)   // post to put into database (public)
 	r.GET("/download/:id", handleDownload) // download a specific envelope

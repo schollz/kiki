@@ -199,6 +199,8 @@
             <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">Edit profile</a></li>
             <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">Upload image</a></li>
             <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name">Change name</a></li>
+            <li><a href="#!" class="addserver">Add server</a></li>
+            <li><a href="#!" class="syncup">Sync</a></li>
           </ol>
         </div>
         <div class="sidebar-module">
@@ -381,6 +383,26 @@
         submitLetter(letter);
         $("#writingModal").modal('hide');
       });
+      $(".addserver").click(function(event){
+        event.preventDefault();
+        var server = prompt("Enter a server to connect to", "https://kiki.network");
+        if (server != null) {
+          // Send the data using post
+         var posting = $.post( "/sync", JSON.stringify({ "address": server }) );
+         // Put the results in a div
+         posting.done(function( data ) {
+           console.log(data);
+           toastr["success"](data['message'], "Updating Kiki");
+         });
+        }
+      })
+      $(".syncup").click(function(event){
+        event.preventDefault();
+        var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
+        posting.done(function( data ) {
+          toastr["success"](data['message'], "Updating Kiki");
+        });
+      })
       $(".editmodal").click(function() {
         $("#nameModal").modal('hide');
         $("#writingModal").modal();

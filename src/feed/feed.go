@@ -735,7 +735,7 @@ func (f *Feed) Sync(address string) (err error) {
 	// get the information about the kiki server
 	err = f.PingKikiInstance(address)
 	if err != nil {
-		return
+		return errors.Wrap(err, "syncing ping doesn't work")
 	}
 
 	// Get a list of my IDs
@@ -872,6 +872,7 @@ func (f *Feed) DownloadEnvelope(address, id string) (err error) {
 func (f *Feed) PingKikiInstance(address string) (err error) {
 	f.servers.RLock()
 	if _, ok := f.servers.connected[address]; ok {
+		f.logger.Log.Debugf("already connected to %s", address)
 		f.servers.RUnlock()
 		return
 	}
@@ -892,25 +893,31 @@ func (f *Feed) PingKikiInstance(address string) (err error) {
 	}
 	bPayload, _ := json.Marshal(payload)
 	body := bytes.NewReader(bPayload)
+	f.logger.Log.Debugf("POST %s/handshake", address)
 	resp, err := client.Post(address+"/handshake", "application/json", body)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
 
+	f.logger.Log.Debug("decoding response")
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
 		return
 	}
 	if "ok" != target.Status {
+		f.logger.Log.Debug("got error")
 		err = errors.New(target.Error)
 		return
 	}
 
+	f.logger.Log.Debugf("validating %s", address)
 	err = f.ValidateKikiInstance(target)
 	if err == nil {
 		f.AddAddressToServers(address, target)
+	} else {
+		f.logger.Log.Warnf("could not validate %s", address)
 	}
 	return
 }
@@ -920,15 +927,19 @@ func (f *Feed) ValidateKikiInstance(r Response) (err error) {
 	// validate that the same region sent the signature
 	err = f.RegionKey.Validate(r.RegionSignature, f.RegionKey)
 	if err != nil {
+		f.logger.Log.Warn(err)
 		err = errors.Wrap(err, "could not validate region key")
 		return
 	}
 	senderKey, err := keypair.FromPublic(r.PersonalPublicKey)
 	if err != nil {
+		f.logger.Log.Warn(err)
+		err = errors.Wrap(err, "problem deciphering key")
 		return
 	}
 	err = f.RegionKey.Validate(r.PersonalSignature, senderKey)
 	if err != nil {
+		f.logger.Log.Warn(err)
 		err = errors.Wrap(err, "could not validate personal key")
 		return
 	}
@@ -1023,6 +1034,7 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 }
 
 func (f *Feed) TestStuff() {
-	posts, _ := f.ShowFeed(ShowFeedParameters{})
-	fmt.Println(posts)
+	err := f.PingKikiInstance("http://localhost:8005")
+	f.logger.Log.Error(err.Error())
+	f.logger.Log.Error(err == nil)
 }
