@@ -48,6 +48,7 @@ func handleLetter(c *gin.Context) (err error) {
 	}
 	logger.Log.Debug(p)
 	err = f.ProcessLetter(p)
+	go f.UpdateEverything()
 	return
 }
 
