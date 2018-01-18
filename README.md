@@ -42,6 +42,22 @@ This will start your local server instance and open up a browser so that you can
 - You can comment on posts so that only friends can see (unlike all other social media)
 - Storage goes towards content rather than styling (unlike IPFS).
 
+# Precepts of kiki
+
+1. Almost all information in *kiki* is stored in **letters**.
+2. A **letter** is defined to have **recipients**, **content**, and a **purpose**.
+3. The **purpose** tells *kiki* how to process the letter (e.g. the sharing of an image).
+4. The **content** depends on the purpose (e.g. its base64 data of an image).
+5. The **recipients** is a list of **persons**.
+6. A **person** is just a public-private keypair. Your personal keypair is one of two items not stored as a letter. The second item is the **region** keypair.
+7. A **region** is a public-private keypair. 
+8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the region keypair and uses it to validate their identity.
+10. Information is transfered in *envelopes*.
+11. An *envelope* contains a letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient. Thus, only recipients can deciper the passphrase and unseal the envelope and obtain the contents of the letter.
+12. Two instances of *kiki* are **synced** by exchanging envelopes that they do not have. 
+13. Only instances in the same region can sync.
+ 
+
 # Overview
 
 This *kiki* server is a barebones social media service, the main features are described below.
