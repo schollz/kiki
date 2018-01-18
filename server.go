@@ -101,11 +101,12 @@ func Run() (err error) {
 	})
 
 	restApi = HttpRestApi{Db: f.GetDatabase(), PrimaryUserId: f.PersonalKey.Public}
-	r.GET("/api/v1/posts", restApi.GetPosts)
-	r.GET("/api/v1/post/:post_id", restApi.GetPost)
-	r.GET("/api/v1/post/:post_id/comments", restApi.GetPostComments)
-	r.GET("/api/v1/user", restApi.GetPrimaryUser)
-	r.GET("/api/v1/user/:user_id", restApi.GetUser)
+	restApi.AttachToRouter(r)
+	// r.GET("/api/v1/posts", restApi.GetPosts)
+	// r.GET("/api/v1/post/:post_id", restApi.GetPost)
+	// r.GET("/api/v1/post/:post_id/comments", restApi.GetPostComments)
+	// r.GET("/api/v1/user", restApi.GetPrimaryUser)
+	// r.GET("/api/v1/user/:user_id", restApi.GetUser)
 	//.end
 
 	// /api/v1/friendsrout is depricated. Please use /api/v1/user or /api/v1/user/:user_id.
