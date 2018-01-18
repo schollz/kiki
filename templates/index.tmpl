@@ -183,28 +183,39 @@
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
           <img src="/img/{{ .User.Image }}">
-          <h4><div id="current-name">{{ .User.Name }}</div></h4>
+          <h5><div id="current-name">{{ .User.Name }}</div></h5>
           <div id="current-profile">
             {{ .User.Profile }}
           </div>
           <div class="publickey">
-          <small>{{ .User.PublicKey }}</small>
+          <small>Pubkey: <em>{{ .User.PublicKey }}</em></small>
 
           </div>
         </div>
         <div class="sidebar-module">
-          <h4>Actions</h4>
+          <h5>Actions</h5>
           <ol class="list-unstyled">
-            <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
-            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">Edit profile</a></li>
-            <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">Upload image</a></li>
-            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name">Change name</a></li>
-            <li><a href="#!" class="addserver">Add server</a></li>
-            <li><a href="#!" class="syncup">Sync</a></li>
+            <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text"><i class="fas fa-pencil-alt"></i>&nbsp; Share</a></li>
+            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile"><i class="fas fa-child"></i>&nbsp;
+            Edit profile</a></li>
+            <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image..."><i class="fas fa-upload"></i>&nbsp;
+            Change profile image</a></li>
+            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name"><i class="fas fa-comment-alt"></i>&nbsp;
+            Change name</a></li>
+            <li><a href="#!" class="addserver"><i class="fas fa-plus-circle"></i>&nbsp;
+            Add server</a></li>
+            <li><a href="#!" class="syncup"><i class="fas fa-sync-alt"></i>&nbsp;
+            Sync</a></li>
+            <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
+            Follow someone</a></li>
+            <li><a href="#!" class="blocksomeone"><i class="fas fa-user-times"></i>&nbsp;
+            Block someone</a></li>
+            <li><a href="#!" class="eraseprofile"><i class="fas fa-trash-alt"></i>&nbsp;
+            Erase profile</a></li>
           </ol>
         </div>
         <div class="sidebar-module">
-          <h4>Following  ({{ len .Friends.Following }})</h4>
+          <h5>Following  ({{ len .Friends.Following }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Following }}
             <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
@@ -212,7 +223,7 @@
           </ol>
         </div>
         <div class="sidebar-module">
-          <h4>Followers  ({{ len .Friends.Followers }})</h4>
+          <h5>Followers  ({{ len .Friends.Followers }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Followers }}
             <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
@@ -220,7 +231,7 @@
           </ol>
         </div>
         <div class="sidebar-module">
-          <h4>Friends ({{ len .Friends.Friends }})</h4>
+          <h5>Friends ({{ len .Friends.Friends }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Friends }}
             <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">
@@ -229,7 +240,7 @@
           </ol>
         </div>
         <div class="sidebar-module">
-          <h4>Connections ({{ len .Connected }})</h4>
+          <h5>Connections ({{ len .Connected }})</h5>
           <ol class="list-unstyled">
             {{ range .Connected }}
             <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
@@ -237,7 +248,7 @@
           </ol>
         </div>
         <div class="sidebar-module">
-          <h4>Blocked ({{ len .User.Blocked }})</h4>
+          <h5>Blocked ({{ len .User.Blocked }})</h5>
           <ol class="list-unstyled">
             {{ range .User.Blocked }}
             <li><div class="publickey"><small>{{ . }}</small></div></li>

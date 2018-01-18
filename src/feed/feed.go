@@ -370,6 +370,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		p := bluemonday.UGCPolicy()
 		l.Content = p.Sanitize(l.Content)
 	}
+	l.Content = strings.TrimSpace(l.Content)
 
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {
