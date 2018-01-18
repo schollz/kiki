@@ -596,29 +596,31 @@ func (f *Feed) MakePostWithComments(e letter.Envelope) (post Post) {
 	return
 }
 
+// This is needed for http rest api
 func (self Feed) GetDatabase() database.DatabaseAPI {
 	return self.db
 }
 
-func (self Feed) ShowPostsForApi() ([]database.ApiBasicPost, error) {
-	posts, err := self.db.GetPostsForApi()
-	return posts, err
-}
-
-func (self Feed) ShowPostCommentsForApi(post_id string) ([]database.ApiBasicPost, error) {
-	posts, err := self.db.GetPostCommentsForApi(post_id)
-	return posts, err
-}
-
-func (self Feed) ShowPostForApi(post_id string) ([]database.ApiBasicPost, error) {
-	posts, err := self.db.GetPostForApi(post_id)
-	return posts, err
-}
-
-func (self Feed) ShowUserForApi(user_id string) (database.ApiUser, error) {
-	user, err := self.db.GetUserForApi(user_id)
-	return user, err
-}
+//
+// func (self Feed) ShowPostsForApi() ([]database.ApiBasicPost, error) {
+// 	posts, err := self.db.GetPostsForApi()
+// 	return posts, err
+// }
+//
+// func (self Feed) ShowPostCommentsForApi(post_id string) ([]database.ApiBasicPost, error) {
+// 	posts, err := self.db.GetPostCommentsForApi(post_id)
+// 	return posts, err
+// }
+//
+// func (self Feed) ShowPostForApi(post_id string) ([]database.ApiBasicPost, error) {
+// 	posts, err := self.db.GetPostForApi(post_id)
+// 	return posts, err
+// }
+//
+// func (self Feed) ShowUserForApi(user_id string) (database.ApiUser, error) {
+// 	user, err := self.db.GetUserForApi(user_id)
+// 	return user, err
+// }
 
 func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 	recipients := []string{}

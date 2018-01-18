@@ -100,31 +100,12 @@ func Run() (err error) {
 		})
 	})
 
-	r.GET("/api/v1/posts", func(c *gin.Context) {
-		posts, err := f.ShowPostsForApi()
-		apiPostsHandler(c, posts, err)
-	})
-
-	r.GET("/api/v1/post/:post_id", func(c *gin.Context) {
-		post_id := c.Param("post_id")
-		posts, err := f.ShowPostForApi(post_id)
-		apiPostsHandler(c, posts, err)
-	})
-
-	r.GET("/api/v1/post/:post_id/comments", func(c *gin.Context) {
-		post_id := c.Param("post_id")
-		posts, err := f.ShowPostCommentsForApi(post_id)
-		apiPostsHandler(c, posts, err)
-	})
-
-	r.GET("/api/v1/user", func(c *gin.Context) {
-		user_id := f.PersonalKey.Public
-		apiFetchUserHandler(c, user_id)
-	})
-	r.GET("/api/v1/user/:user_id", func(c *gin.Context) {
-		user_id := c.Param("user_id")
-		apiFetchUserHandler(c, user_id)
-	})
+	restApi = HttpRestApi{Db: f.GetDatabase(), PrimaryUserId: f.PersonalKey.Public}
+	r.GET("/api/v1/posts", restApi.GetPosts)
+	r.GET("/api/v1/post/:post_id", restApi.GetPost)
+	r.GET("/api/v1/post/:post_id/comments", restApi.GetPostComments)
+	r.GET("/api/v1/user", restApi.GetPrimaryUser)
+	r.GET("/api/v1/user/:user_id", restApi.GetUser)
 	//.end
 
 	// /api/v1/friendsrout is depricated. Please use /api/v1/user or /api/v1/user/:user_id.
