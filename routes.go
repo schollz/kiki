@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/letter"
-	"github.com/schollz/kiki/src/web"
 )
 
 // GET /img
@@ -56,6 +55,7 @@ func handleLetter(c *gin.Context) (err error) {
 
 // GET /ping
 func handlePing(c *gin.Context) {
+	fmt.Printf("%+v", c.Request)
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "pong"})
 }
 
@@ -67,13 +67,8 @@ func handleHandshake(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem binding data"})
 		return
 	}
-	address, err := web.GetClientIPHelper(c.Request)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem determing address"})
-		return
-	}
 
-	err = f.ValidateKikiInstance(address, p)
+	err = f.ValidateKikiInstance(p)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "problem validating kiki instance"})
 		return

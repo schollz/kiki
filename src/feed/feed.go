@@ -908,12 +908,15 @@ func (f *Feed) PingKikiInstance(address string) (err error) {
 		return
 	}
 
-	err = f.ValidateKikiInstance(address, target)
+	err = f.ValidateKikiInstance(target)
+	if err == nil {
+		f.AddAddressToServers(address, target)
+	}
 	return
 }
 
 // ValidateKikiInstance will validate whether a ping response is valid when POSTing or when recieving
-func (f *Feed) ValidateKikiInstance(address string, r Response) (err error) {
+func (f *Feed) ValidateKikiInstance(r Response) (err error) {
 	// validate that the same region sent the signature
 	err = f.RegionKey.Validate(r.RegionSignature, f.RegionKey)
 	if err != nil {
@@ -929,6 +932,10 @@ func (f *Feed) ValidateKikiInstance(address string, r Response) (err error) {
 		err = errors.Wrap(err, "could not validate personal key")
 		return
 	}
+	return
+}
+
+func (f *Feed) AddAddressToServers(address string, r Response) {
 	u := f.GetUser(r.PersonalPublicKey)
 	u.Server = address
 
@@ -947,8 +954,6 @@ func (f *Feed) ValidateKikiInstance(address string, r Response) (err error) {
 		f.Settings.AvailableServers = append(f.Settings.AvailableServers, address)
 		f.Save()
 	}
-
-	return
 }
 
 // PurgeOverflowingStorage will delete old messages
