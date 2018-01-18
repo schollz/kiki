@@ -12,8 +12,9 @@ import (
 var restApi HttpRestApi
 
 type HttpRestApi struct {
-	PrimaryUserId string
-	Db            database.DatabaseAPI
+	PrimaryUserId  string
+	RegionPublicId string
+	Db             database.DatabaseAPI
 }
 
 func (self HttpRestApi) AttachToRouter(router *gin.Engine) {
@@ -83,6 +84,9 @@ func (self HttpRestApi) apiPostsHandler(c *gin.Context, posts []database.ApiBasi
 
 func (self HttpRestApi) apiFetchUserHandler(c *gin.Context, user_id string) {
 	user, err := self.Db.GetUserForApi(user_id)
+	if user_id == self.RegionPublicId {
+		user.Name = "Public"
+	}
 	self.apiUserHandler(c, user, err)
 }
 

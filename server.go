@@ -97,7 +97,7 @@ func Run() (err error) {
 	r.GET("/client", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "client.html", nil)
 	})
-	restApi = HttpRestApi{Db: f.GetDatabase(), PrimaryUserId: f.PersonalKey.Public}
+	restApi = HttpRestApi{Db: f.GetDatabase(), PrimaryUserId: f.PersonalKey.Public, RegionPublicId: f.RegionKey.Public}
 	restApi.AttachToRouter(r)
 	//.end
 
