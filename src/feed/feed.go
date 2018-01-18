@@ -143,7 +143,7 @@ func (f Feed) Cleanup() {
 	fmt.Println("cleaning up...")
 }
 
-func (f Feed) UpdateBlockedUsers() (err error) {
+func (f *Feed) UpdateBlockedUsers() (err error) {
 	// update the blocked users
 	blockedUsers, err := f.db.ListBlockedUsers(f.PersonalKey.Public)
 	if err != nil {
@@ -159,7 +159,7 @@ func (f Feed) UpdateBlockedUsers() (err error) {
 	return
 }
 
-func (f Feed) signalSyncing() {
+func (f *Feed) signalSyncing() {
 	f.logger.Log.Info("signaling")
 	f.servers.Lock()
 	f.logger.Log.Debug(f.servers.syncingCount)
@@ -168,7 +168,7 @@ func (f Feed) signalSyncing() {
 	f.servers.Unlock()
 }
 
-func (f Feed) DoSyncing() {
+func (f *Feed) DoSyncing() {
 	for {
 		time.Sleep(1 * time.Second)
 		currentCount := 0
