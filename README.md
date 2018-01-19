@@ -32,7 +32,6 @@ kiki
 
 This will start your local server instance and open up a browser so that you can interact with the network.
 
-
 ## Features
 
 - Single binary, single settings file, and a setting database.
@@ -42,9 +41,9 @@ This will start your local server instance and open up a browser so that you can
 - You can comment on posts so that only friends can see (unlike all other social media)
 - Storage goes towards content rather than styling (unlike IPFS).
 
-# Precepts of kiki
+# The 50 precepts of *kiki*
 
-By reading these precepts you should be able to obtain the majority of the information about *kiki*.
+This is a barebones overview of *kiki*. You will be able to obtain the majority of the information about *kiki* by reading the following 50 precepts which are the design guidelines for *kiki*.
 
 *Basics*
 
@@ -55,7 +54,7 @@ By reading these precepts you should be able to obtain the majority of the infor
 5. The **recipients** is a list of **persons**.
 6. A **person** is just a public-private keypair. Your personal keypair is one of two items not stored as a letter. The second item is the **region** keypair.
 7. A **region** is a public-private keypair. 
-8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the region keypair and uses it to validate their identity.
+8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the *region keypair *and uses it to validate their identity.
 10. Information is securely transfered in **envelopes**.
 11. An **envelope** contains a letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient. Thus, only recipients can deciper the passphrase and unseal the envelope and obtain the contents of the letter.
 
@@ -69,22 +68,42 @@ By reading these precepts you should be able to obtain the majority of the infor
 *Purposes*
 
 16. Currently there are two kinds of **purposes** - a *share* and an *action*.
-17. A *share* purpose is to share text/html, images (png/jpg), or keys.
+17. A *share* purpose is to share text/html, images (png/jpg), or keys. 
 18. A *action* purpose is to create public information for constructing the social network. 
-19. The available actions are: following, liking, assigning a profile name, assigning a profile, assigning a profile image, blocking someone, erasing a profile. 
-20. Actions are made public in order to allow quanitfying aspects of the social network to have reliable reputation and identity.
+19. Currnetly available actions are: following, liking, assigning a profile name, assigning a profile, assigning a profile image, blocking someone, erasing a profile. 
+20. Actions are made **public** in order to allow quanitfying aspects of the social network to have reliable reputation and identity.
 
+*Access*
+
+32. A envelope is sealed using public-private key encryption so that only intended recipients can open it. You are also a recipient of your own letters.
+33. A **public** letter is one which is additionally sealed with the *region keypair*. Everyone on the network has this keypair and will be able to unseal the envelope.
+34. A **friends** letter is one that is sealed against the latest personal *friends keypair*.
+35. The *friends keypair* is generated for each user on initiation.
+36. A *friends keypair* is shared upon making a **friend**.
+37. A **friend** is someone that you follow, that also follows you.
+38. By unfriending, you generate a new *friends keypair* which is transmitted to your remaining friends. Your ex-friend will still see your old content, but not th enew content.
+39. You can also send a letter addressed to specific people.
+.
 *Editing and deletion*
 
-21. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the previous letter using **replaces** tag.
-23. Only everything on *kiki* is deletable (e.g. your profile). By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (__Note__: since letters are signed, you cannot delete someone else's profile).
+40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the previous letter using **replaces** tag.
+41. Only everything on *kiki* is deletable (e.g. your profile). By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (__Note__: since letters are signed, you cannot delete someone else's profile).
 
 *The Feed*
 
-26. All posts, user information, and images are aggregated in reverse-chronological order in a displayed **feed**.
-27. You can also hide things from showing up in the feed by editing a post so that its content is empty (effectively deleting it).
-28. When editing content, only the latest edit is shown in the feed.
-29. All functions of *kiki* are accessible from the feed (e.g. sending letters of various purposes)
+42. Your **feed** is a representation of all the envelopes that are accessible to you. 
+43. Letters than contain shared images/text are aggregated in reverse-chronological order in a displayed **feed**.
+44. You can also hide things from showing up in the feed by editing a post so that its content is empty (effectively deleting it).
+45. When editing content, only the latest edit is shown in the feed.
+46. All functions of *kiki* are accessible from the feed (e.g. sending letters of various purposes).
+47. Even though you have the majority of the envelopes on the network, you can only open ones you have access to.
+
+*The files*
+
+48. The entire program is a single binary: *kiki*.
+49. The entire database of envelopes is a single `sqlite3` database: *kiki.db*.
+50. The settings file, containing your personal key, is a single file: *kiki.json*.
+
 
 # Overview
 
