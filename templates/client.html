@@ -97,9 +97,33 @@
             color: white;
         }
 
-        /*button.user-action {
-            max-width: 38px;
-        }*/
+        .user-lists .sidebar-module {
+            /*padding: 0.75rem;*/
+            padding: 5px 10px;
+            /*padding-right: 0.75rem;
+            padding-left: 0.75rem;
+            padding-top: 0.37rem;
+            padding-top: 0.37rem;*/
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: .25rem;
+            margin: 5px;
+        }
+
+        .user-lists label {
+            margin-bottom: 0px;
+        }
+
+
+        .toggle-list {
+            font-weight: bold;
+            cursor: pointer;
+            transition: all .2s ease-in;
+        }
+        .toggle-list:hover {
+            color: #428bca;
+            transition: all .2s ease-in;
+        }
+
 
     </style>
 
@@ -262,24 +286,24 @@
 
         <div class="user-lists">
             <div class="sidebar-module following">
-                <div><label>Following</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">Following (<span>0</span>)</div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module followers">
-                <div><label>Followers</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">Followers (<span>0</span>)</div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module friends">
-                <div><label>Friends</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">Friends (<span>0</span>)</div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module connections">
-                <div><label>Connections</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">Connections (<span>0</span>)</div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module blocked">
-                <div><label>Blocked</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">Blocked (<span>0</span>)</div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
         </div>
 
@@ -717,6 +741,11 @@ UserClient.prototype.addListeners = function() {
 
     $('.user-action.edit-profile').on('click', app.Posts.openModal);
 
+    //
+    $(".toggle-list").on("click", function(){
+        $(this).siblings().slideToggle(250);
+    });
+
     $(".syncup").on("click", function(){
         // event.preventDefault();
         var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
@@ -794,7 +823,7 @@ UserClient.prototype.buildUserUi = function(){
             var user_id = this.data.following[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".following ol").append(
+                $(".following .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
@@ -804,7 +833,7 @@ UserClient.prototype.buildUserUi = function(){
             var user_id = this.data.followers[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".followers ol").append(
+                $(".followers .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
@@ -814,7 +843,7 @@ UserClient.prototype.buildUserUi = function(){
             var user_id = this.data.friends[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".friends ol").append(
+                $(".friends .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
@@ -824,7 +853,7 @@ UserClient.prototype.buildUserUi = function(){
             var user_id = this.data.blocked[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".blocked ol").append(
+                $(".blocked .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
