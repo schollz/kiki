@@ -21,6 +21,10 @@
   <script src="https://unpkg.com/sweetalert2@7.4.1/dist/sweetalert2.all.js"></script>
 
     <style>
+        main {
+            padding-top: 90px;
+        }
+
         #posts {
             font-size: 16px;
         }
@@ -61,7 +65,30 @@
 
         .users-list {
             max-height: 300px;
-            overflow-y: scroll;
+            overflow-y: auto;
+        }
+
+        .user-profile-image {
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            top: 0;
+            bottom: 0;
+            padding-top: 90px;
+        }
+
+        /*.user-lists {
+            overflow-y: auto;
+        }*/
+
+        .logo {
+            color: white;
         }
 
     </style>
@@ -69,24 +96,12 @@
 </head>
 
 <body>
-  <header>
-    <div class="blog-masthead">
-      <div class="container">
-        <nav class="nav">
-          <a class="nav-link active" href="/">Kiki</a>
-          <!-- <a class="nav-link" href="#">Help</a>
-          <a class="nav-link" href="#">About</a> -->
-        </nav>
-      </div>
-    </div>
-    <!--         <div class="blog-header">
-                <div class="container">
-                    <h1 class="blog-title">The Bootstrap Blog</h1>
-                    <p class="lead blog-description">An example blog template built with Bootstrap.</p>
-                </div>
-            </div>
-        -->
-  </header>
+
+    <!-- <header></header> -->
+    <nav class="blog-masthead navbar fixed-top">
+        <a class="navbar-brand logo" href="#">Kiki</a>
+    </nav>
+
   <main role="main" class="container">
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
@@ -164,7 +179,10 @@
         </nav>
       </div>
       <!-- /.blog-main -->
-      <aside class="col-sm-3 ml-sm-auto blog-sidebar">
+
+
+<!-- <nav>  -->
+      <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar">
 
     <!-- User profile -->
         <div class="sidebar-module sidebar-module-inset">
@@ -236,28 +254,28 @@
         </div>
     <!--.end User actions -->
 
-
-        <div class="sidebar-module following">
-            <div><label>Following</label> (<span>0</span>)</div>
-            <ol class="list-unstyled users-list"></ol>
+        <div class="user-lists">
+            <div class="sidebar-module following">
+                <div><label>Following</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module followers">
+                <div><label>Followers</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module friends">
+                <div><label>Friends</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module connections">
+                <div><label>Connections</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module blocked">
+                <div><label>Blocked</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
         </div>
-        <div class="sidebar-module followers">
-            <div><label>Followers</label> (<span>0</span>)</div>
-            <ol class="list-unstyled users-list"></ol>
-        </div>
-        <div class="sidebar-module friends">
-            <div><label>Friends</label> (<span>0</span>)</div>
-            <ol class="list-unstyled users-list"></ol>
-        </div>
-        <div class="sidebar-module connections">
-            <div><label>Connections</label> (<span>0</span>)</div>
-            <ol class="list-unstyled users-list"></ol>
-        </div>
-        <div class="sidebar-module blocked">
-            <div><label>Blocked</label> (<span>0</span>)</div>
-            <ol class="list-unstyled users-list"></ol>
-        </div>
-
 
 
       </aside>
@@ -266,12 +284,12 @@
     <!-- /.row -->
   </main>
   <!-- /.container -->
-  <footer class="blog-footer">
+  <!-- <footer class="blog-footer">
     <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
     <p>
       <a href="#">Back to top</a>
     </p>
-  </footer>
+  </footer> -->
   <!-- Bootstrap core JavaScript
     ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
@@ -905,7 +923,7 @@ var updateInterval = setInterval(function(){
       }
     });
     $(document).ready(function() {
-      $("img").addClass("img-fluid");
+    //   $("img").addClass("img-fluid");
       $("#submit-writing").click(function(event) {
         // Stop form from submitting normally
         event.preventDefault();
