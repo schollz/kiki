@@ -414,7 +414,8 @@
           toastr["success"](data['message'], "Updating Kiki");
         });
       })
-      $(".editmodal").click(function() {
+      $(".editmodal").click(function(event) {
+        event.preventDefault();
         $("#nameModal").modal('hide');
         $("#writingModal").modal();
         console.log($(this).data('title'));
@@ -472,6 +473,7 @@
         $("#messageButton").attr("data-purpose", "share-text");
       });
       $("#followButton").click(function(event) {
+        event.preventDefault();
         console.log($(this).data("publickey"));
         letter = {
           "purpose": "action-follow",
@@ -482,6 +484,7 @@
         $("#nameModal").modal('hide');
       });
       $("#blockButton").click(function(event) {
+        event.preventDefault();
         console.log($(this).data("publickey"));
         letter = {
           "purpose": "action-block",
@@ -492,8 +495,8 @@
         $("#nameModal").modal('hide');
       });
       $(".likebutton").click(function(event) {
-        console.log($(this).data("id"));
         event.preventDefault();
+        console.log($(this).data("id"));
         letter = {
           "purpose": "action-like",
           "to": ["public"],
