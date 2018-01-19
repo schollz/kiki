@@ -52,18 +52,18 @@ This will start your local server instance and open up a browser to `localhost:8
 
 You will be able to understand the design and usage of *kiki* by reading the following 50 precepts.
 
-*Basics*
+*Fundamentals*
 
-1. Almost all information in *kiki* is stored in **letters**.
+1. Information in *kiki* is stored in **letters**.
 2. A **letter** is defined to have **recipients**, **content**, and a **purpose**.
-3. The **purpose** tells *kiki* how to process the letter (e.g. the sharing of an image).
-4. The **content** is the data, which depends on the purpose (e.g. its base64 data when sharing an image).
+3. The **purpose** specifies how a letter is processed (e.g. whether the letter is an image to be shared, or the liking of a post, etc.).
+4. The **content** is the data, which depends on the purpose (e.g. its base64 data when sharing an image, or the ID of the post if liking, etc.).
 5. The **recipients** is a list of **persons**.
 6. A **person** is just a public-private keypair. Your personal keypair is one of two items not stored as a letter. The second item is the **region** keypair.
-7. A **region** is a public-private keypair. 
-8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the *region keypair *and uses it to validate their identity.
+8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the **region keypair** that is used to validate identities.
+7. A **region keypair** is a public-private keypair that is shared by everyone.
 10. Information is securely transfered in **envelopes**.
-11. An **envelope** contains a letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter.
+11. An **envelope** contains a letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter. The sender signs the envelope using the region keypair and their personal keypair to verify authenticity.
 
 *Syncing*
 
@@ -75,8 +75,8 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 *Purposes*
 
 16. Currently there are two kinds of **purposes** - a *share* and an *action*.
-17. A *share* purpose is to share text/html, images (png/jpg), or keys. 
-18. A *action* purpose is to create public information for constructing the social network. 
+17. A **share** purpose is to share text/html, images (png/jpg), or keys. 
+18. A **action** purpose is to create public information for constructing the social network. 
 19. Currently available actions are: following, liking, assigning a profile name, assigning a profile, assigning a profile image, blocking someone, erasing a profile. 
 20. Actions are made **public** in order to allow quantifying aspects of the social network to have reliable reputation and identity.
 
