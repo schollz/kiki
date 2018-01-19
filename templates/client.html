@@ -242,7 +242,6 @@
                     </a>
                 </li>
 
-
                 <li>
                     <a href="#!" class="addserver">
                         <i class="fas fa-server"></i> Add server
@@ -253,21 +252,9 @@
                         <i class="fas fa-sync-alt"></i> Sync
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="#!" class="eraseprofile">
                         <i class="fas fa-trash-alt"></i> Erase profile
-                    </a>
-                </li>
-
-
-                <!-- <li>
-                    <a href="#!" class="followsomeone">
-                        <i class="fas fa-user-plus"></i> Follow someone
-                    </a>
-                </li>
-                <li>
-                    <a href="#!" class="blocksomeone">
-                        <i class="fas fa-user-times"></i> Block someone
                     </a>
                 </li> -->
             </ol>
@@ -383,6 +370,24 @@ KiKiApi.prototype.submitLetter = function(letter, callback) {
     });
 }
 
+KiKiApi.prototype.editPost = function(post_id) {
+//     content
+// :
+// "<p></p><p></p><p>test edit edit again</p><p></p><p></p>"
+// purpose
+// :
+// "share-text"
+// replaces
+// :
+// "f493e1c2f7c6d59918ce344c603428ca878891296a3c9cdcea6749de0f0fa96f"
+// reply_to
+// :
+// "96983c6cfb792f3b9b4fe76f06a780c5e081c627b291c84226a9de1a97627fc4"
+// to
+// :
+// ["public"]
+}
+
 KiKiApi.prototype.likePost = function(post_id) {
     this.submitLetter({
         "purpose": "action-like",
@@ -454,8 +459,9 @@ KiKiApi.prototype.fetchUser = function(user_id, callback) {
 
 
 
-var KiKiClient = function(api, callback){
+var KiKiClient = function(api, user, callback){
     this.api = api;
+    this.user = user;
     this.posts = [];
     this.primary = {};
     this.$el = $("#posts");
@@ -466,11 +472,11 @@ KiKiClient.prototype.collectUsersFromPost = function(post) {
 
     var _clbk = function(err, user){
         if (user) {
-            if (user && "" != user.image) {
-                $('img.profile-pic[owner_id="'+user.public_key+'"]').attr('src', '/img/'+user.image);
+            if (user && "" != user.getImage()) {
+                $('img.profile-pic[owner_id="'+user.getPublicKey()+'"]').attr('src', '/img/'+user.getImage());
             }
-            $('span.recipient[owner_id="'+user.public_key+'"]').text(
-                user.name || user.public_key
+            $('span.recipient[owner_id="'+user.getPublicKey()+'"]').text(
+                user.getDisplayName()
             );
         }
     }
@@ -492,6 +498,7 @@ KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
         $('.post-container[post_id="'+post_id+'"] .post-comments').html('');
         $('.post-container[post_id="'+post_id+'"] .post-comments').append(
             (function(){
+                if (!res.data.posts) {return [];}
                 var elems = [];
                 for (var i=0; i<res.data.posts.length; i++) {
                     var post = res.data.posts[i];
@@ -520,33 +527,6 @@ KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
     });
 };
 
-KiKiClient.prototype.openModal = function(event) {
-    $("#writingModal").modal();
-    $("#writingModalLabel").text($(this).data('title'));
-    $(".editable").focus(function() {
-        $(this).select();
-    });
-    if ($(this).data("usecontent")) {
-        $(".editable").html($("#" + $(this).data("usecontent")).html())
-    } else {
-        $(".editable").text("Write your post...");
-    }
-    if ($(this).data("makecontent")) {
-        $(".editable").html($(this).data("makecontent"));
-    }
-    if ($(this).data("replyto")) {
-        $("#letterReplyTo").val($(this).data("replyto"));
-    } else {
-        $("#letterReplyTo").val("");
-    }
-    if ($(this).data("replaces")) {
-        $("#letterReplaces").val($(this).data("replaces"));
-    } else {
-        $("#letterReplaces").val("");
-    }
-    $("#letterPurpose").val($(this).data("purpose"));
-}
-
 KiKiClient.prototype.buildPostElem = function(post) {
     var self = this;
     return $("<div>").append(
@@ -561,13 +541,13 @@ KiKiClient.prototype.buildPostElem = function(post) {
                     'data-purpose':"share-text"
                 }).addClass("editmodal").append(
                     $('<i>').addClass("fas fa-reply")
-                ).on('click', this.openModal),
+                ).on('click', app.openModal),
                 "&nbsp;",
 
                 // edit button
                 (function() {
                     // only display if current user owns the post
-                    if (post.owner_id == app.User.public_key) {
+                    if (post.owner_id == self.user.getPublicKey()) {
                         return [
                                 $("<a>", {
                                 'href': "#!",
@@ -575,11 +555,12 @@ KiKiClient.prototype.buildPostElem = function(post) {
                                 'data-title':"Edit post",
                                 'data-usecontent':post.id,
                                 'data-replaces':post.id,
-                                'data-purpose':"share-text"
+                                'data-purpose':"share-text",
+                                'data-replyto': post.reply_to
 
                             }).addClass("editmodal").append(
                                 $("<i>").addClass("fas fa-edit")
-                            ).on('click', this.openModal),
+                            ).on('click', app.openModal),
                             "&nbsp;"
                         ];
                     }
@@ -616,22 +597,22 @@ KiKiClient.prototype.buildPostElem = function(post) {
                 app.Users.fetchUser(user_id, function(err, user){
                     if (err) throw err;
                     if (user) {
-                        $("#modalNameName").text(user.name || user.public_key);
+                        $("#modalNameName").text(user.getDisplayName());
 
                         $("#modalNamePublicKey").text("");
                         if (user.name) {
-                            $("#modalNamePublicKey").text(user.public_key);
+                            $("#modalNamePublicKey").text(user.getPublicKey());
                         }
 
-                        $("#modalNameContent").html(user.profile);
+                        $("#modalNameContent").html(user.getProfile());
 
                         $("#modalNameImage").attr("src", null);
                         if (user.image && "" != user.image) {
-                            $("#modalNameImage").attr("src", '/img/'+user.image);
+                            $("#modalNameImage").attr("src", '/img/'+user.getImage());
                         }
 
                         $("#nameModal").modal();
-                        $("#followButton").attr("data-publickey", user.public_key);
+                        $("#followButton").attr("data-publickey", user.getPublicKey());
                     }
                 });
             }),
@@ -692,7 +673,7 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
 
 KiKiClient.prototype.init = function(callback){
     var self = this;
-    $('.user-info .editmodal').on('click', this.openModal);
+    $('.user-info .editmodal').on('click', app.openModal);
     $("#followButton").click(function() {
         self.api.followUser($(this).data("publickey"));
     });
@@ -709,20 +690,28 @@ KiKiClient.prototype.init = function(callback){
 
 
 
-var UserClient = function(api) {
+var UserClient = function(api, callback) {
     this.data = {};
     this.api = api;
-    this.init();
+    this.init(callback);
 }
 
-UserClient.prototype.init = function() {
+UserClient.prototype.init = function(callback) {
     var self = this;
     this.api.fetchUser(null, function(err,res){
         if (err) throw err;
         self.data = res.data.user;
+        self.user = new User(res.data.user, self.api, function(){
+            self.init();
+        });
         self.buildUserUi();
+        callback && callback(self);
     });
     this.addListeners();
+}
+
+UserClient.prototype.getPublicKey = function() {
+    return this.user.getPublicKey();
 }
 
 UserClient.prototype.addListeners = function() {
@@ -744,14 +733,15 @@ UserClient.prototype.addListeners = function() {
                         return;
                     };
                     swal('Success!', 'Your username has been changed.', 'success');
+                    self.user.update();
                 });
             }
         });
     });
 
-    $('.user-action.edit-profile').on('click', app.Posts.openModal);
+    $('.user-action.edit-profile').on('click', app.openModal);
+    // self.user.update();
 
-    //
     $(".toggle-list").on("click", function(){
         var self = this;
         $(this).siblings().slideToggle(250, function(){
@@ -822,11 +812,21 @@ UserClient.prototype.buildUserListItem = function(user) {
     );
 }
 
+UserClient.prototype.clearUserUi = function() {
+    $("#user-profile").html("");
+    $(".following .users-list").html("");
+    $(".followers .users-list").html("");
+    $(".friends .users-list").html("");
+    $(".blocked .users-list").html("");
+}
+
 UserClient.prototype.buildUserUi = function(){
     var self = this;
     if (this.data) {
+
+        this.clearUserUi();
+
         $("#user-name").text( this.data.name || this.data.public_key );
-        $("#user-profile").html("");
         $("#user-profile").append( this.data.profile );
         if (this.data.image && "" != this.data.image) {
             $("#user-profile-image").attr("src", "/img/"+ this.data.image);
@@ -837,7 +837,6 @@ UserClient.prototype.buildUserUi = function(){
         $(".friends span").text(this.data.friends.length);
         $(".blocked span").text(this.data.blocked.length);
 
-
         for (var i=0; i<this.data.following.length; i++) {
             var user_id = this.data.following[i];
             app.Users.fetchUser(user_id, function(err, user){
@@ -847,7 +846,6 @@ UserClient.prototype.buildUserUi = function(){
                 )
             });
         }
-
         for (var i=0; i<this.data.followers.length; i++) {
             var user_id = this.data.followers[i];
             app.Users.fetchUser(user_id, function(err, user){
@@ -878,14 +876,56 @@ UserClient.prototype.buildUserUi = function(){
             });
         }
 
-        // $(".connections span").text(this.data.connections.length);
-
     }
 }
 
 
 
 
+
+var User = function(data, api, onUpdate) {
+    this.data = data;
+    this.api = api;
+    if ("function" == typeof(onUpdate)) {
+        this.onUpdate = onUpdate;
+    }
+}
+
+User.prototype.getPublicKey = function() {
+    return this.data.public_key;
+}
+
+User.prototype.getUsername = function() {
+    return this.data.name;
+}
+
+User.prototype.getDisplayName = function() {
+    return this.data.name || this.data.public_key;
+}
+
+User.prototype.getProfile = function() {
+    return this.data.profile;
+}
+
+User.prototype.getImage = function() {
+    return this.data.image;
+}
+
+User.prototype.update = function() {
+    var self = this;
+    if (this.api) {
+        this.api.fetchUser(this.getPublicKey, function(err, res){
+            if (err) throw err;
+            self.data = res.data.user
+            self.onUpdate && self.onUpdate();
+        });
+    }
+}
+
+
+/**
+ *
+ */
 var UsersCollection = function(api) {
     this.api = api;
     this.data = {};
@@ -911,7 +951,7 @@ UsersCollection.prototype.fetchUser = function(user_id, callback) {
             self.runCallbacks(err, user_id);
             return;
         }
-        self.data[user_id] = res.data.user;
+        self.data[user_id] = new User(res.data.user, self.api);
         self.runCallbacks(null, user_id);
     });
 
@@ -925,19 +965,44 @@ UsersCollection.prototype.runCallbacks = function(err, user_id) {
 }
 
 
+
+
 var app = {}
+app.openModal = function(event) {
+    $("#writingModal").modal();
+    $("#writingModalLabel").text($(this).data('title'));
+    $(".editable").focus(function() {
+        $(this).select();
+    });
+    if ($(this).data("usecontent")) {
+        $(".editable").html($("#" + $(this).data("usecontent")).html())
+    } else {
+        $(".editable").text("Write your post...");
+    }
+    if ($(this).data("makecontent")) {
+        $(".editable").html($(this).data("makecontent"));
+    }
+    if ($(this).data("replyto")) {
+        $("#letterReplyTo").val($(this).data("replyto"));
+    } else {
+        $("#letterReplyTo").val("");
+    }
+    if ($(this).data("replaces")) {
+        $("#letterReplaces").val($(this).data("replaces"));
+    } else {
+        $("#letterReplaces").val("");
+    }
+    $("#letterPurpose").val($(this).data("purpose"));
+}
 app.Api = new KiKiApi();
 app.Users = new UsersCollection(app.Api);
-app.Posts = new KiKiClient(app.Api);
-app.User = new UserClient(app.Api);
-
+app.User = new UserClient(app.Api, function(user){
+    app.Posts = new KiKiClient(app.Api, user);
+});
 
 var updateInterval = setInterval(function(){
     console.log("update page");
 },10000);
-
-
-
 
 
 
