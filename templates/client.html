@@ -79,13 +79,22 @@
             right: 0;
             overflow-y: auto;
             z-index: 100;
-            top: 0;
+            /*top: 0;*/
+            to[: 91px;
             bottom: 0;
-            padding-top: 90px;
+            /*padding-top: 90px;*/
+            min-width: 300px;
+
+            border: 1px solid rgba(0,0,0,.125)
+            border-radius: .25rem;
         }
 
         .logo {
             color: white;
+        }
+
+        button.user-action {
+            min-width: 38px;
         }
 
     </style>
@@ -190,7 +199,19 @@
                 <h5 id="user-name"></h5>
             </div>
             <div id="user-profile"></div>
+            <div>
+                <button class="btn btn-sm user-action change-name" title="Change username">
+                    <i class="fas fa-comment-alt"></i>
+                </button>
+                <button class="editmodal btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
+                    <i class="fas fa-child"></i>
+                </button>
+                <button class="editmodal btn btn-sm user-action" title="Change profile image" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
+                    <i class="fas fa-upload"></i>
+                </button>
+            </div>
         </div>
+
     <!--.end User profile -->
 
     <!-- User actions -->
@@ -202,23 +223,7 @@
                         <i class="fas fa-pencil-alt"></i> Share
                     </a>
                 </li>
-                <li>
-                    <a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
-                        <i class="fas fa-child"></i> Edit profile
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
-                        <i class="fas fa-upload"></i> Change profile image
-                    </a>
-                </li>
 
-
-                <li>
-                    <a href="#!" class="user-action change-name">
-                        <i class="fas fa-comment-alt"></i> Change name
-                    </a>
-                </li>
                 <li>
                     <a href="#!" class="addserver">
                         <i class="fas fa-plus-circle"></i> Add server
