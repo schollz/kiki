@@ -18,16 +18,23 @@
   <link href="/static/bootstrap.medium.css" rel="stylesheet" />
 
 
+  <script src="https://unpkg.com/sweetalert2@7.4.1/dist/sweetalert2.all.js"></script>
+
     <style>
+        main {
+            padding-top: 90px;
+        }
+
         #posts {
             font-size: 16px;
+            padding-left: 24px;
         }
 
         .post-datetime {
             font-size: 14px;
         }
 
-        #posts img.profile-pic {
+        img.profile-pic {
             max-width: 25px;
             max-height: 25px;
         }
@@ -53,39 +60,55 @@
             width: 100%;
         }
 
-        #posts a {
+        #posts a, .user-actions a {
             text-decoration: none;
         }
 
         .users-list {
             max-height: 300px;
-            overflow-y: scroll;
+            overflow-y: auto;
         }
+
+        .user-profile-image {
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: 0;
+            overflow-y: auto;
+            z-index: 100;
+            /*top: 0;*/
+            to[: 91px;
+            bottom: 0;
+            /*padding-top: 90px;*/
+            min-width: 300px;
+
+            border: 1px solid rgba(0,0,0,.125)
+            border-radius: .25rem;
+        }
+
+        .logo {
+            color: white;
+        }
+
+        /*button.user-action {
+            max-width: 38px;
+        }*/
 
     </style>
 
 </head>
 
 <body>
-  <header>
-    <div class="blog-masthead">
-      <div class="container">
-        <nav class="nav">
-          <a class="nav-link active" href="/">Kiki</a>
-          <!-- <a class="nav-link" href="#">Help</a>
-          <a class="nav-link" href="#">About</a> -->
-        </nav>
-      </div>
-    </div>
-    <!--         <div class="blog-header">
-                <div class="container">
-                    <h1 class="blog-title">The Bootstrap Blog</h1>
-                    <p class="lead blog-description">An example blog template built with Bootstrap.</p>
-                </div>
-            </div>
-        -->
-  </header>
-  <main role="main" class="container">
+
+    <!-- <header></header> -->
+    <nav class="blog-masthead navbar fixed-top">
+        <a class="navbar-brand logo" href="#">Kiki</a>
+    </nav>
+
+  <main role="main" class="container-fluid">
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterReplaces" value="" />
@@ -162,66 +185,99 @@
         </nav>
       </div>
       <!-- /.blog-main -->
-      <aside class="col-sm-3 ml-sm-auto blog-sidebar">
+
+
+<!-- <nav>  -->
+      <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar">
+
+    <!-- User profile -->
         <div class="sidebar-module sidebar-module-inset">
-          <img id="user-profile-image" class="user-profile-image">
-          <h4><div id="user-name"></div></h4>
-          <div id="user-profile"></div>
-        </div>
-        <div class="sidebar-module user-info">
-          <div><label>Actions</label></div>
-          <ol class="list-unstyled">
-            <!-- <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">Write</a></li>
-            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">Edit profile</a></li>
-            <li><a href="#"  class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">Upload image</a></li>
-            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name">Change name</a></li> -->
-
-
-            <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text"><i class="fas fa-pencil-alt"></i>&nbsp; Share</a></li>
-            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile"><i class="fas fa-child"></i>&nbsp;
-            Edit profile</a></li>
-            <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image..."><i class="fas fa-upload"></i>&nbsp;
-            Change profile image</a></li>
-            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name"><i class="fas fa-comment-alt"></i>&nbsp;
-            Change name</a></li>
-            <li><a href="#!" class="addserver"><i class="fas fa-plus-circle"></i>&nbsp;
-            Add server</a></li>
-            <li><a href="#!" class="syncup"><i class="fas fa-sync-alt"></i>&nbsp;
-            Sync</a></li>
-            <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
-            Follow someone</a></li>
-            <li><a href="#!" class="blocksomeone"><i class="fas fa-user-times"></i>&nbsp;
-            Block someone</a></li>
-            <li><a href="#!" class="eraseprofile"><i class="fas fa-trash-alt"></i>&nbsp;
-            Erase profile</a></li>
-
-          </ol>
+            <div>
+                <img id="user-profile-image" class="user-profile-image">
+            </div>
+            <div>
+                <h5 id="user-name"></h5>
+            </div>
+            <div id="user-profile"></div>
+            <div>
+                <button class="btn btn-sm user-action change-name" title="Change username">
+                    <i class="fas fa-comment-alt"></i>
+                </button>
+                <button class="edit-profile btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <button class="editmodal btn btn-sm user-action" title="Change profile image" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
+                    <i class="fas fa-upload"></i>
+                </button>
+            </div>
         </div>
 
+    <!--.end User profile -->
 
-        <div class="sidebar-module following">
-          <div><label>Following</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list">
-            <!-- <li><a href="#!" class="activatenamemodal publickey" data-name="Name" data-publickey="PublicKey" data-content="Profile" data-image="/img/"><div class="publickey"><img src="/img/Image" class="align-middle profile-pic">Name<small>PublicKey</small></div></a></li> -->
-          </ol>
-        </div>
-        <div class="sidebar-module followers">
-          <div><label>Followers</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
-        </div>
-        <div class="sidebar-module friends">
-          <div><label>Friends</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
-        </div>
-        <div class="sidebar-module connections">
-          <div><label>Connections</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
-        </div>
-        <div class="sidebar-module blocked">
-          <div><label>Blocked</label> (<span>0</span>)</div>
-          <ol class="list-unstyled users-list"></ol>
-        </div>
+    <!-- User actions -->
+        <div class="sidebar-module user-info user-actions">
+            <div><label>Actions</label></div>
+            <ol class="list-unstyled">
+                <li>
+                    <a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text">
+                        <i class="fas fa-pencil-alt"></i> Share
+                    </a>
+                </li>
 
+                <li>
+                    <a href="#!" class="addserver">
+                        <i class="fas fa-server"></i> Add server
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="syncup">
+                        <i class="fas fa-sync-alt"></i> Sync
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="#!" class="followsomeone">
+                        <i class="fas fa-user-plus"></i> Follow someone
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="blocksomeone">
+                        <i class="fas fa-user-times"></i> Block someone
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="eraseprofile">
+                        <i class="fas fa-trash-alt"></i> Erase profile
+                    </a>
+                </li>
+
+            </ol>
+        </div>
+    <!--.end User actions -->
+
+        <div class="user-lists">
+            <div class="sidebar-module following">
+                <div><label>Following</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module followers">
+                <div><label>Followers</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module friends">
+                <div><label>Friends</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module connections">
+                <div><label>Connections</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+            <div class="sidebar-module blocked">
+                <div><label>Blocked</label> (<span>0</span>)</div>
+                <ol class="list-unstyled users-list"></ol>
+            </div>
+        </div>
 
 
       </aside>
@@ -230,12 +286,12 @@
     <!-- /.row -->
   </main>
   <!-- /.container -->
-  <footer class="blog-footer">
+  <!-- <footer class="blog-footer">
     <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
     <p>
       <a href="#">Back to top</a>
     </p>
-  </footer>
+  </footer> -->
   <!-- Bootstrap core JavaScript
     ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
@@ -295,6 +351,14 @@ KiKiApi.prototype.likePost = function(post_id) {
         "to": ["public"],
         "content": post_id,
     });
+}
+
+KiKiApi.prototype.changeName = function(name, callback) {
+    this.submitLetter({
+        "purpose": "action-assign/name",
+        "to": ["public"],
+        "content": name
+    }, callback);
 }
 
 KiKiApi.prototype.followUser = function(user_id) {
@@ -620,6 +684,67 @@ UserClient.prototype.init = function() {
         self.data = res.data.user;
         self.buildUserUi();
     });
+    this.addListeners();
+}
+
+UserClient.prototype.addListeners = function() {
+    var self = this;
+    $('.user-action.change-name').on('click', function(){
+        swal({
+            title: 'Username',
+            text: 'Would you like to change your username?',
+            type: 'warning',
+            input: 'text',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        }).then(function(result) {
+            if (result.value) {
+                self.api.changeName(result.value, function(err, res) {
+                    if (err) {
+                        swal('Error!', 'An error occurred: ' + err.message, 'error');
+                        return;
+                    };
+                    swal('Success!', 'Your username has been changed.', 'success');
+                });
+            }
+        });
+    });
+
+    $('.user-action.edit-profile').on('click', app.Posts.openModal);
+
+    $(".syncup").on("click", function(){
+        // event.preventDefault();
+        var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
+        posting.done(function( data ) {
+            toastr.success(data.message, "Updating Kiki");
+        });
+    });
+
+
+    $(".addserver").on("click", function(){
+        //   event.preventDefault();
+        swal({
+            title: 'Server connection',
+            text: 'Enter a server to connect to:',
+            type: 'warning',
+            input: 'url',
+            inputPlaceholder: 'https://kiki.network',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        }).then(function(result) {
+            if (result.value) {
+                var posting = $.post( "/sync", JSON.stringify({ "address": result.value }) );
+                posting.done(function( data ) {
+                    toastr.success(data.message, "Updating Kiki");
+                });
+            }
+        });
+    });
+
+
+
 }
 
 UserClient.prototype.buildUserListItem = function(user) {
@@ -713,7 +838,6 @@ var UsersCollection = function(api) {
     this.api = api;
     this.data = {};
     this.callbacks = {};
-    // this.queue =
 }
 
 UsersCollection.prototype.fetchUser = function(user_id, callback) {
@@ -803,7 +927,7 @@ var updateInterval = setInterval(function(){
       }
     });
     $(document).ready(function() {
-      $("img").addClass("img-fluid");
+    //   $("img").addClass("img-fluid");
       $("#submit-writing").click(function(event) {
         // Stop form from submitting normally
         event.preventDefault();
@@ -825,50 +949,16 @@ var updateInterval = setInterval(function(){
       });
 
 
-      $(".syncup").click(function(event){
-        event.preventDefault();
-        var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
-        posting.done(function( data ) {
-          toastr["success"](data['message'], "Updating Kiki");
-        });
-      })
-
-      $(".addserver").click(function(event){
-        event.preventDefault();
-        var server = prompt("Enter a server to connect to", "https://kiki.network");
-        if (server != null) {
-          // Send the data using post
-         var posting = $.post( "/sync", JSON.stringify({ "address": server }) );
-         // Put the results in a div
-         posting.done(function( data ) {
-           console.log(data);
-           toastr["success"](data['message'], "Updating Kiki");
-         });
-        }
-      })
-
-
-
-
-      var restrictInput = function(event) {
-        $("img:not(.img-fluid)").addClass("img-fluid");
-      }
-      editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
-
-
-
-
-
-
       // SCROLL TO TOP
-      $('body').append(
-          $('<div>', {id: 'toTop'})
+        $('body').append(
+            $('<div>', {id: 'toTop'})
                 .css({
                     'position': 'fixed',
                     'bottom': '20px',
                     'right': '40px',
                     'cursor': 'pointer',
-                    'display': 'none'
+                    'display': 'none',
+                    'z-index': 1000
                 })
                 .addClass('btn btn-info')
                 .append(
@@ -876,7 +966,7 @@ var updateInterval = setInterval(function(){
                 ).on('click', function(){
                     $("html, body").animate({ scrollTop: 0 }, 600);
                 })
-      );
+        );
         $(window).scroll(function () {
             if ($(this).scrollTop() != 0) {
                 $('#toTop').fadeIn();
