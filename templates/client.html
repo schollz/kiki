@@ -27,6 +27,7 @@
 
         #posts {
             font-size: 16px;
+            padding-left: 24px;
         }
 
         .post-datetime {
@@ -77,15 +78,11 @@
             position: fixed;
             right: 0;
             overflow-y: auto;
-            z-index: 1000;
+            z-index: 100;
             top: 0;
             bottom: 0;
             padding-top: 90px;
         }
-
-        /*.user-lists {
-            overflow-y: auto;
-        }*/
 
         .logo {
             color: white;
@@ -102,7 +99,7 @@
         <a class="navbar-brand logo" href="#">Kiki</a>
     </nav>
 
-  <main role="main" class="container">
+  <main role="main" class="container-fluid">
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterReplaces" value="" />
@@ -945,28 +942,16 @@ var updateInterval = setInterval(function(){
       });
 
 
-
-
-
-      var restrictInput = function(event) {
-        $("img:not(.img-fluid)").addClass("img-fluid");
-      }
-      editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
-
-
-
-
-
-
       // SCROLL TO TOP
-      $('body').append(
-          $('<div>', {id: 'toTop'})
+        $('body').append(
+            $('<div>', {id: 'toTop'})
                 .css({
                     'position': 'fixed',
                     'bottom': '20px',
                     'right': '40px',
                     'cursor': 'pointer',
-                    'display': 'none'
+                    'display': 'none',
+                    'z-index': 1000
                 })
                 .addClass('btn btn-info')
                 .append(
@@ -974,7 +959,7 @@ var updateInterval = setInterval(function(){
                 ).on('click', function(){
                     $("html, body").animate({ scrollTop: 0 }, 600);
                 })
-      );
+        );
         $(window).scroll(function () {
             if ($(this).scrollTop() != 0) {
                 $('#toTop').fadeIn();
