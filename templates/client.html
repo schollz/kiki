@@ -470,7 +470,7 @@ var KiKiClient = function(api, user, callback){
 
 KiKiClient.prototype.collectUsersFromPost = function(post) {
 
-    var _clbk = function(err, user){
+    var _onUpdateCallback = function(err, user) {
         if (user) {
             if (user && "" != user.getImage()) {
                 $('img.profile-pic[owner_id="'+user.getPublicKey()+'"]').attr('src', '/img/'+user.getImage());
@@ -481,35 +481,43 @@ KiKiClient.prototype.collectUsersFromPost = function(post) {
         }
     }
 
-    app.Users.fetchUser(post.owner_id, _clbk);
-    if (post.recipients) {
-        for (var i=0; i<post.recipients.length; i++) {
-            app.Users.fetchUser(post.recipients[i], _clbk);
+    var _clbk = function(err, user){
+        if (user && 0 == user.callbacks.length) {
+            user.registerUpdateCallback(_onUpdateCallback);
+        }
+        _onUpdateCallback(err, user);
+    }
+
+    app.Users.fetchUser(post.getOwnerId(), _clbk);
+    var recipients = post.getRecipients();
+    if (post.getRecipients()) {
+        for (var i=0; i<recipients.length; i++) {
+            app.Users.fetchUser(recipients[i], _clbk);
         }
     }
 }
 
 KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
     var self = this;
-    this.api.fetchPostComments(post_id, function(err, res){
+    app.Posts.fetchPostComments(post_id, function(err, posts){
         if (err) throw err;
         // recursive build
         var post_comments = [];
         $('.post-container[post_id="'+post_id+'"] .post-comments').html('');
         $('.post-container[post_id="'+post_id+'"] .post-comments').append(
             (function(){
-                if (!res.data.posts) {return [];}
+                // if (!posts) {return [];}
                 var elems = [];
-                for (var i=0; i<res.data.posts.length; i++) {
-                    var post = res.data.posts[i];
-                    if (0 != post.num_comments) {
-                        post_comments.push(post.id);
+                for (var i=0; i<posts.length; i++) {
+                    var post = posts[i];
+                    if (0 != post.data.num_comments) {
+                        post_comments.push(post.getPostId());
                     }
 
                     self.collectUsersFromPost(post);
 
                     elems.push(
-                        $("<div>", {post_id: post.id}).addClass('post-container').append(
+                        $("<div>", {post_id: post.getPostId()}).addClass('post-container').append(
                             $('<div>').addClass('col-12').append(
                                 self.buildPostElem(post)
                             )
@@ -535,9 +543,9 @@ KiKiClient.prototype.buildPostElem = function(post) {
                 "&nbsp;",
                 $("<a>", {
                     'href': "#!",
-                    'title': "Reply to " + post.owner_name,
-                    'data-title': "Reply to " + post.owner_name,
-                    'data-replyto': post.id,
+                    'title': "Reply to " + post.data.owner_name,
+                    'data-title': "Reply to " + post.data.owner_name,
+                    'data-replyto': post.getPostId(),
                     'data-purpose':"share-text"
                 }).addClass("editmodal").append(
                     $('<i>').addClass("fas fa-reply")
@@ -553,10 +561,10 @@ KiKiClient.prototype.buildPostElem = function(post) {
                                 'href': "#!",
                                 'title': "Edit post",
                                 'data-title':"Edit post",
-                                'data-usecontent':post.id,
-                                'data-replaces':post.id,
+                                'data-usecontent':post.getPostId(),
+                                'data-replaces':post.getPostId(),
                                 'data-purpose':"share-text",
-                                'data-replyto': post.reply_to
+                                'data-replyto': post.data.reply_to
 
                             }).addClass("editmodal").append(
                                 $("<i>").addClass("fas fa-edit")
@@ -570,12 +578,12 @@ KiKiClient.prototype.buildPostElem = function(post) {
                 // like button
                 $("<a>",  {
                         'href': "#!",
-                        "data-id":post.id
+                        "data-id":post.getPostId()
                     }).addClass("likebutton").append(
                         $("<i>").addClass("fas fa-heart"),
                         "x"+(post.likes||0)
                     ).on('click', function() {
-                        self.api.likePost(post.id);
+                        self.api.likePost(post.getPostId());
                     })
                 //.end
 
@@ -622,11 +630,12 @@ KiKiClient.prototype.buildPostElem = function(post) {
             " to ",
             (function(){
                 var elems = [];
-                for (var i=0; i<post.recipients.length; i++) {
+                var recipients = post.getRecipients();
+                for (var i=0; i<recipients.length; i++) {
                     elems.push(
                         $("<span>", {
-                            owner_id: post.recipients[i]
-                        }).addClass('recipient').append(post.recipients[i])
+                            owner_id: recipients[i]
+                        }).addClass('recipient').append(recipients[i])
                     );
                 }
                 return elems;
@@ -635,13 +644,13 @@ KiKiClient.prototype.buildPostElem = function(post) {
 
             "<br>",
             $("<span>").addClass('text-muted post-datetime').append(
-                $('<a>', {href:'/?id='+post.id}).append(
-                    new Date(post.timestamp*1000)
+                $('<a>', {href:'/?id='+post.getPostId()}).append(
+                    new Date(post.data.timestamp*1000)
                 )
             )
         ),
 
-        $('<div>', {id:post.id}).append(post.content),
+        $('<div>', {id:post.getPostId()}).append(post.getContent()),
         $('<div>').addClass('post-comments row')
     );
 }
@@ -649,7 +658,7 @@ KiKiClient.prototype.buildPostElem = function(post) {
 
 KiKiClient.prototype.buildPostUi = function(post) {
     var self = this;
-    return $("<div>", {post_id: post.id}).addClass("card post-container").append(
+    return $("<div>", {post_id: post.getPostId()}).addClass("card post-container").append(
         $("<div>").addClass("card-body").append(
             self.buildPostElem(post)
         )
@@ -664,7 +673,7 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
         );
 
         if (0 != post.num_comments) {
-            this.buildPostCommentsUi(post.id);
+            this.buildPostCommentsUi(post.getPostId());
         }
 
         this.collectUsersFromPost(post);
@@ -677,11 +686,11 @@ KiKiClient.prototype.init = function(callback){
     $("#followButton").click(function() {
         self.api.followUser($(this).data("publickey"));
     });
-    this.api.fetchPosts(function(err,res){
+    app.Posts.fetchPosts(function(err, posts){
         if (err) {
             throw err;
         }
-        self.posts = res.data.posts;
+        self.posts = posts;
         self.buildPostsUi();
     });
     callback && callback();
@@ -693,6 +702,7 @@ KiKiClient.prototype.init = function(callback){
 var UserClient = function(api, callback) {
     this.data = {};
     this.api = api;
+    this.addListeners();
     this.init(callback);
 }
 
@@ -701,13 +711,13 @@ UserClient.prototype.init = function(callback) {
     this.api.fetchUser(null, function(err,res){
         if (err) throw err;
         self.data = res.data.user;
-        self.user = new User(res.data.user, self.api, function(){
+        self.user = new User(res.data.user, self.api);
+        self.user.registerUpdateCallback(function(){
             self.init();
         });
         self.buildUserUi();
         callback && callback(self);
     });
-    this.addListeners();
 }
 
 UserClient.prototype.getPublicKey = function() {
@@ -793,20 +803,20 @@ UserClient.prototype.buildUserListItem = function(user) {
     return $('<li>').append(
             $('<a>', {
                 'href': "#!",
-                'data-name': user.name,
-                'data-publickey': user.public_key,
-                'data-content': user.profile
+                'data-name': user.getDisplayName(),
+                'data-publickey': user.getPublicKey(),
+                'data-content': user.getProfile()
             }).addClass('activatenamemodal publickey').append(
                 $('<div>').addClass('publickey').append(
                     $("<img>",{
                         src: (function(){
-                            if (user.image && "" != user.image) {
-                                return "/img/" + user.image;
+                            if (user.getImage() && "" != user.getImage()) {
+                                return "/img/" + user.getImage();
                             }
                             return null;
                         })()
                     }).addClass('align-middle profile-pic'),
-                    $('<small>').append(user.name || user.public_key)
+                    $('<small>').append(user.getDisplayName())
                 )
             )
     );
@@ -883,11 +893,191 @@ UserClient.prototype.buildUserUi = function(){
 
 
 
-var User = function(data, api, onUpdate) {
+
+var Post = function(data, api) {
     this.data = data;
     this.api = api;
-    if ("function" == typeof(onUpdate)) {
-        this.onUpdate = onUpdate;
+    this.comments = null;
+    this.callbacks = [];
+}
+
+Post.prototype.registerUpdateCallback = function(callback) {
+    if ("function" == typeof(callback)) {
+        this.callbacks.push(callback);
+    }
+}
+
+Post.prototype.getContent = function() {
+    return this.data.content;
+}
+
+Post.prototype.getPostId = function() {
+    return this.data.id;
+}
+
+Post.prototype.getOwnerId = function() {
+    return this.data.owner_id;
+}
+
+Post.prototype.getOwner = function(callback) {
+    // return this.data.owner_id;
+}
+
+Post.prototype.getComments = function(callback) {
+    // return this.data.owner_id;
+}
+
+Post.prototype.getRecipients = function() {
+    return this.data.recipients;
+}
+
+Post.prototype.onUpdate = function() {
+    for (var i=0; i<this.callbacks.length; i++) {
+        this.callbacks[i]();
+    }
+}
+
+Post.prototype.update = function() {
+    var self = this;
+    if (this.api) {
+        this.api.fetchPost(this.getPostId(), function(err, res){
+            if (err) throw err;
+            self.data = res.data.post[0];
+            self.onUpdate();
+        });
+    }
+}
+
+
+var PostsCollection = function(api) {
+    this.api = api;
+    this.data = {};
+    this.callbacks = {};
+}
+
+PostsCollection.prototype.addPost = function(data) {
+    var post = new Post(data, this.api);
+    this.data[data.id] = post;
+    return post;
+}
+
+PostsCollection.prototype.addPosts = function(data) {
+    var posts = [];
+    for (var i=0; i<data.length; i++) {
+        posts.push(this.addPost(data[i]));
+    }
+    return posts;
+}
+
+PostsCollection.prototype.fetchPosts = function(callback){
+    var self = this;
+    this.api.fetchPosts(function(err, res){
+        var posts = [];
+        if(!err && res.data.posts) {
+            posts = self.addPosts(res.data.posts);
+        }
+        callback && callback(err, posts);
+    });
+}
+
+PostsCollection.prototype.fetchPost = function(post_id, callback) {
+    var self = this;
+    if (this.data[post_id]) {
+        return callback(null, this.data[post_id]);
+    }
+    if (!this.callbacks[post_id]) {
+        this.callbacks[post_id] = [];
+    }
+    this.callbacks[post_id].push(callback);
+    // only fire one request
+    if (1 < this.callbacks[post_id].length){
+        return
+    };
+    // fetch from api
+    this.api.fetchPost(post_id, function(err, res){
+        if (err) {
+            self.runCallbacks(err, post_id);
+            return;
+        }
+        if (res.data.posts && res.data.posts[0]) {
+            self.data[post_id] = new Post(res.data.posts[0], self.api);
+            self.runCallbacks(null, post_id);
+        } else {
+            self.runCallbacks(new Error("Not found"));
+        }
+    });
+}
+
+PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
+    var self = this;
+    if (!this.data[post_id]) {
+        return this.fetchPost(post_id, function(){
+            self.fetchPostComments(post_id, callback);
+        });
+    }
+    if (this.data[post_id] && this.data[post_id].comments) {
+        return callback(null, this.data[post_id].comments);
+    }
+    if (!this.callbacks['comments_'+post_id]) {
+        this.callbacks['comments_'+post_id] = [];
+    }
+    this.callbacks['comments_'+post_id].push(callback);
+    // only fire one request
+    if (1 < this.callbacks['comments_'+post_id].length){
+        return
+    };
+    // fetch from api
+    this.api.fetchPostComments(post_id, function(err, res){
+        if (err) {
+            self.runCommentCallbacks(err, post_id);
+            return;
+        }
+        if (res.data.posts) {
+            self.data[post_id].comments = self.addPosts(res.data.posts);
+        } else {
+            self.data[post_id].comments = [];
+        }
+        self.runCommentCallbacks(null, post_id);
+    });
+
+}
+
+PostsCollection.prototype.runCommentCallbacks = function(err, post_id) {
+    while (this.callbacks['comments_'+post_id].length) {
+        var callback = this.callbacks['comments_'+post_id].shift();
+        callback && callback(err, this.data[post_id].comments);
+    }
+    if (0 == this.callbacks['comments_'+post_id].length) {
+        delete this.callbacks['comments_'+post_id];
+    }
+}
+
+PostsCollection.prototype.runCallbacks = function(err, post_id) {
+    while (this.callbacks[post_id].length) {
+        var callback = this.callbacks[post_id].shift();
+        callback && callback(err, this.data[post_id]);
+    }
+    if (0 == this.callbacks[post_id].length) {
+        delete this.callbacks[post_id];
+    }
+}
+
+
+var User = function(data, api) {
+    this.data = data;
+    this.api = api;
+    this.callbacks = [];
+}
+
+User.prototype.registerUpdateCallback = function(callback) {
+    if ("function" == typeof(callback)) {
+        this.callbacks.push(callback);
+    }
+}
+
+User.prototype.onUpdate = function() {
+    for (var i=0; i<this.callbacks.length; i++) {
+        this.callbacks[i]();
     }
 }
 
@@ -914,18 +1104,15 @@ User.prototype.getImage = function() {
 User.prototype.update = function() {
     var self = this;
     if (this.api) {
-        this.api.fetchUser(this.getPublicKey, function(err, res){
+        this.api.fetchUser(this.getPublicKey(), function(err, res){
             if (err) throw err;
             self.data = res.data.user
-            self.onUpdate && self.onUpdate();
+            self.onUpdate();
         });
     }
 }
 
 
-/**
- *
- */
 var UsersCollection = function(api) {
     this.api = api;
     this.data = {};
@@ -952,6 +1139,7 @@ UsersCollection.prototype.fetchUser = function(user_id, callback) {
             return;
         }
         self.data[user_id] = new User(res.data.user, self.api);
+        // self.data[user_id].registerUpdateCallback(callback);
         self.runCallbacks(null, user_id);
     });
 
@@ -996,8 +1184,9 @@ app.openModal = function(event) {
 }
 app.Api = new KiKiApi();
 app.Users = new UsersCollection(app.Api);
+app.Posts = new PostsCollection(app.Api);
 app.User = new UserClient(app.Api, function(user){
-    app.Posts = new KiKiClient(app.Api, user);
+    app.Ui = new KiKiClient(app.Api, user);
 });
 
 var updateInterval = setInterval(function(){
