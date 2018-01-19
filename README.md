@@ -84,22 +84,22 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 
 32. A envelope is sealed using public-private key encryption so that only intended recipients can open it. You are also a recipient of your own letters.
 33. A **public** letter is one which is additionally sealed with the *region keypair*. Everyone on the network has this keypair and will be able to unseal the envelope.
-34. A **friends** letter is one that is sealed against the latest personal *friends keypair*.
-35. The *friends keypair* is generated for each user on initiation.
-36. A *friends keypair* is shared upon making a **friend**.
+34. A **friends** letter is one that is sealed against the latest personal **friends keypair**.
+35. The **friends keypair** is just a keypair that is generated for each user on initiation.
+36. Two friends keypairs are shared upon making a **friend**.
 37. A **friend** is someone that you follow, that also follows you.
 38. By unfriending, you generate a new *friends keypair* which is transmitted to your remaining friends. Your ex-friend will still see your old content, but not the new content.
-39. You can also send a letter addressed to specific people.
+39. You can also send a letter addressed to specific people by specifying their public keys.
 .
 *Editing and deletion*
 
-40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the previous letter using **replaces** tag.
-41. Only everything on *kiki* is deletable (e.g. your profile). By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (__Note__: since letters are signed, you cannot delete someone else's profile).
+40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the previous letter using a **replaces** tag.
+41. You can delete anything you made on *kiki*. By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (__Note__: since letters are signed, you cannot delete someone else's profile).
 
 *The Feed*
 
-42. Your **feed** is a representation of all the envelopes that are accessible to you. 
-43. Letters than contain shared images/text are aggregated in reverse-chronological order in a displayed **feed**.
+42. Your **feed** is a representation of all the envelopes that are accessible to you (i.e. addressed to you, addressed to friends, or addressed to public).
+43. The representation of letters is most generally a website where shared images/text are aggregated in reverse-chronological order in a displayed **feed**. (__Note__: *kiki* is not a website - it is an infrastructure. Feel free to build your own display).
 44. You can also hide things from showing up in the feed by editing a post so that its content is empty (effectively deleting it).
 45. When editing content, only the latest edit is shown in the feed.
 46. All functions of *kiki* are accessible from the feed (e.g. sending letters of various purposes).
@@ -132,7 +132,7 @@ kiki -region-public 'X' -region-private 'Y'
 
 ## Status
 
-kiki has rough edges, and is not yet suitable for non-technical users.
+*kiki* is in alpha status. You can use it, but breaking changes may still occur. *kiki* has rough edges, and is not yet suitable for non-technical users.
 
 [![Build Status](https://travis-ci.org/schollz/kiki.svg?branch=master)](https://travis-ci.org/schollz/kiki)
 
@@ -151,12 +151,13 @@ Please report issues through
 
 ## Community
 
-All kiki users should subscribe to the
-[kiki Announcements mailing list](https://groups.google.com/forum/#!forum/kiki-announce)
-to receive critical information about the project.
+All kiki users should subscribe `WORLD1` to see the public sharing of ideas, knowledge, and code for building *kiki*:
 
-Use the [kiki mailing list](https://groups.google.com/forum/#!forum/kiki)
-for discussion about kiki use and development.
+```
+kiki -region-public 'iXBCWwVSzEPRDBH645mssgKuDi0Z5a_hRy4I6qjTYiQ=' -region-private 'E6yz0wKVoo2vMgHPuWOM5h84Tjo3q9J-eqiJOqgZIL8=' -path world1
+```
+
+You can send @schollz a message at `zzbo1SZvn20bOd5KQQaVYJRLy_qFm5KrbI63W8_C4TI=`.
 
 
 ### Code of Conduct
