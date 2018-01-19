@@ -76,17 +76,21 @@
 
         .sidebar {
             position: fixed;
-            right: 0;
+            /*right: 0;*/
             overflow-y: auto;
             z-index: 100;
             /*top: 0;*/
-            to[: 91px;
-            bottom: 0;
+            top: 90px;
+            /*bottom: 0;*/
+            bottom: 84px;
             /*padding-top: 90px;*/
-            min-width: 300px;
-
-            border: 1px solid rgba(0,0,0,.125)
+            /*min-width: 300px;*/
+            border: 1px solid rgba(0,0,0,.125);
             border-radius: .25rem;
+        }
+
+        .sidebar-wrapper {
+            position: relative;
         }
 
         .logo {
@@ -188,8 +192,8 @@
 
 
 <!-- <nav>  -->
-      <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar">
-
+      <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar-wrapper">
+<div class="sidebar">
     <!-- User profile -->
         <div class="sidebar-module sidebar-module-inset">
             <div>
@@ -224,6 +228,7 @@
                     </a>
                 </li>
 
+
                 <li>
                     <a href="#!" class="addserver">
                         <i class="fas fa-server"></i> Add server
@@ -234,9 +239,14 @@
                         <i class="fas fa-sync-alt"></i> Sync
                     </a>
                 </li>
-
-
                 <li>
+                    <a href="#!" class="eraseprofile">
+                        <i class="fas fa-trash-alt"></i> Erase profile
+                    </a>
+                </li>
+
+
+                <!-- <li>
                     <a href="#!" class="followsomeone">
                         <i class="fas fa-user-plus"></i> Follow someone
                     </a>
@@ -245,13 +255,7 @@
                     <a href="#!" class="blocksomeone">
                         <i class="fas fa-user-times"></i> Block someone
                     </a>
-                </li>
-                <li>
-                    <a href="#!" class="eraseprofile">
-                        <i class="fas fa-trash-alt"></i> Erase profile
-                    </a>
-                </li>
-
+                </li> -->
             </ol>
         </div>
     <!--.end User actions -->
@@ -279,7 +283,7 @@
             </div>
         </div>
 
-
+</div>
       </aside>
       <!-- /.blog-sidebar -->
     </div>
