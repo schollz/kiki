@@ -15,12 +15,17 @@ How is *kiki* different? The main difference is that *the social network exists 
 
 ## Features
 
+
+- You can use *kiki* offline.
+- You have all the data, all the time. 
+- You have total control of your posts - you can easily edit/delete posts and profiles.
+- You can comment on posts so that only friends can see.
+- Storage goes towards content rather than styling.
 - Single binary (*kiki*), single settings file (*kiki.json*), and a setting database (*kiki.db*, an `sqlite3` db).
 - Cross-platform, with [binaries for every OS/architecture](https://github.com/schollz/kiki/releases/latest).
 - Easily federated (just a command line flag to federate).
-- You have total control. You can easily edit/delete posts and profiles.
-- You can comment on posts so that only friends can see .
-- Storage goes towards content rather than styling.
+
+## Why?
 
 Does this already exist? Yes, of course.
 
