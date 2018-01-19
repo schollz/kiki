@@ -366,7 +366,13 @@
         /* options which only apply when static is true */
         align: 'center',
         sticky: false,
-        updateOnEmptySelection: false
+        updateOnEmptySelection: false,
+        placeholder: {
+          /* This example includes the default options for placeholder,
+             if nothing is passed this is what it used */
+          text: 'Type your text',
+          hideOnClick: true
+        }
       }
     });
     $(document).ready(function() {
@@ -425,12 +431,15 @@
         });
         console.log($(this).data("usecontent"));
         if ($(this).data("usecontent")) {
-          $(".editable").html($("#" + $(this).data("usecontent")).html())
+          editor.setContent($("#" + $(this).data("usecontent")).html());
+          // $(".editable").html($("#" + $(this).data("usecontent")).html())
         } else {
-          $(".editable").text("Write your post");
+          editor.setContent("");
+          // $(".editable").text("Write your post");
         }
         if ($(this).data("makecontent")) {
-          $(".editable").html($(this).data("makecontent"));
+          editor.setContent($(this).data("makecontent"));
+          // $(".editable").html($(this).data("makecontent"));
         }
         if ($(this).data("replyto")) {
           $("#letterReplyTo").val($(this).data("replyto"));
