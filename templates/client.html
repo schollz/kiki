@@ -93,9 +93,9 @@
             color: white;
         }
 
-        button.user-action {
-            min-width: 38px;
-        }
+        /*button.user-action {
+            max-width: 38px;
+        }*/
 
     </style>
 
@@ -203,8 +203,8 @@
                 <button class="btn btn-sm user-action change-name" title="Change username">
                     <i class="fas fa-comment-alt"></i>
                 </button>
-                <button class="editmodal btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
-                    <i class="fas fa-child"></i>
+                <button class="edit-profile btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
+                    <i class="fas fa-user-circle"></i>
                 </button>
                 <button class="editmodal btn btn-sm user-action" title="Change profile image" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
                     <i class="fas fa-upload"></i>
@@ -226,7 +226,7 @@
 
                 <li>
                     <a href="#!" class="addserver">
-                        <i class="fas fa-plus-circle"></i> Add server
+                        <i class="fas fa-server"></i> Add server
                     </a>
                 </li>
                 <li>
@@ -710,6 +710,8 @@ UserClient.prototype.addListeners = function() {
             }
         });
     });
+
+    $('.user-action.edit-profile').on('click', app.Posts.openModal);
 
     $(".syncup").on("click", function(){
         // event.preventDefault();
