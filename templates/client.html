@@ -98,12 +98,7 @@
         }
 
         .user-lists .sidebar-module {
-            /*padding: 0.75rem;*/
             padding: 5px 10px;
-            /*padding-right: 0.75rem;
-            padding-left: 0.75rem;
-            padding-top: 0.37rem;
-            padding-top: 0.37rem;*/
             border: 1px solid rgba(0,0,0,.125);
             border-radius: .25rem;
             margin: 5px;
@@ -286,23 +281,43 @@
 
         <div class="user-lists">
             <div class="sidebar-module following">
-                <div class="toggle-list">Following (<span>0</span>)</div>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                    Following (<span>0</span>)
+                </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module followers">
-                <div class="toggle-list">Followers (<span>0</span>)</div>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Followers (<span>0</span>)
+                 </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module friends">
-                <div class="toggle-list">Friends (<span>0</span>)</div>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Friends (<span>0</span>)
+                 </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module connections">
-                <div class="toggle-list">Connections (<span>0</span>)</div>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Connections (<span>0</span>)
+                 </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module blocked">
-                <div class="toggle-list">Blocked (<span>0</span>)</div>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Blocked (<span>0</span>)
+                 </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
         </div>
@@ -743,7 +758,16 @@ UserClient.prototype.addListeners = function() {
 
     //
     $(".toggle-list").on("click", function(){
-        $(this).siblings().slideToggle(250);
+        var self = this;
+        $(this).siblings().slideToggle(250, function(){
+             if ($(this).is(":visible")) {
+                 var icon = $(self).find("svg");
+                 $({deg: 0}).animate({deg: 90}, {duration: 200, step:function(now){icon.css({transform: 'rotate('+now+'deg)'})}})
+             } else {
+                 var icon = $(self).find("svg");
+                 $({deg: 90}).animate({deg: 0}, {duration: 200, step:function(now){icon.css({transform: 'rotate('+now+'deg)'})}})
+             }
+        });
     });
 
     $(".syncup").on("click", function(){
