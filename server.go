@@ -90,6 +90,7 @@ func Run() (err error) {
 			"User":      f.GetUser(),
 			"Friends":   f.GetUserFriends(),
 			"Connected": f.GetConnected(),
+			"Hashtags":  f.GetHashTags(),
 		})
 	})
 

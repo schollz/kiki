@@ -255,6 +255,14 @@
             {{ end }}
           </ol>
         </div>
+        <div class="sidebar-module">
+          <h5>Hashtags</h5>
+          <ol class="list-unstyled">
+            {{ range .Hashtags }}
+            <li><a href="/?channel={{.}}"><small>{{ . }}</small></a></li>
+            {{ end }}
+          </ol>
+        </div>
 
 
       </aside>

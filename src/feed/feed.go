@@ -291,6 +291,23 @@ func (f *Feed) DetermineHashtags() (err error) {
 	return f.db.Set("globals", "tags", tagCounts)
 }
 
+func (f *Feed) GetHashTags() (tags []string) {
+	tagCounts := make(map[string]int)
+	err := f.db.Get("globals", "tags", &tagCounts)
+	if err != nil {
+		f.logger.Log.Error(err)
+		return
+	}
+	tags = make([]string, len(tagCounts))
+	// TODO: Sort tags by popularity? or alphabetically?
+	i := 0
+	for tag := range tagCounts {
+		tags[i] = tag
+		i++
+	}
+	return
+}
+
 func (f *Feed) SyncServers() {
 	f.logger.Log.Info("Starting syncing")
 	needToUpdate := false
