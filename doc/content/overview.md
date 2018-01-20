@@ -139,7 +139,7 @@ The **Letter** is the sealed contents of the envelope, which contains the conten
 type Letter struct {
 	LatestID string        `json:"latest_id"` // hash of sender + un-encrypted data
 	ID       string        `json:"id"`        // original ID, different than LatestID if overwriting
-	Channels []string      `json:"channels"`  // channels for showing the post
+	Hashtags []string      `json:"channels"`  // channels for showing the post
 	ReplyTo  string        `json:"reply_to"`  // hash that Letter is response to
 	Content  LetterContent `json:"content"`
 }
@@ -155,7 +155,7 @@ All letters invoke actions. Typically these actions are just to post text/image 
 
 All the Letters are stored in a [bbolt database](https://github.com/asdine/storm) in `$HOME/.kiki/letters.db`. This file contains unsealed Envelopes, so it will never be shared. To further ensure privacy you can enable `StoreLettersInMemory=true` in the configuration file to keep the database in memory (and rebuild on each startup). My [tests](https://gist.github.com/schollz/f08282396a8b184e30dddbe2422ba88a) determine that loading data from files in a database is about 70x faster than find and loading files from a file system.
 
-Letters can have up to 3 "Channels". Channels are hashtags that indicate the group that this message should belong. Channels are determined by the last three hashtags by [using Regex](https://regex101.com/r/voKb2s/1).
+Letters can have up to 3 "Hashtags". Hashtags are hashtags that indicate the group that this message should belong. Hashtags are determined by the last three hashtags by [using Regex](https://regex101.com/r/voKb2s/1).
 
 #### Assigning name / profile / profile picture
 
@@ -195,7 +195,7 @@ Here the `Content` is simply the HTML of the post. There is some server processi
 
 The server will server these as the `ID+Kind` where the `Kind` is just the extension.
 
-The server will also find all the Channels by finding the last three tags [using Regex](https://regex101.com/r/voKb2s/1).
+The server will also find all the Hashtags by finding the last three tags [using Regex](https://regex101.com/r/voKb2s/1).
 
 #### Following
 

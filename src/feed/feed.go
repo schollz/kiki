@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -250,6 +251,69 @@ func (f *Feed) UpdateEverything() {
 		}
 	}
 
+	// determine the available hashtags
+	err = f.DetermineHashtags()
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
+}
+
+// DetermineHashtags will go through and find all the hashtags
+func (f *Feed) DetermineHashtags() (err error) {
+	r, err := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
+	if err != nil {
+		return
+	}
+	es, err := f.db.GetAllEnvelopes(true)
+	if err != nil {
+		return
+	}
+	tagCounts := make(map[string]int)
+	idToTags := make(map[string][]string)
+	for _, e := range es {
+		foundTags := make(map[string]struct{})
+		idToTags[e.ID] = []string{}
+		for _, tag := range r.FindAll([]byte(e.Letter.Content), -1) {
+			t := strings.ToLower(string(tag))
+			if len(t) < 3 {
+				continue
+			}
+
+			foundTags[t[1:len(t)]] = struct{}{}
+			idToTags[e.ID] = append(idToTags[e.ID], t[1:len(t)])
+		}
+		for tag := range foundTags {
+			if _, ok := tagCounts[tag]; !ok {
+				tagCounts[tag] = 0
+			}
+			tagCounts[tag]++
+		}
+	}
+	f.logger.Log.Debugf("Found %d tags", len(tagCounts))
+	f.logger.Log.Info(tagCounts)
+	err = f.db.Set("globals", "tags", tagCounts)
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
+	err = f.db.AddTags(idToTags)
+	return
+}
+
+func (f *Feed) GetHashTags() (tags []string) {
+	tagCounts := make(map[string]int)
+	err := f.db.Get("globals", "tags", &tagCounts)
+	if err != nil {
+		f.logger.Log.Error(err)
+		return
+	}
+	tags = make([]string, len(tagCounts))
+	// TODO: Sort tags by popularity? or alphabetically?
+	i := 0
+	for tag := range tagCounts {
+		tags[i] = tag
+		i++
+	}
+	return
 }
 
 func (f *Feed) SyncServers() {
@@ -285,6 +349,9 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		}
 		if f.PersonalKey.Public != e.Sender.Public {
 			return errors.New("refusing to replace someone else's post")
+		}
+		if e.Letter.ReplyTo != "" {
+			l.ReplyTo = e.Letter.ReplyTo
 		}
 	}
 
@@ -371,6 +438,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		l.Content = p.Sanitize(l.Content)
 	}
 	l.Content = strings.TrimSpace(l.Content)
+
+	// TODO: replace hashtags with links to the hash tags
 
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {
@@ -538,7 +607,7 @@ func (f *Feed) UpdateFriends() (err error) {
 
 type ShowFeedParameters struct {
 	ID      string // view a single post
-	Channel string // filter by channel
+	Hashtag string // filter by channel
 	User    string // filter by user
 	Search  string // filter by search term
 	Latest  bool   // get the latest
@@ -554,8 +623,9 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		} else {
 			envelopes[0], err = f.db.GetEnvelopeFromID(p.ID)
 		}
-	} else if p.Channel != "" {
-
+	} else if p.Hashtag != "" {
+		envelopes, err = f.db.GetEnvelopesFromTag(strings.ToLower(p.Hashtag))
+		f.logger.Log.Debugf("Got %d envelopes searching for '#%s'", len(envelopes), p.Hashtag)
 	} else if p.User != "" {
 		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
 		envelopes, err = f.db.GetBasicPostsForUser(p.User)

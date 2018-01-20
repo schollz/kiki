@@ -79,7 +79,7 @@ func Run() (err error) {
 	r.GET("/", func(c *gin.Context) {
 		p := feed.ShowFeedParameters{}
 		p.ID = c.DefaultQuery("id", "")
-		p.Channel = c.DefaultQuery("channel", "")
+		p.Hashtag = c.DefaultQuery("hashtag", "")
 		p.User = c.DefaultQuery("user", "")
 		p.Search = c.DefaultQuery("search", "")
 		p.Latest = c.DefaultQuery("latest", "") == "1"
@@ -90,6 +90,7 @@ func Run() (err error) {
 			"User":      f.GetUser(),
 			"Friends":   f.GetUserFriends(),
 			"Connected": f.GetConnected(),
+			"Hashtags":  f.GetHashTags(),
 		})
 	})
 
