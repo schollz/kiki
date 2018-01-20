@@ -286,6 +286,9 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		if f.PersonalKey.Public != e.Sender.Public {
 			return errors.New("refusing to replace someone else's post")
 		}
+		if e.Letter.ReplyTo != "" {
+			l.ReplyTo = e.Letter.ReplyTo
+		}
 	}
 
 	if strings.Contains(l.Purpose, "action-") {
