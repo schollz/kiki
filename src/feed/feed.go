@@ -439,6 +439,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 	l.Content = strings.TrimSpace(l.Content)
 
+	// TODO: replace hashtags with links to the hash tags
+
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {
 		l.Content = strip.StripTags(l.Content)
