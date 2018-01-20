@@ -896,9 +896,11 @@ UserClient.prototype.buildUserUi = function(){
 
 var Post = function(data, api) {
     this.data = data;
+    this.hash;
     this.api = api;
     this.comments = null;
     this.callbacks = [];
+    this.fetchComments();
 }
 
 Post.prototype.registerUpdateCallback = function(callback) {
@@ -945,6 +947,17 @@ Post.prototype.update = function() {
             self.data = res.data.post[0];
             self.onUpdate();
         });
+    }
+}
+
+Post.prototype.fetchComments = function() {
+    var self = this;
+    if (0 < this.data.num_comments) {
+        app.Posts.fetchPostComments(this.getPostId(), function(err, posts) {
+            self.comments = posts;
+        });
+    } else {
+        this.comments = [];
     }
 }
 
@@ -1065,6 +1078,7 @@ PostsCollection.prototype.runCallbacks = function(err, post_id) {
 
 var User = function(data, api) {
     this.data = data;
+    this.hash;
     this.api = api;
     this.callbacks = [];
 }
