@@ -56,6 +56,10 @@
             padding-left: 16px;
         }
 
+        .post-controls a {
+            margin-right: 4px;
+        }
+
         .post-container {
             width: 100%;
         }
@@ -369,170 +373,11 @@ KiKiClient.prototype.collectUsersFromPost = function(post) {
     }
 }
 
-KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
-    var self = this;
-    app.Posts.fetchPostComments(post_id, function(err, posts){
-        if (err) throw err;
-        // recursive build
-        var post_comments = [];
-        $('.post-container[post_id="'+post_id+'"] .post-comments').html('');
-        $('.post-container[post_id="'+post_id+'"] .post-comments').append(
-            (function(){
-                // if (!posts) {return [];}
-                var elems = [];
-                for (var i=0; i<posts.length; i++) {
-                    var post = posts[i];
-                    if (0 != post.data.num_comments) {
-                        post_comments.push(post.getPostId());
-                    }
-
-                    self.collectUsersFromPost(post);
-
-                    elems.push(
-                        $("<div>", {post_id: post.getPostId()}).addClass('post-container').append(
-                            $('<div>').addClass('col-12').append(
-                                self.buildPostElem(post)
-                            )
-                        )
-                    );
-                }
-                return elems;
-            })()
-        );
-
-        // fetch posts comment comments
-        for (var i=0; i<post_comments.length; i++) {
-            self.buildPostCommentsUi(post_comments[i]);
-        }
-    });
-};
-
-KiKiClient.prototype.buildPostElem = function(post) {
-    var self = this;
-    return $("<div>").append(
-        $("<div>").addClass("post-header").append(
-            $("<span>").addClass("float-right").append(
-                "&nbsp;",
-                $("<a>", {
-                    'href': "#!",
-                    'title': "Reply to " + post.data.owner_name,
-                    'data-title': "Reply to " + post.data.owner_name,
-                    'data-replyto': post.getPostId(),
-                    'data-purpose':"share-text"
-                }).addClass("editmodal").append(
-                    $('<i>').addClass("fas fa-reply")
-                ).on('click', app.openModal),
-                "&nbsp;",
-
-                // edit button
-                (function() {
-                    // only display if current user owns the post
-                    if (post.owner_id == self.user.getPublicKey()) {
-                        return [
-                                $("<a>", {
-                                'href': "#!",
-                                'title': "Edit post",
-                                'data-title':"Edit post",
-                                'data-usecontent':post.getPostId(),
-                                'data-replaces':post.getPostId(),
-                                'data-purpose':"share-text",
-                                'data-replyto': post.data.reply_to
-
-                            }).addClass("editmodal").append(
-                                $("<i>").addClass("fas fa-edit")
-                            ).on('click', app.openModal),
-                            "&nbsp;"
-                        ];
-                    }
-                })(),
-                //.end
-
-                // like button
-                $("<a>",  {
-                        'href': "#!",
-                        "data-id":post.getPostId()
-                    }).addClass("likebutton").append(
-                        $("<i>").addClass("fas fa-heart"),
-                        "x"+(post.likes||0)
-                    ).on('click', function() {
-                        self.api.likePost(post.getPostId());
-                    })
-                //.end
-
-            ),
-
-            $("<img>", {
-                owner_id: post.owner_id
-            }).addClass("align-middle profile-pic"),
-
-            // activatenamemodal
-            $("<a>",{
-                'href':"#!",
-                'data-publickey': post.owner_id,
-            }).addClass("activatenamemodal").append(
-                 post.owner_name || post.owner_id
-            ).on('click', function() {
-                var self = this;
-                var user_id = $(this).data('publickey');
-                app.Users.fetchUser(user_id, function(err, user){
-                    if (err) throw err;
-                    if (user) {
-                        $("#modalNameName").text(user.getDisplayName());
-
-                        $("#modalNamePublicKey").text("");
-                        if (user.name) {
-                            $("#modalNamePublicKey").text(user.getPublicKey());
-                        }
-
-                        $("#modalNameContent").html(user.getProfile());
-
-                        $("#modalNameImage").attr("src", null);
-                        if (user.image && "" != user.image) {
-                            $("#modalNameImage").attr("src", '/img/'+user.getImage());
-                        }
-
-                        $("#nameModal").modal();
-                        $("#followButton").attr("data-publickey", user.getPublicKey());
-                    }
-                });
-            }),
-            //.end
-
-            // recipients
-            " to ",
-            (function(){
-                var elems = [];
-                var recipients = post.getRecipients();
-                for (var i=0; i<recipients.length; i++) {
-                    elems.push(
-                        $("<span>", {
-                            owner_id: recipients[i]
-                        }).addClass('recipient').append(recipients[i])
-                    );
-                }
-                return elems;
-            })(),
-            //.end
-
-            "<br>",
-            $("<span>").addClass('text-muted post-datetime').append(
-                $('<a>', {href:'/?id='+post.getPostId()}).append(
-                    new Date(post.data.timestamp*1000)
-                )
-            )
-        ),
-
-        $('<div>', {id:post.getPostId()}).append(post.getContent()),
-        $('<div>').addClass('post-comments row')
-    );
-}
-
-
 KiKiClient.prototype.buildPostUi = function(post) {
     var self = this;
-    return $("<div>", {post_id: post.getPostId()}).addClass("card post-container").append(
+    return $("<div>", {post_id: post.getPostId()}).addClass("card").append(
         $("<div>").addClass("card-body").append(
-            self.buildPostElem(post)
+            post.$el
         )
     );
 }
@@ -543,11 +388,6 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
         this.$el.append(
             this.buildPostUi(post)
         );
-
-        if (0 != post.num_comments) {
-            this.buildPostCommentsUi(post.getPostId());
-        }
-
         this.collectUsersFromPost(post);
     }
 }
@@ -763,31 +603,46 @@ UserClient.prototype.buildUserUi = function(){
 
 
 var app = {}
-app.openModal = function(event) {
+app.openModal = function(title, data) {
     $("#writingModal").modal();
-    $("#writingModalLabel").text($(this).data('title'));
-    $(".editable").focus(function() {
-        $(this).select();
-    });
-    if ($(this).data("usecontent")) {
-        $(".editable").html($("#" + $(this).data("usecontent")).html())
+
+    if ('string' == typeof(title)) {
+        $("#writingModalLabel").text(title);
+        $(".editable").html(
+            data.content || "Write your post..."
+        );
+        // if ($(this).data("makecontent")) {
+        //     $(".editable").html($(this).data("makecontent"));
+        // }
+        $("#letterReplyTo").val(data.reply_to || "");
+        $("#letterReplaces").val(data.replaces || "");
+        $("#letterPurpose").val(data.purpose);
     } else {
-        $(".editable").text("Write your post...");
+        $("#writingModalLabel").text($(this).data('title'));
+        $(".editable").focus(function() {
+            $(this).select();
+        });
+        if ($(this).data("usecontent")) {
+            $(".editable").html($("#" + $(this).data("usecontent")).html())
+        } else {
+            $(".editable").text("Write your post...");
+        }
+        if ($(this).data("makecontent")) {
+            $(".editable").html($(this).data("makecontent"));
+        }
+        if ($(this).data("replyto")) {
+            $("#letterReplyTo").val($(this).data("replyto"));
+        } else {
+            $("#letterReplyTo").val("");
+        }
+        if ($(this).data("replaces")) {
+            $("#letterReplaces").val($(this).data("replaces"));
+        } else {
+            $("#letterReplaces").val("");
+        }
+        $("#letterPurpose").val($(this).data("purpose"));
     }
-    if ($(this).data("makecontent")) {
-        $(".editable").html($(this).data("makecontent"));
-    }
-    if ($(this).data("replyto")) {
-        $("#letterReplyTo").val($(this).data("replyto"));
-    } else {
-        $("#letterReplyTo").val("");
-    }
-    if ($(this).data("replaces")) {
-        $("#letterReplaces").val($(this).data("replaces"));
-    } else {
-        $("#letterReplaces").val("");
-    }
-    $("#letterPurpose").val($(this).data("purpose"));
+
 }
 app.Api = new KiKiApi();
 app.Users = new UsersCollection(app.Api);
