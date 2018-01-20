@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -250,6 +251,44 @@ func (f *Feed) UpdateEverything() {
 		}
 	}
 
+	// determine the available hashtags
+	err = f.DetermineHashtags()
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
+}
+
+// DetermineHashtags will go through and find all the hashtags
+func (f *Feed) DetermineHashtags() (err error) {
+	r, err := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
+	if err != nil {
+		return
+	}
+	es, err := f.db.GetAllEnvelopes(true)
+	if err != nil {
+		return
+	}
+	tagCounts := make(map[string]int)
+	for _, e := range es {
+		foundTags := make(map[string]struct{})
+		for _, tag := range r.FindAll([]byte(e.Letter.Content), -1) {
+			t := strings.ToLower(string(tag))
+			if len(t) < 3 {
+				continue
+			}
+
+			foundTags[t[1:len(t)]] = struct{}{}
+		}
+		for tag := range foundTags {
+			if _, ok := tagCounts[tag]; !ok {
+				tagCounts[tag] = 0
+			}
+			tagCounts[tag]++
+		}
+	}
+	f.logger.Log.Debugf("Found %d tags", len(tagCounts))
+	f.logger.Log.Info(tagCounts)
+	return f.db.Set("globals", "tags", tagCounts)
 }
 
 func (f *Feed) SyncServers() {
