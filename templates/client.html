@@ -76,15 +76,10 @@
 
         .sidebar {
             position: fixed;
-            /*right: 0;*/
             overflow-y: auto;
             z-index: 100;
-            /*top: 0;*/
             top: 90px;
-            /*bottom: 0;*/
             bottom: 84px;
-            /*padding-top: 90px;*/
-            /*min-width: 300px;*/
             border: 1px solid rgba(0,0,0,.125);
             border-radius: .25rem;
         }
@@ -97,9 +92,28 @@
             color: white;
         }
 
-        /*button.user-action {
-            max-width: 38px;
-        }*/
+        .user-lists .sidebar-module {
+            padding: 5px 10px;
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: .25rem;
+            margin: 5px;
+        }
+
+        .user-lists label {
+            margin-bottom: 0px;
+        }
+
+
+        .toggle-list {
+            font-weight: bold;
+            cursor: pointer;
+            transition: all .2s ease-in;
+        }
+        .toggle-list:hover {
+            color: #428bca;
+            transition: all .2s ease-in;
+        }
+
 
     </style>
 
@@ -228,7 +242,6 @@
                     </a>
                 </li>
 
-
                 <li>
                     <a href="#!" class="addserver">
                         <i class="fas fa-server"></i> Add server
@@ -239,21 +252,9 @@
                         <i class="fas fa-sync-alt"></i> Sync
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="#!" class="eraseprofile">
                         <i class="fas fa-trash-alt"></i> Erase profile
-                    </a>
-                </li>
-
-
-                <!-- <li>
-                    <a href="#!" class="followsomeone">
-                        <i class="fas fa-user-plus"></i> Follow someone
-                    </a>
-                </li>
-                <li>
-                    <a href="#!" class="blocksomeone">
-                        <i class="fas fa-user-times"></i> Block someone
                     </a>
                 </li> -->
             </ol>
@@ -262,24 +263,44 @@
 
         <div class="user-lists">
             <div class="sidebar-module following">
-                <div><label>Following</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                    Following (<span>0</span>)
+                </div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module followers">
-                <div><label>Followers</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Followers (<span>0</span>)
+                 </div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module friends">
-                <div><label>Friends</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Friends (<span>0</span>)
+                 </div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module connections">
-                <div><label>Connections</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Connections (<span>0</span>)
+                 </div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
             <div class="sidebar-module blocked">
-                <div><label>Blocked</label> (<span>0</span>)</div>
-                <ol class="list-unstyled users-list"></ol>
+                <div class="toggle-list">
+                    <i class="fa fa-caret-right"></i>
+                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
+                     Blocked (<span>0</span>)
+                 </div>
+                <div class="list-unstyled users-list" style="display:none;"></div>
             </div>
         </div>
 
@@ -304,124 +325,15 @@
   <script src="/static/bootstrap.min.js"></script>
   <script src="/static/medium-editor.min.js"></script>
   <script src="/static/toastr.min.js"></script>
+
+  <script src="/static/Api.js"></script>
+  <script src="/static/Posts.js"></script>
+  <script src="/static/Users.js"></script>
   <script>
 
-var KiKiApi = function() {}
-
-KiKiApi.prototype.fetch = function(ajaxObj){
-    $.ajax(ajaxObj);
-}
-
-KiKiApi.prototype.onError = function(toast_msg, callback){
-    return function(xhr, status, err) {
-        if (xhr.responseJSON.error) {
-            err = xhr.responseJSON.error;
-        }
-        toast_msg && toastr.error(err, toast_msg || 'Error');
-        if (!err.stack) {
-            err = new Error(err)
-        }
-        callback && callback(err);
-    }
-}
-
-KiKiApi.prototype.onSuccess = function(toast_msg, callback){
-    return function(data, status, xhr) {
-        if ("ok" != data.status) {
-            toast_msg && toastr.error(data.error, toast_msg || 'Error');
-            callback && callback(new Error(data.error));
-        }
-        toast_msg && toastr.success(data.message, toast_msg);
-        callback && callback(null, data);
-    }
-}
-
-KiKiApi.prototype.submitLetter = function(letter, callback) {
-    var self = this;
-    var toast_msg = "Posting to KiKi";
-    $.ajax({
-        url: "/letter",
-        method: "POST",
-        data: JSON.stringify(letter),
-        contentType: "application/json",
-        error: self.onError(toast_msg, callback),
-        success: self.onSuccess(toast_msg, callback)
-    });
-}
-
-KiKiApi.prototype.likePost = function(post_id) {
-    this.submitLetter({
-        "purpose": "action-like",
-        "to": ["public"],
-        "content": post_id,
-    });
-}
-
-KiKiApi.prototype.changeName = function(name, callback) {
-    this.submitLetter({
-        "purpose": "action-assign/name",
-        "to": ["public"],
-        "content": name
-    }, callback);
-}
-
-KiKiApi.prototype.followUser = function(user_id) {
-    this.submitLetter({
-        "purpose": "action-follow",
-        "to": ["public"],
-        "content": user_id,
-    });
-}
-
-KiKiApi.prototype.fetchPosts = function(callback) {
-    var self = this;
-    $.ajax({
-        url: "/api/v1/posts",
-        method: "GET",
-        error: self.onError(null, callback),
-        success: self.onSuccess(null, callback)
-    });
-}
-
-KiKiApi.prototype.fetchPost = function(post_id, callback) {
-    var self = this;
-    $.ajax({
-        url: "/api/v1/post/"+post_id,
-        method: "GET",
-        error: self.onError(null, callback),
-        success: self.onSuccess(null, callback)
-    });
-}
-
-KiKiApi.prototype.fetchPostComments = function(post_id, callback) {
-    var self = this;
-    $.ajax({
-        url: "/api/v1/post/"+post_id+"/comments",
-        method: "GET",
-        error: self.onError(null, callback),
-        success: self.onSuccess(null, callback)
-    });
-}
-
-KiKiApi.prototype.fetchUser = function(user_id, callback) {
-    var self = this;
-    var url = "/api/v1/user"
-    if (user_id) {
-        url += "/"+user_id
-    }
-    $.ajax({
-        url: url,
-        method: "GET",
-        error: self.onError(null, callback),
-        success: self.onSuccess(null, callback)
-    });
-}
-
-
-
-
-var KiKiClient = function(api, callback){
+var KiKiClient = function(api, user, callback){
     this.api = api;
+    this.user = user;
     this.posts = [];
     this.primary = {};
     this.$el = $("#posts");
@@ -430,45 +342,54 @@ var KiKiClient = function(api, callback){
 
 KiKiClient.prototype.collectUsersFromPost = function(post) {
 
-    var _clbk = function(err, user){
+    var _onUpdateCallback = function(err, user) {
         if (user) {
-            if (user && "" != user.image) {
-                $('img.profile-pic[owner_id="'+user.public_key+'"]').attr('src', '/img/'+user.image);
+            if (user && "" != user.getImage()) {
+                $('img.profile-pic[owner_id="'+user.getPublicKey()+'"]').attr('src', '/img/'+user.getImage());
             }
-            $('span.recipient[owner_id="'+user.public_key+'"]').text(
-                user.name || user.public_key
+            $('span.recipient[owner_id="'+user.getPublicKey()+'"]').text(
+                user.getDisplayName()
             );
         }
     }
 
-    app.Users.fetchUser(post.owner_id, _clbk);
-    if (post.recipients) {
-        for (var i=0; i<post.recipients.length; i++) {
-            app.Users.fetchUser(post.recipients[i], _clbk);
+    var _clbk = function(err, user){
+        if (user && 0 == user.callbacks.length) {
+            user.registerUpdateCallback(_onUpdateCallback);
+        }
+        _onUpdateCallback(err, user);
+    }
+
+    app.Users.fetchUser(post.getOwnerId(), _clbk);
+    var recipients = post.getRecipients();
+    if (post.getRecipients()) {
+        for (var i=0; i<recipients.length; i++) {
+            app.Users.fetchUser(recipients[i], _clbk);
         }
     }
 }
 
 KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
     var self = this;
-    this.api.fetchPostComments(post_id, function(err, res){
+    app.Posts.fetchPostComments(post_id, function(err, posts){
         if (err) throw err;
         // recursive build
         var post_comments = [];
         $('.post-container[post_id="'+post_id+'"] .post-comments').html('');
         $('.post-container[post_id="'+post_id+'"] .post-comments').append(
             (function(){
+                // if (!posts) {return [];}
                 var elems = [];
-                for (var i=0; i<res.data.posts.length; i++) {
-                    var post = res.data.posts[i];
-                    if (0 != post.num_comments) {
-                        post_comments.push(post.id);
+                for (var i=0; i<posts.length; i++) {
+                    var post = posts[i];
+                    if (0 != post.data.num_comments) {
+                        post_comments.push(post.getPostId());
                     }
 
                     self.collectUsersFromPost(post);
 
                     elems.push(
-                        $("<div>", {post_id: post.id}).addClass('post-container').append(
+                        $("<div>", {post_id: post.getPostId()}).addClass('post-container').append(
                             $('<div>').addClass('col-12').append(
                                 self.buildPostElem(post)
                             )
@@ -486,33 +407,6 @@ KiKiClient.prototype.buildPostCommentsUi = function(post_id) {
     });
 };
 
-KiKiClient.prototype.openModal = function(event) {
-    $("#writingModal").modal();
-    $("#writingModalLabel").text($(this).data('title'));
-    $(".editable").focus(function() {
-        $(this).select();
-    });
-    if ($(this).data("usecontent")) {
-        $(".editable").html($("#" + $(this).data("usecontent")).html())
-    } else {
-        $(".editable").text("Write your post...");
-    }
-    if ($(this).data("makecontent")) {
-        $(".editable").html($(this).data("makecontent"));
-    }
-    if ($(this).data("replyto")) {
-        $("#letterReplyTo").val($(this).data("replyto"));
-    } else {
-        $("#letterReplyTo").val("");
-    }
-    if ($(this).data("replaces")) {
-        $("#letterReplaces").val($(this).data("replaces"));
-    } else {
-        $("#letterReplaces").val("");
-    }
-    $("#letterPurpose").val($(this).data("purpose"));
-}
-
 KiKiClient.prototype.buildPostElem = function(post) {
     var self = this;
     return $("<div>").append(
@@ -521,31 +415,32 @@ KiKiClient.prototype.buildPostElem = function(post) {
                 "&nbsp;",
                 $("<a>", {
                     'href': "#!",
-                    'title': "Reply to " + post.owner_name,
-                    'data-title': "Reply to " + post.owner_name,
-                    'data-replyto': post.id,
+                    'title': "Reply to " + post.data.owner_name,
+                    'data-title': "Reply to " + post.data.owner_name,
+                    'data-replyto': post.getPostId(),
                     'data-purpose':"share-text"
                 }).addClass("editmodal").append(
                     $('<i>').addClass("fas fa-reply")
-                ).on('click', this.openModal),
+                ).on('click', app.openModal),
                 "&nbsp;",
 
                 // edit button
                 (function() {
                     // only display if current user owns the post
-                    if (post.owner_id == app.User.public_key) {
+                    if (post.owner_id == self.user.getPublicKey()) {
                         return [
                                 $("<a>", {
                                 'href': "#!",
                                 'title': "Edit post",
                                 'data-title':"Edit post",
-                                'data-usecontent':post.id,
-                                'data-replaces':post.id,
-                                'data-purpose':"share-text"
+                                'data-usecontent':post.getPostId(),
+                                'data-replaces':post.getPostId(),
+                                'data-purpose':"share-text",
+                                'data-replyto': post.data.reply_to
 
                             }).addClass("editmodal").append(
                                 $("<i>").addClass("fas fa-edit")
-                            ).on('click', this.openModal),
+                            ).on('click', app.openModal),
                             "&nbsp;"
                         ];
                     }
@@ -555,12 +450,12 @@ KiKiClient.prototype.buildPostElem = function(post) {
                 // like button
                 $("<a>",  {
                         'href': "#!",
-                        "data-id":post.id
+                        "data-id":post.getPostId()
                     }).addClass("likebutton").append(
                         $("<i>").addClass("fas fa-heart"),
                         "x"+(post.likes||0)
                     ).on('click', function() {
-                        self.api.likePost(post.id);
+                        self.api.likePost(post.getPostId());
                     })
                 //.end
 
@@ -582,22 +477,22 @@ KiKiClient.prototype.buildPostElem = function(post) {
                 app.Users.fetchUser(user_id, function(err, user){
                     if (err) throw err;
                     if (user) {
-                        $("#modalNameName").text(user.name || user.public_key);
+                        $("#modalNameName").text(user.getDisplayName());
 
                         $("#modalNamePublicKey").text("");
                         if (user.name) {
-                            $("#modalNamePublicKey").text(user.public_key);
+                            $("#modalNamePublicKey").text(user.getPublicKey());
                         }
 
-                        $("#modalNameContent").html(user.profile);
+                        $("#modalNameContent").html(user.getProfile());
 
                         $("#modalNameImage").attr("src", null);
                         if (user.image && "" != user.image) {
-                            $("#modalNameImage").attr("src", '/img/'+user.image);
+                            $("#modalNameImage").attr("src", '/img/'+user.getImage());
                         }
 
                         $("#nameModal").modal();
-                        $("#followButton").attr("data-publickey", user.public_key);
+                        $("#followButton").attr("data-publickey", user.getPublicKey());
                     }
                 });
             }),
@@ -607,11 +502,12 @@ KiKiClient.prototype.buildPostElem = function(post) {
             " to ",
             (function(){
                 var elems = [];
-                for (var i=0; i<post.recipients.length; i++) {
+                var recipients = post.getRecipients();
+                for (var i=0; i<recipients.length; i++) {
                     elems.push(
                         $("<span>", {
-                            owner_id: post.recipients[i]
-                        }).addClass('recipient').append(post.recipients[i])
+                            owner_id: recipients[i]
+                        }).addClass('recipient').append(recipients[i])
                     );
                 }
                 return elems;
@@ -620,13 +516,13 @@ KiKiClient.prototype.buildPostElem = function(post) {
 
             "<br>",
             $("<span>").addClass('text-muted post-datetime').append(
-                $('<a>', {href:'/?id='+post.id}).append(
-                    new Date(post.timestamp*1000)
+                $('<a>', {href:'/?id='+post.getPostId()}).append(
+                    new Date(post.data.timestamp*1000)
                 )
             )
         ),
 
-        $('<div>', {id:post.id}).append(post.content),
+        $('<div>', {id:post.getPostId()}).append(post.getContent()),
         $('<div>').addClass('post-comments row')
     );
 }
@@ -634,7 +530,7 @@ KiKiClient.prototype.buildPostElem = function(post) {
 
 KiKiClient.prototype.buildPostUi = function(post) {
     var self = this;
-    return $("<div>", {post_id: post.id}).addClass("card post-container").append(
+    return $("<div>", {post_id: post.getPostId()}).addClass("card post-container").append(
         $("<div>").addClass("card-body").append(
             self.buildPostElem(post)
         )
@@ -649,7 +545,7 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
         );
 
         if (0 != post.num_comments) {
-            this.buildPostCommentsUi(post.id);
+            this.buildPostCommentsUi(post.getPostId());
         }
 
         this.collectUsersFromPost(post);
@@ -658,15 +554,15 @@ KiKiClient.prototype.buildPostsUi = function(callback) {
 
 KiKiClient.prototype.init = function(callback){
     var self = this;
-    $('.user-info .editmodal').on('click', this.openModal);
+    $('.user-info .editmodal').on('click', app.openModal);
     $("#followButton").click(function() {
         self.api.followUser($(this).data("publickey"));
     });
-    this.api.fetchPosts(function(err,res){
+    app.Posts.fetchPosts(function(err, posts){
         if (err) {
             throw err;
         }
-        self.posts = res.data.posts;
+        self.posts = posts;
         self.buildPostsUi();
     });
     callback && callback();
@@ -675,20 +571,29 @@ KiKiClient.prototype.init = function(callback){
 
 
 
-var UserClient = function(api) {
+var UserClient = function(api, callback) {
     this.data = {};
     this.api = api;
-    this.init();
+    this.addListeners();
+    this.init(callback);
 }
 
-UserClient.prototype.init = function() {
+UserClient.prototype.init = function(callback) {
     var self = this;
     this.api.fetchUser(null, function(err,res){
         if (err) throw err;
         self.data = res.data.user;
+        self.user = new User(res.data.user, self.api);
+        self.user.registerUpdateCallback(function(){
+            self.init();
+        });
         self.buildUserUi();
+        callback && callback(self);
     });
-    this.addListeners();
+}
+
+UserClient.prototype.getPublicKey = function() {
+    return this.user.getPublicKey();
 }
 
 UserClient.prototype.addListeners = function() {
@@ -710,12 +615,27 @@ UserClient.prototype.addListeners = function() {
                         return;
                     };
                     swal('Success!', 'Your username has been changed.', 'success');
+                    self.user.update();
                 });
             }
         });
     });
 
-    $('.user-action.edit-profile').on('click', app.Posts.openModal);
+    $('.user-action.edit-profile').on('click', app.openModal);
+    // self.user.update();
+
+    $(".toggle-list").on("click", function(){
+        var self = this;
+        $(this).siblings().slideToggle(250, function(){
+             if ($(this).is(":visible")) {
+                 var icon = $(self).find("svg");
+                 $({deg: 0}).animate({deg: 90}, {duration: 200, step:function(now){icon.css({transform: 'rotate('+now+'deg)'})}})
+             } else {
+                 var icon = $(self).find("svg");
+                 $({deg: 90}).animate({deg: 0}, {duration: 200, step:function(now){icon.css({transform: 'rotate('+now+'deg)'})}})
+             }
+        });
+    });
 
     $(".syncup").on("click", function(){
         // event.preventDefault();
@@ -755,30 +675,40 @@ UserClient.prototype.buildUserListItem = function(user) {
     return $('<li>').append(
             $('<a>', {
                 'href': "#!",
-                'data-name': user.name,
-                'data-publickey': user.public_key,
-                'data-content': user.profile
+                'data-name': user.getDisplayName(),
+                'data-publickey': user.getPublicKey(),
+                'data-content': user.getProfile()
             }).addClass('activatenamemodal publickey').append(
                 $('<div>').addClass('publickey').append(
                     $("<img>",{
                         src: (function(){
-                            if (user.image && "" != user.image) {
-                                return "/img/" + user.image;
+                            if (user.getImage() && "" != user.getImage()) {
+                                return "/img/" + user.getImage();
                             }
                             return null;
                         })()
                     }).addClass('align-middle profile-pic'),
-                    $('<small>').append(user.name || user.public_key)
+                    $('<small>').append(user.getDisplayName())
                 )
             )
     );
 }
 
+UserClient.prototype.clearUserUi = function() {
+    $("#user-profile").html("");
+    $(".following .users-list").html("");
+    $(".followers .users-list").html("");
+    $(".friends .users-list").html("");
+    $(".blocked .users-list").html("");
+}
+
 UserClient.prototype.buildUserUi = function(){
     var self = this;
     if (this.data) {
+
+        this.clearUserUi();
+
         $("#user-name").text( this.data.name || this.data.public_key );
-        $("#user-profile").html("");
         $("#user-profile").append( this.data.profile );
         if (this.data.image && "" != this.data.image) {
             $("#user-profile-image").attr("src", "/img/"+ this.data.image);
@@ -789,22 +719,20 @@ UserClient.prototype.buildUserUi = function(){
         $(".friends span").text(this.data.friends.length);
         $(".blocked span").text(this.data.blocked.length);
 
-
         for (var i=0; i<this.data.following.length; i++) {
             var user_id = this.data.following[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".following ol").append(
+                $(".following .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
         }
-
         for (var i=0; i<this.data.followers.length; i++) {
             var user_id = this.data.followers[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".followers ol").append(
+                $(".followers .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
@@ -814,7 +742,7 @@ UserClient.prototype.buildUserUi = function(){
             var user_id = this.data.friends[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".friends ol").append(
+                $(".friends .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
@@ -824,72 +752,53 @@ UserClient.prototype.buildUserUi = function(){
             var user_id = this.data.blocked[i];
             app.Users.fetchUser(user_id, function(err, user){
                 if (err) throw err;
-                $(".blocked ol").append(
+                $(".blocked .users-list").append(
                     self.buildUserListItem(user)
                 )
             });
         }
 
-        // $(".connections span").text(this.data.connections.length);
-
-    }
-}
-
-
-
-
-var UsersCollection = function(api) {
-    this.api = api;
-    this.data = {};
-    this.callbacks = {};
-}
-
-UsersCollection.prototype.fetchUser = function(user_id, callback) {
-    var self = this;
-    if (this.data[user_id]) {
-        return callback(null, this.data[user_id]);
-    }
-    if (!this.callbacks[user_id]) {
-        this.callbacks[user_id] = [];
-    }
-    this.callbacks[user_id].push(callback);
-    // only fire one request
-    if (1 < this.callbacks[user_id].length){
-        return
-    };
-    // fetch from api
-    this.api.fetchUser(user_id, function(err, res){
-        if (err) {
-            self.runCallbacks(err, user_id);
-            return;
-        }
-        self.data[user_id] = res.data.user;
-        self.runCallbacks(null, user_id);
-    });
-
-}
-
-UsersCollection.prototype.runCallbacks = function(err, user_id) {
-    while (this.callbacks[user_id].length) {
-        var callback = this.callbacks[user_id].shift();
-        callback && callback(err, this.data[user_id]);
     }
 }
 
 
 var app = {}
+app.openModal = function(event) {
+    $("#writingModal").modal();
+    $("#writingModalLabel").text($(this).data('title'));
+    $(".editable").focus(function() {
+        $(this).select();
+    });
+    if ($(this).data("usecontent")) {
+        $(".editable").html($("#" + $(this).data("usecontent")).html())
+    } else {
+        $(".editable").text("Write your post...");
+    }
+    if ($(this).data("makecontent")) {
+        $(".editable").html($(this).data("makecontent"));
+    }
+    if ($(this).data("replyto")) {
+        $("#letterReplyTo").val($(this).data("replyto"));
+    } else {
+        $("#letterReplyTo").val("");
+    }
+    if ($(this).data("replaces")) {
+        $("#letterReplaces").val($(this).data("replaces"));
+    } else {
+        $("#letterReplaces").val("");
+    }
+    $("#letterPurpose").val($(this).data("purpose"));
+}
 app.Api = new KiKiApi();
 app.Users = new UsersCollection(app.Api);
-app.Posts = new KiKiClient(app.Api);
-app.User = new UserClient(app.Api);
-
+app.Posts = new PostsCollection(app.Api);
+app.User = new UserClient(app.Api, function(user){
+    app.Ui = new KiKiClient(app.Api, user);
+});
 
 var updateInterval = setInterval(function(){
     console.log("update page");
 },10000);
-
-
-
 
 
 
