@@ -6,19 +6,19 @@ var Post = function(data, api) {
     this.comments = null;
     this.owner = null;
     this.callbacks = [];
+    this.$el = this.buildUi();
     this.fetchComments();
     this.fetchOwner();
-    this.$el = this.buildUi();
-}
-
-Post.prototype.buildUi = function() {
-    return $("<div>");
 }
 
 Post.prototype.registerUpdateCallback = function(callback) {
     if ("function" == typeof(callback)) {
         this.callbacks.push(callback);
     }
+}
+
+Post.prototype.getTimestamp = function() {
+    return this.data.timestamp;
 }
 
 Post.prototype.getContent = function() {
@@ -55,6 +55,7 @@ Post.prototype.onUpdate = function() {
     }
 }
 
+/*
 Post.prototype.edit = function(content) {
     var letter = {
         "purpose": this.data.purpose,
@@ -67,6 +68,7 @@ Post.prototype.edit = function(content) {
         console.log(err, res);
     });
 }
+*/
 
 Post.prototype.update = function() {
     var self = this;
@@ -84,10 +86,165 @@ Post.prototype.fetchComments = function() {
     if (0 < this.data.num_comments) {
         app.Posts.fetchPostComments(this.getPostId(), function(err, posts) {
             self.comments = posts;
+            self.buildCommentUi();
         });
     } else {
         this.comments = [];
     }
+}
+
+Post.prototype.buildCommentUi = function() {
+    var self = this;
+    this.elements.comments.html('');
+    for (var i=0; i<self.comments.length; i++) {
+        app.Ui.collectUsersFromPost(self.comments[i]);
+        this.elements.comments.append(
+            $('<div>').addClass('col-12').append(
+                self.comments[i].$el
+            )
+        );
+    }
+}
+
+Post.prototype.toLetter = function() {
+    return {
+        replaces: this.getPostId(),
+        purpose: 'share-text',
+        reply_to: this.data.reply_to,
+        content: this.getContent()
+    }
+}
+
+Post.prototype.buildUi = function() {
+    var self = this;
+    this.elements = {
+        content: $('<div>').append(
+            self.getContent()
+        ),
+        comments: $('<div>').addClass('post-comments row'),
+        datetime: $("<div>").addClass('text-muted post-datetime').append(
+            new Date(this.getTimestamp()*1000)
+        )
+    }
+    return $("<div>").addClass('post-container').append(
+            $("<div>").addClass("post-header").append(
+
+                $("<span>").addClass("float-right post-controls").append(
+                    $("<a>", {
+                        'href': "#!",
+                        'title': "Reply to " + self.data.owner_name,
+                        'data-title': "Reply to " + self.data.owner_name,
+                        'data-replyto': self.getPostId(),
+                        'data-purpose':"share-text"
+                    }).addClass("editmodal").append(
+                        $('<i>').addClass("fas fa-reply")
+                    ).on('click', function() {
+                        app.openModal("Reply to " + self.data.owner_name, self.toLetter());
+                    }),
+
+                    // edit button
+                    (function() {
+                        // only display if current user owns the post
+                        if (self.getOwnerId() == app.User.getPublicKey()) {
+                            return [
+                                    $("<a>", {
+                                    'href': "#!",
+                                    'title': "Edit post",
+                                    'data-title':"Edit post",
+                                    'data-usecontent':self.getPostId(),
+                                    'data-replaces':self.getPostId(),
+                                    'data-purpose':"share-text",
+                                    'data-replyto': self.data.reply_to
+
+                                }).addClass("editmodal").append(
+                                    $("<i>").addClass("fas fa-edit")
+                                ).on('click', function() {
+                                    app.openModal("Edit post", self.toLetter());
+                                })
+                            ];
+                        }
+                    })(),
+                    //.end
+
+                    // like button
+                    $("<a>",  {
+                            'href': "#!",
+                            "data-id":self.getPostId()
+                        }).addClass("likebutton").append(
+                            $("<i>").addClass("fas fa-heart"),
+                            "x"+(self.data.likes||0)
+                        ).on('click', function() {
+                            self.api.likePost(self.getPostId());
+                        })
+                    //.end
+
+                ),
+
+                $("<img>", {
+                    owner_id: self.getOwnerId()
+                }).addClass("align-middle profile-pic"),
+
+                // activatenamemodal
+                $("<a>",{
+                    'href':"#!",
+                    'data-publickey': self.getOwnerId(),
+                }).addClass("activatenamemodal").append(
+                     self.data.owner_name || self.getOwnerId()
+                ).on('click', function() {
+                    self.fetchOwner(function(err, user){
+                        if (err) throw err;
+                        if (user) {
+                            $("#modalNameName").text(user.getDisplayName());
+
+                            $("#modalNamePublicKey").text("");
+                            if (user.name) {
+                                $("#modalNamePublicKey").text(user.getPublicKey());
+                            }
+
+                            $("#modalNameContent").html(user.getProfile());
+
+                            $("#modalNameImage").attr("src", null);
+                            if (user.image && "" != user.image) {
+                                $("#modalNameImage").attr("src", '/img/'+user.getImage());
+                            }
+
+                            $("#nameModal").modal();
+                            $("#followButton").attr("data-publickey", user.getPublicKey());
+                        }
+                    });
+                }),
+                //.end
+
+                // recipients
+                $("<span>").append(
+                    " to ",
+                    (function(){
+                        var elems = [];
+                        var recipients = self.getRecipients();
+                        for (var i=0; i<recipients.length; i++) {
+                            // dont display owner
+                            // owner can always see their data
+                            if (self.getOwnerId() != recipients[i]) {
+                                elems.push(
+                                    "[",
+                                    $("<span>", {
+                                        owner_id: recipients[i]
+                                    }).addClass('recipient').append(recipients[i]),
+                                    "]"
+                                );
+                            }
+                        }
+                        return elems;
+                    })()
+                ),
+                //.end
+
+                self.elements.datetime
+            ),
+
+            self.elements.content,
+            self.elements.comments
+        );
 }
 
 
