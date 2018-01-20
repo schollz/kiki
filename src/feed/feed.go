@@ -446,7 +446,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 			tagMap[tag] = struct{}{}
 		}
 		for tag := range tagMap {
-			l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag, tag), -1)
+			l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag[1:], tag), -1)
 		}
 	}
 	l.Content = strings.TrimSpace(l.Content)
