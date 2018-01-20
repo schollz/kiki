@@ -433,13 +433,23 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 	l.Content = newHTML
 	if l.Purpose == purpose.ShareText {
+		// convert Markdown -> HTML
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
+		// sanitize
 		p := bluemonday.UGCPolicy()
 		l.Content = p.Sanitize(l.Content)
+		// replace hashtags with links to the hash tags
+		r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
+		tags := r.FindAllString(l.Content, -1)
+		tagMap := make(map[string]struct{})
+		for _, tag := range tags {
+			tagMap[tag] = struct{}{}
+		}
+		for tag := range tagMap {
+			l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag[1:], tag), -1)
+		}
 	}
 	l.Content = strings.TrimSpace(l.Content)
-
-	// TODO: replace hashtags with links to the hash tags
 
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {

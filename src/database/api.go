@@ -77,7 +77,8 @@ func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, er
 	if err != nil {
 		return
 	}
-	es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE id IN ('%s');", strings.Join(ids, "','")))
+
+	es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id IN ('%s') AND id NOT IN (SELECT letter_replaces FROM letters WHERE letter_replaces != '') AND letter_replyto == '' ORDER BY time DESC;", strings.Join(ids, "','")))
 	return
 }
 
@@ -154,17 +155,6 @@ func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err
 	} else {
 		return db.getAllFromQuery("SELECT * FROM letters ORDER BY time DESC")
 	}
-}
-
-// GetEnvelopesFromSearch returns all envelopes that have the text in the letter content
-func (api DatabaseAPI) GetEnvelopesFromSearch(search string) (es []letter.Envelope, err error) {
-	db, err := open(api.FileName)
-	if err != nil {
-		return
-	}
-	defer db.Close()
-	es, err = db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND LOWER(letter_content) LIKE '%?%' ORDER BY time DESC", search)
-	return
 }
 
 // GetReplies returns all envelopes that are replies to a specific envelope
