@@ -111,7 +111,20 @@ func (d *database) Close() (err error) {
 //
 // and also a `letters`:
 func (d *database) MakeTables() (err error) {
-	sqlStmt := `create table keystore (bucket_key text not null primary key, value text);`
+	sqlStmt := `CREATE TABLE tags (tag TEXT, e_id TEXT);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables")
+		return
+	}
+	sqlStmt = `CREATE index tags_idx on tags(tag,e_id);`
+	_, err = d.db.Exec(sqlStmt)
+	if err != nil {
+		err = errors.Wrap(err, "MakeTables")
+		return
+	}
+
+	sqlStmt = `create table keystore (bucket_key text not null primary key, value text);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
 		err = errors.Wrap(err, "MakeTables")
@@ -171,6 +184,76 @@ func (d *database) MakeTables() (err error) {
 		return
 	}
 
+	return
+}
+
+// AddTag will add a tag into the database if it hasn't already been inserted.
+func (d *database) AddTag(tag, id string) (err error) {
+	if exists := d.TagExists(tag, id); exists {
+		return
+	}
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "AddTag")
+	}
+	stmt, err := tx.Prepare("INSERT INTO tags(tag,e_id) values (?, ?)")
+	if err != nil {
+		return errors.Wrap(err, "AddTag")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(tag, id)
+	if err != nil {
+		return errors.Wrap(err, "AddTag")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "AddTag")
+	}
+
+	return
+}
+
+// TagExists will return an error if the tag and ID does not exist
+func (d *database) TagExists(tag, id string) (yes bool) {
+	stmt, err := d.db.Prepare("SELECT e_id FROM tags WHERE tag = ? AND e_id = ?")
+	if err != nil {
+		panic(err)
+	}
+	defer stmt.Close()
+	var result string
+	err = stmt.QueryRow(tag, id).Scan(&result)
+	if err != nil {
+		return
+	}
+	if result == "" {
+		return
+	}
+	return true
+}
+
+// GetIDsFromTag get all the ides for a tag
+func (d *database) GetIDsFromTag(tag string) (ids []string, err error) {
+	stmt, err := d.db.Prepare("SELECT e_id FROM tags WHERE tag = ?")
+	if err != nil {
+		return nil, errors.Wrap(err, "problem preparing SQL")
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(tag)
+	if err != nil {
+		return nil, errors.Wrap(err, "problem getting key")
+	}
+	ids = []string{}
+	for rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			err = errors.Wrap(err, "GetIDsFromTag")
+			return
+		}
+		ids = append(ids, id)
+	}
 	return
 }
 
@@ -284,6 +367,7 @@ func (d *database) getAllFromQuery(query string) (s []letter.Envelope, err error
 // getAllFromPreparedQuery
 func (d *database) getAllFromPreparedQuery(query string, args ...interface{}) (s []letter.Envelope, err error) {
 	// prepare statement
+	logger.Log.Debug(query)
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
 		err = errors.Wrap(err, query)

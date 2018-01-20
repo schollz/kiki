@@ -269,8 +269,10 @@ func (f *Feed) DetermineHashtags() (err error) {
 		return
 	}
 	tagCounts := make(map[string]int)
+	idToTags := make(map[string][]string)
 	for _, e := range es {
 		foundTags := make(map[string]struct{})
+		idToTags[e.ID] = []string{}
 		for _, tag := range r.FindAll([]byte(e.Letter.Content), -1) {
 			t := strings.ToLower(string(tag))
 			if len(t) < 3 {
@@ -278,6 +280,7 @@ func (f *Feed) DetermineHashtags() (err error) {
 			}
 
 			foundTags[t[1:len(t)]] = struct{}{}
+			idToTags[e.ID] = append(idToTags[e.ID], t[1:len(t)])
 		}
 		for tag := range foundTags {
 			if _, ok := tagCounts[tag]; !ok {
@@ -288,7 +291,12 @@ func (f *Feed) DetermineHashtags() (err error) {
 	}
 	f.logger.Log.Debugf("Found %d tags", len(tagCounts))
 	f.logger.Log.Info(tagCounts)
-	return f.db.Set("globals", "tags", tagCounts)
+	err = f.db.Set("globals", "tags", tagCounts)
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
+	err = f.db.AddTags(idToTags)
+	return
 }
 
 func (f *Feed) GetHashTags() (tags []string) {
@@ -614,7 +622,8 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 			envelopes[0], err = f.db.GetEnvelopeFromID(p.ID)
 		}
 	} else if p.Channel != "" {
-
+		envelopes, err = f.db.GetEnvelopesFromTag(strings.ToLower(p.Channel))
+		f.logger.Log.Debugf("Got %d envelopes searching for '#%s'", len(envelopes), p.Channel)
 	} else if p.User != "" {
 		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
 		envelopes, err = f.db.GetBasicPostsForUser(p.User)

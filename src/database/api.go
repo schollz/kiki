@@ -48,6 +48,39 @@ func (api DatabaseAPI) Get(bucket, key string, value interface{}) (err error) {
 	return db.Get(bucket, key, value)
 }
 
+// AddTags will add the tags to the database
+func (api DatabaseAPI) AddTags(idToTags map[string][]string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	for id := range idToTags {
+		for _, tag := range idToTags[id] {
+			err = db.AddTag(tag, id)
+			if err != nil {
+				return
+			}
+		}
+	}
+	return
+}
+
+// GetEnvelopesFromTag
+func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	ids, err := db.GetIDsFromTag(tag)
+	if err != nil {
+		return
+	}
+	es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE id IN ('%s');", strings.Join(ids, "','")))
+	return
+}
+
 func (api DatabaseAPI) AddEnvelope(e letter.Envelope) (err error) {
 	_, err = api.GetEnvelopeFromID(e.ID)
 	if err == nil {
@@ -121,6 +154,17 @@ func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err
 	} else {
 		return db.getAllFromQuery("SELECT * FROM letters ORDER BY time DESC")
 	}
+}
+
+// GetEnvelopesFromSearch returns all envelopes that have the text in the letter content
+func (api DatabaseAPI) GetEnvelopesFromSearch(search string) (es []letter.Envelope, err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	es, err = db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND LOWER(letter_content) LIKE '%?%' ORDER BY time DESC", search)
+	return
 }
 
 // GetReplies returns all envelopes that are replies to a specific envelope
