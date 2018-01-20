@@ -607,7 +607,7 @@ func (f *Feed) UpdateFriends() (err error) {
 
 type ShowFeedParameters struct {
 	ID      string // view a single post
-	Channel string // filter by channel
+	Hashtag string // filter by channel
 	User    string // filter by user
 	Search  string // filter by search term
 	Latest  bool   // get the latest
@@ -623,9 +623,9 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		} else {
 			envelopes[0], err = f.db.GetEnvelopeFromID(p.ID)
 		}
-	} else if p.Channel != "" {
-		envelopes, err = f.db.GetEnvelopesFromTag(strings.ToLower(p.Channel))
-		f.logger.Log.Debugf("Got %d envelopes searching for '#%s'", len(envelopes), p.Channel)
+	} else if p.Hashtag != "" {
+		envelopes, err = f.db.GetEnvelopesFromTag(strings.ToLower(p.Hashtag))
+		f.logger.Log.Debugf("Got %d envelopes searching for '#%s'", len(envelopes), p.Hashtag)
 	} else if p.User != "" {
 		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
 		envelopes, err = f.db.GetBasicPostsForUser(p.User)
