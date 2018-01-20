@@ -319,11 +319,14 @@ func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 	for rows.Next() {
 		var text string
 		err = rows.Scan(&text)
+
 		if nil != err {
 			return posts, err
 		}
 
 		text = self.jsonFormatting(text)
+
+		// logger.Log.Info(text)
 
 		var post ApiBasicPost
 		if err = post.Unmarshal(text); nil != err {

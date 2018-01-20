@@ -50,6 +50,9 @@ Post.prototype.getRecipients = function() {
 }
 
 Post.prototype.onUpdate = function() {
+    this.elements.content.html(this.getContent());
+    this.elements.likebutton.find("span").text("x"+(this.data.likes||0));
+    this.fetchComments();
     for (var i=0; i<this.callbacks.length; i++) {
         this.callbacks[i]();
     }
@@ -75,7 +78,7 @@ Post.prototype.update = function() {
     if (this.api) {
         this.api.fetchPost(this.getPostId(), function(err, res){
             if (err) throw err;
-            self.data = res.data.post[0];
+            self.data = res.data.posts[0];
             self.onUpdate();
         });
     }
@@ -106,12 +109,21 @@ Post.prototype.buildCommentUi = function() {
     }
 }
 
-Post.prototype.toLetter = function() {
-    return {
-        replaces: this.getPostId(),
-        purpose: 'share-text',
-        reply_to: this.data.reply_to,
-        content: this.getContent()
+Post.prototype.toLetter = function(action) {
+    if ("edit" == action) {
+        return {
+            replaces: this.getPostId(),
+            purpose: 'share-text',
+            reply_to: this.data.reply_to,
+            content: this.getContent()
+        }
+    } else if ("reply" == action) {
+        return {
+            purpose: 'share-text',
+            reply_to: this.getPostId()
+        }
+    } else {
+        throw new Error("action not found");
     }
 }
 
@@ -124,60 +136,42 @@ Post.prototype.buildUi = function() {
         comments: $('<div>').addClass('post-comments row'),
         datetime: $("<div>").addClass('text-muted post-datetime').append(
             new Date(this.getTimestamp()*1000)
-        )
+        ),
+        likebutton: $("<a>").addClass("post-action likebutton").append(
+            $("<i>").addClass("fas fa-heart"),
+            $("<span>").text("x"+(self.data.likes||0))
+        ).on('click', function() {
+            self.api.likePost(self.getPostId(), function(err, res){
+                if (err) throw err;
+                self.update();
+            });
+        })
     }
     return $("<div>").addClass('post-container').append(
             $("<div>").addClass("post-header").append(
 
                 $("<span>").addClass("float-right post-controls").append(
-                    $("<a>", {
-                        'href': "#!",
-                        'title': "Reply to " + self.data.owner_name,
-                        'data-title': "Reply to " + self.data.owner_name,
-                        'data-replyto': self.getPostId(),
-                        'data-purpose':"share-text"
-                    }).addClass("editmodal").append(
+                    $("<a>").addClass("post-action").append(
                         $('<i>').addClass("fas fa-reply")
                     ).on('click', function() {
-                        app.openModal("Reply to " + self.data.owner_name, self.toLetter());
+                        app.openModal("Reply to " + self.data.owner_name, self.toLetter("reply"));
                     }),
 
                     // edit button
                     (function() {
                         // only display if current user owns the post
                         if (self.getOwnerId() == app.User.getPublicKey()) {
-                            return [
-                                    $("<a>", {
-                                    'href': "#!",
-                                    'title': "Edit post",
-                                    'data-title':"Edit post",
-                                    'data-usecontent':self.getPostId(),
-                                    'data-replaces':self.getPostId(),
-                                    'data-purpose':"share-text",
-                                    'data-replyto': self.data.reply_to
-
-                                }).addClass("editmodal").append(
-                                    $("<i>").addClass("fas fa-edit")
-                                ).on('click', function() {
-                                    app.openModal("Edit post", self.toLetter());
-                                })
-                            ];
+                            return $("<a>").addClass("post-action").append(
+                                        $("<i>").addClass("fas fa-edit")
+                                    ).on('click', function() {
+                                        app.openModal("Edit post", self.toLetter("edit"));
+                                    });
                         }
+                        return null;
                     })(),
                     //.end
 
-                    // like button
-                    $("<a>",  {
-                            'href': "#!",
-                            "data-id":self.getPostId()
-                        }).addClass("likebutton").append(
-                            $("<i>").addClass("fas fa-heart"),
-                            "x"+(self.data.likes||0)
-                        ).on('click', function() {
-                            self.api.likePost(self.getPostId());
-                        })
-                    //.end
-
+                    self.elements.likebutton
                 ),
 
                 $("<img>", {
@@ -211,7 +205,7 @@ Post.prototype.buildUi = function() {
                             $("#nameModal").modal();
                             $("#followButton").attr("data-publickey", user.getPublicKey());
                         }
-                    });
+                    })
                 }),
                 //.end
 
@@ -309,26 +303,27 @@ PostsCollection.prototype.fetchPost = function(post_id, callback) {
 
 PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
     var self = this;
-    if (!this.data[post_id]) {
-        return this.fetchPost(post_id, function(){
-            self.fetchPostComments(post_id, callback);
-        });
-    }
-    if (this.data[post_id] && this.data[post_id].comments) {
-        return callback(null, this.data[post_id].comments);
-    }
-    if (!this.callbacks['comments_'+post_id]) {
-        this.callbacks['comments_'+post_id] = [];
-    }
-    this.callbacks['comments_'+post_id].push(callback);
-    // only fire one request
-    if (1 < this.callbacks['comments_'+post_id].length){
-        return
-    };
+    // if (!this.data[post_id]) {
+    //     return this.fetchPost(post_id, function(){
+    //         self.fetchPostComments(post_id, callback);
+    //     });
+    // }
+    // if (this.data[post_id] && this.data[post_id].comments) {
+    //     return callback(null, this.data[post_id].comments);
+    // }
+    // if (!this.callbacks['comments_'+post_id]) {
+    //     this.callbacks['comments_'+post_id] = [];
+    // }
+    // this.callbacks['comments_'+post_id].push(callback);
+    // // only fire one request
+    // if (1 < this.callbacks['comments_'+post_id].length){
+    //     return
+    // };
     // fetch from api
     this.api.fetchPostComments(post_id, function(err, res){
         if (err) {
-            self.runCommentCallbacks(err, post_id);
+            // self.runCommentCallbacks(err, post_id);
+            callback && callback(err);
             return;
         }
         if (res.data.posts) {
@@ -336,7 +331,8 @@ PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
         } else {
             self.data[post_id].comments = [];
         }
-        self.runCommentCallbacks(null, post_id);
+        // self.runCommentCallbacks(null, post_id);
+        callback && callback(err, self.data[post_id].comments);
     });
 
 }

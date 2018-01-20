@@ -42,12 +42,12 @@ KiKiApi.prototype.submitLetter = function(letter, callback) {
     });
 }
 
-KiKiApi.prototype.likePost = function(post_id) {
+KiKiApi.prototype.likePost = function(post_id, callback) {
     this.submitLetter({
         "purpose": "action-like",
         "to": ["public"],
         "content": post_id,
-    });
+    }, callback);
 }
 
 KiKiApi.prototype.changeName = function(name, callback) {
