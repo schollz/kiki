@@ -2,7 +2,6 @@ package letter
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/json"
 	"strings"
 	"time"
@@ -145,7 +144,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	if err != nil {
 		return
 	}
-	e.SealedLetter = base64.URLEncoding.EncodeToString(encryptedLetter)
+	e.SealedLetter = base58.FastBase58Encoding(encryptedLetter)
 
 	// For each recipient, generate a key-encrypted passphrase
 	e.SealedRecipients = make([]string, len(recipients))
@@ -155,7 +154,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 			err = err2
 			return
 		}
-		e.SealedRecipients[i] = base64.URLEncoding.EncodeToString(encryptedSecret)
+		e.SealedRecipients[i] = base58.FastBase58Encoding(encryptedSecret)
 	}
 
 	// sign the letter by encrypting the public key against the region key
@@ -163,7 +162,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	if err != nil {
 		return
 	}
-	e.Signature = base64.URLEncoding.EncodeToString(signatureEncrypted)
+	e.Signature = base58.FastBase58Encoding(signatureEncrypted)
 
 	// Remove the letter information
 	e.Opened = false
@@ -194,7 +193,7 @@ func (e2 Envelope) unseal(keysToTry []keypair.KeyPair, regionKey keypair.KeyPair
 	for _, keyToTry := range keysToTry {
 		for _, recipient := range e.SealedRecipients {
 			var err2 error
-			encryptedSecret, err2 := base64.URLEncoding.DecodeString(recipient)
+			encryptedSecret, err2 := base58.FastBase58Decoding(recipient)
 			if err2 != nil {
 				err = errors.Wrap(err2, "recipients are corrupted")
 				return
@@ -212,7 +211,7 @@ func (e2 Envelope) unseal(keysToTry []keypair.KeyPair, regionKey keypair.KeyPair
 		return
 	}
 
-	encryptedContent, err := base64.URLEncoding.DecodeString(e.SealedLetter)
+	encryptedContent, err := base58.FastBase58Decoding(e.SealedLetter)
 	if err != nil {
 		err = errors.Wrap(err, "content is corrupted")
 		return
@@ -237,7 +236,7 @@ func (e Envelope) Validate(regionKey keypair.KeyPair) (err error) {
 	if e.Sender.Public == regionKey.Public {
 		return errors.New("region cannot be sender")
 	}
-	encryptedPublicKey, err := base64.URLEncoding.DecodeString(e.Signature)
+	encryptedPublicKey, err := base58.FastBase58Decoding(e.Signature)
 	if err != nil {
 		return
 	}

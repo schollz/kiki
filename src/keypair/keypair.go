@@ -3,7 +3,6 @@ package keypair
 import (
 	"bytes"
 	crypto_rand "crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -136,7 +135,7 @@ func GenerateKeys() (publicKey, privateKey string) {
 }
 
 func keyStringToBytes(s string) (key *[32]byte, err error) {
-	keyBytes, err := base64.URLEncoding.DecodeString(s)
+	keyBytes, err := base58.FastBase58Decoding(s)
 	if err != nil {
 		return
 	}
@@ -192,7 +191,7 @@ func (kp KeyPair) Validate(signature string, sender KeyPair) (err error) {
 	if sender.Public == "" {
 		return errors.New("no public key to validate")
 	}
-	encryptedPublicKey, err := base64.URLEncoding.DecodeString(signature)
+	encryptedPublicKey, err := base58.FastBase58Decoding(signature)
 	if err != nil {
 		return
 	}

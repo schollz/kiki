@@ -2,7 +2,6 @@ package feed
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -18,6 +17,7 @@ import (
 
 	"github.com/blevesearch/bleve"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/mr-tron/base58/base58"
 
 	"github.com/pkg/errors"
 	cache "github.com/robfig/go-cache"
@@ -44,8 +44,8 @@ func (f *Feed) Debug(b bool) {
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
 func New(params ...string) (f *Feed, err error) {
-	regionKeyPublic := "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk="
-	regionKeyPrivate := "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
+	regionKeyPublic := "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33"
+	regionKeyPrivate := "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
 	locationToSaveData := "kiki"
 	if len(params) > 0 {
 		locationToSaveData = params[0]
@@ -289,8 +289,8 @@ func (f *Feed) DetermineHashtags() (err error) {
 				continue
 			}
 
-			foundTags[t[1:len(t)]] = struct{}{}
-			idToTags[e.ID] = append(idToTags[e.ID], t[1:len(t)])
+			foundTags[t[1:]] = struct{}{}
+			idToTags[e.ID] = append(idToTags[e.ID], t[1:])
 		}
 		for tag := range foundTags {
 			if _, ok := tagCounts[tag]; !ok {
@@ -423,7 +423,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		}
 		newLetter := letter.Letter{
 			To:      l.To,
-			Content: base64.URLEncoding.EncodeToString(images[name]),
+			Content: base58.FastBase58Encoding(images[name]),
 			Purpose: p,
 		}
 		newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)

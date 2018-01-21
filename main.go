@@ -14,8 +14,8 @@ var (
 	// Port defines what port the carrier should listen on
 	PrivatePort    = "8003"
 	PublicPort     = "8004"
-	RegionPublic   = "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk="
-	RegionPrivate  = "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
+	RegionPublic   = "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33"
+	RegionPrivate  = "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
 	NoSync         = false
 	GenerateRegion = false
 	// Location defines where to open up the kiki database
