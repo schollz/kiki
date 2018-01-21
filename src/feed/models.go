@@ -76,6 +76,7 @@ type Post struct {
 type BasicPost struct {
 	Depth      int           `json:"depth"`
 	ID         string        `json:"id"`
+	FirstID    string        `json:"first_id"`
 	Recipients string        `json:"recipients"`
 	ReplyTo    string        `json:"reply_to"`
 	Content    template.HTML `json:"content"`

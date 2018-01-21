@@ -137,7 +137,7 @@ func (d *database) MakeTables() (err error) {
 		return
 	}
 	// The "letters" table contains all the envelopes (opened and unopened) and their respective inforamtion in the letters.
-	sqlStmt = `create table letters (id text not null primary key, time TIMESTAMP, sender text, signature text, sealed_recipients text, sealed_letter text, opened integer, letter_purpose text, letter_to text, letter_content text, letter_replaces text, letter_replyto text, unique(id), UNIQUE(signature));`
+	sqlStmt = `create table letters (id text not null primary key, time TIMESTAMP, sender text, signature text, sealed_recipients text, sealed_letter text, opened integer, letter_purpose text, letter_to text, letter_content text, letter_firstid text, letter_replyto text, unique(id), UNIQUE(signature));`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
 		err = errors.Wrap(err, "MakeTables, letters")
@@ -169,7 +169,7 @@ func (d *database) MakeTables() (err error) {
 	}
 
 	// indices
-	sqlStmt = `CREATE INDEX idx_replaces ON letters(opened,letter_replaces);`
+	sqlStmt = `CREATE INDEX idx_replaces ON letters(opened,letter_firstid);`
 	_, err = d.db.Exec(sqlStmt)
 	if err != nil {
 		err = errors.Wrap(err, "MakeTables, letters")
@@ -335,12 +335,12 @@ func (d *database) addEnvelope(e letter.Envelope) (err error) {
 	}
 	mTo = string(b)
 
-	stmt, err := tx.Prepare("insert or replace into letters(id,time,sender,signature,sealed_recipients,sealed_letter,opened,letter_purpose,letter_to,letter_content,letter_replaces,letter_replyto) values(?,?,?,?,?,?,?,?,?,?,?,?)")
+	stmt, err := tx.Prepare("insert or replace into letters(id,time,sender,signature,sealed_recipients,sealed_letter,opened,letter_purpose,letter_to,letter_content,letter_firstid,letter_replyto) values(?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(e.ID, e.Timestamp, e.Sender.Public, e.Signature, mSealedRecipients, e.SealedLetter, opened, e.Letter.Purpose, mTo, e.Letter.Content, e.Letter.Replaces, e.Letter.ReplyTo)
+	_, err = stmt.Exec(e.ID, e.Timestamp, e.Sender.Public, e.Signature, mSealedRecipients, e.SealedLetter, opened, e.Letter.Purpose, mTo, e.Letter.Content, e.Letter.FirstID, e.Letter.ReplyTo)
 	if err != nil {
 		return
 	}
@@ -781,19 +781,20 @@ func (d *database) deleteUsersEdits(publicKey string) (err error) {
 	return
 }
 
+// isReplaced will see if there is more than one of a first_id, which only happens if something has been replaced.
 func (d *database) isReplaced(id string) (yes bool, err error) {
-	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE opened == 1 AND letter_replaces==? AND sender == (SELECT sender FROM letters WHERE opened ==1 AND id==?)")
+	stmt, err := d.db.Prepare("SELECT COUNT(id) WHERE opened == 1 AND letter_firstid == ?")
 	if err != nil {
 		err = errors.Wrap(err, "problem preparing SQL")
 		return
 	}
 	defer stmt.Close()
-	var result string
-	err = stmt.QueryRow(id, id).Scan(&result)
+	var num int
+	err = stmt.QueryRow(id).Scan(&num)
 	if err != nil {
 		return false, errors.Wrap(err, "problem getting")
 	}
-	yes = result != ""
+	yes = num > 1
 	return
 }
 
@@ -949,47 +950,19 @@ func (d *database) getFollowers(publicKey string) (s []string, err error) {
 }
 
 func (d *database) getAllVersions(id string) (s []string, err error) {
-	// make sure it exists first
-	_, err = d.getAllFromPreparedQuery("SELECT * FROM letters WHERE id == ? LIMIT 1", id)
+	es, err := d.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND letter_firstid == ? ORDER BY time DESC", id)
 	if err != nil {
+		return
+	}
+	if len(es) == 0 {
+		err = errors.New("no letters")
 		return
 	}
 
-	s = []string{id}
-	// forward propogation, find letters that replace current letter
-	stmt, err := d.db.Prepare("SELECT id FROM letters WHERE opened==1 AND letter_replaces==? LIMIT 1")
-	if err != nil {
-		err = errors.Wrap(err, "problem preparing SQL")
-		return
+	s = make([]string, len(es))
+	for i, e := range es {
+		s[i] = e.ID
 	}
-	for {
-		err = stmt.QueryRow(s[0]).Scan(&id)
-		if err != nil {
-			break
-		} else {
-			// found one that replaces it, prepend it
-			s = append([]string{id}, s...)
-		}
-	}
-	stmt.Close()
-	// backward propogation, find letters that this letter has replaced
-	// forward propogation, find letters that replace current letter
-	stmt, err = d.db.Prepare("SELECT id FROM letters WHERE id IN (SELECT letter_replaces FROM letters WHERE opened==1 AND id == ? LIMIT 1)")
-	if err != nil {
-		err = errors.Wrap(err, "problem preparing SQL")
-		return
-	}
-	for {
-		err = stmt.QueryRow(s[len(s)-1]).Scan(&id)
-		if err != nil {
-			break
-		} else {
-			// found one that replaces it, append it
-			s = append(s, id)
-		}
-	}
-	stmt.Close()
-	err = nil
 	return
 }
 

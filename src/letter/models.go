@@ -51,8 +51,8 @@ type Letter struct {
 	// Content is is the content of the letter (base64 encoded image, text, or HTML)
 	Content string `json:"content,omitempty"`
 
-	// Replaces is the ID that this letter will replace if it is opened
-	Replaces string `json:"replaces,omitempty"`
+	// FirstID is the first ID for chains of edits, which must be constant
+	FirstID string `json:"first_id,omitempty"`
 
 	// ReplyTo is the ID of the post being responded to
 	ReplyTo string `json:"reply_to,omitempty"`
@@ -130,7 +130,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	h.Write([]byte(sender.Public))
 	h.Write([]byte(l.Purpose))
 	h.Write([]byte(l.Content))
-	h.Write([]byte(l.Replaces))
+	h.Write([]byte(l.FirstID))
 	h.Write([]byte(l.ReplyTo))
 	h.Write([]byte(strings.Join(l.To, ",")))
 	e.ID = base58.FastBase58Encoding(h.Sum(nil))
