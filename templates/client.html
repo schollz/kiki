@@ -378,7 +378,7 @@ KiKiClient.prototype.collectUsersFromPost = function(post) {
 
 KiKiClient.prototype.buildPostUi = function(post) {
     var self = this;
-    return $("<div>", {post_id: post.getPostId()}).addClass("card").append(
+    return $("<div>").addClass("card").append(
         $("<div>").addClass("card-body").append(
             post.$el
         )
@@ -386,6 +386,7 @@ KiKiClient.prototype.buildPostUi = function(post) {
 }
 
 KiKiClient.prototype.buildPostsUi = function(callback) {
+    this.$el.html('');
     for (var i=0; i<this.posts.length; i++) {
         var post = this.posts[i];
         this.$el.append(
@@ -411,6 +412,17 @@ KiKiClient.prototype.init = function(callback){
     callback && callback();
 }
 
+
+KiKiClient.prototype.update = function() {
+    var self = this;
+    app.Posts.fetchPosts(function(err, posts){
+        if (err) {
+            throw err;
+        }
+        self.posts = posts;
+        self.buildPostsUi();
+    });
+}
 
 
 
@@ -720,6 +732,14 @@ var updateInterval = setInterval(function(){
                 app.Posts.data[letter.reply_to].update();
             } else if ("action-assign/profile" == letter.purpose) {
                 app.User.user.update();
+            } else if ("" != letter.replaces) {
+                var post = app.Posts.data[letter.replaces];
+                if (post.parent) {
+                    return post.parent.update();
+                }
+                app.Ui.update();
+            } else {
+                app.Ui.update();
             }
         });
       });

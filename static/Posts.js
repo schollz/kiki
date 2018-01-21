@@ -1,14 +1,19 @@
 
-var Post = function(data, api) {
+var Post = function(data, api, parent) {
     this.data = data;
     this.hash;
     this.api = api;
+    this.parent = parent;
     this.comments = null;
     this.owner = null;
     this.callbacks = [];
     this.$el = this.buildUi();
     this.fetchComments();
     this.fetchOwner();
+}
+
+Post.prototype.setParent = function(parent) {
+    this.parent = parent;
 }
 
 Post.prototype.registerUpdateCallback = function(callback) {
@@ -58,15 +63,18 @@ Post.prototype.onUpdate = function() {
     }
 }
 
-Post.prototype.update = function() {
+Post.prototype.update = function(data) {
     var self = this;
-    if (this.api) {
-        this.api.fetchPost(this.getPostId(), function(err, res){
-            if (err) throw err;
-            self.data = res.data.posts[0];
-            self.onUpdate();
-        });
+    if (data) {
+        this.data = data;
+        this.onUpdate();
+        return;
     }
+    this.api.fetchPost(this.getPostId(), function(err, res){
+        if (err) throw err;
+        self.data = res.data.posts[0];
+        self.onUpdate();
+    });
 }
 
 Post.prototype.fetchComments = function() {
@@ -233,16 +241,27 @@ var PostsCollection = function(api) {
     this.callbacks = {};
 }
 
-PostsCollection.prototype.addPost = function(data) {
-    var post = new Post(data, this.api);
-    this.data[data.id] = post;
+PostsCollection.prototype.addPost = function(data, post_id) {
+    var post;
+    var parent_post = null;
+    if (post_id) {
+        parent_post = this.data[post_id];
+    }
+    if (this.data[data.id]) {
+        post = this.data[data.id];
+        post.update(data);
+        post.setParent(parent_post);
+    } else {
+        post = new Post(data, this.api, parent_post);
+        this.data[data.id] = post;
+    }
     return post;
 }
 
-PostsCollection.prototype.addPosts = function(data) {
+PostsCollection.prototype.addPosts = function(data, post_id) {
     var posts = [];
     for (var i=0; i<data.length; i++) {
-        posts.push(this.addPost(data[i]));
+        posts.push(this.addPost(data[i], post_id));
     }
     return posts;
 }
@@ -289,7 +308,7 @@ PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
             return;
         }
         if (res.data.posts) {
-            self.data[post_id].comments = self.addPosts(res.data.posts);
+            self.data[post_id].comments = self.addPosts(res.data.posts, post_id);
         } else {
             self.data[post_id].comments = [];
         }
@@ -297,23 +316,23 @@ PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
         callback && callback(err, self.data[post_id].comments);
     });
 }
-
-PostsCollection.prototype.runCommentCallbacks = function(err, post_id) {
-    while (this.callbacks['comments_'+post_id].length) {
-        var callback = this.callbacks['comments_'+post_id].shift();
-        callback && callback(err, this.data[post_id].comments);
-    }
-    if (0 == this.callbacks['comments_'+post_id].length) {
-        delete this.callbacks['comments_'+post_id];
-    }
-}
-
-PostsCollection.prototype.runCallbacks = function(err, post_id) {
-    while (this.callbacks[post_id].length) {
-        var callback = this.callbacks[post_id].shift();
-        callback && callback(err, this.data[post_id]);
-    }
-    if (0 == this.callbacks[post_id].length) {
-        delete this.callbacks[post_id];
-    }
-}
+//
+// PostsCollection.prototype.runCommentCallbacks = function(err, post_id) {
+//     while (this.callbacks['comments_'+post_id].length) {
+//         var callback = this.callbacks['comments_'+post_id].shift();
+//         callback && callback(err, this.data[post_id].comments);
+//     }
+//     if (0 == this.callbacks['comments_'+post_id].length) {
+//         delete this.callbacks['comments_'+post_id];
+//     }
+// }
+//
+// PostsCollection.prototype.runCallbacks = function(err, post_id) {
+//     while (this.callbacks[post_id].length) {
+//         var callback = this.callbacks[post_id].shift();
+//         callback && callback(err, this.data[post_id]);
+//     }
+//     if (0 == this.callbacks[post_id].length) {
+//         delete this.callbacks[post_id];
+//     }
+// }
