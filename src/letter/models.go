@@ -4,10 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
+	"github.com/mr-tron/base58/base58"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/logging"
@@ -134,7 +134,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	h.Write([]byte(l.Replaces))
 	h.Write([]byte(l.ReplyTo))
 	h.Write([]byte(strings.Join(l.To, ",")))
-	e.ID = fmt.Sprintf("%x", h.Sum(nil))
+	e.ID = base58.FastBase58Encoding(h.Sum(nil))
 
 	// Generate a passphrase to encrypt the letter
 	contentBytes, err := json.Marshal(l)

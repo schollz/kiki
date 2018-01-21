@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/mr-tron/base58/base58"
 	"golang.org/x/crypto/nacl/box"
 )
 
@@ -129,8 +130,8 @@ func GenerateKeys() (publicKey, privateKey string) {
 		panic(err)
 	}
 
-	publicKey = base64.URLEncoding.EncodeToString(publicKeyBytes[:])
-	privateKey = base64.URLEncoding.EncodeToString(privateKeyBytes[:])
+	publicKey = base58.FastBase58Encoding(publicKeyBytes[:])
+	privateKey = base58.FastBase58Encoding(privateKeyBytes[:])
 	return
 }
 
@@ -179,7 +180,7 @@ func (kp KeyPair) Signature(regionkey KeyPair) (signature string, err error) {
 	if err != nil {
 		return
 	}
-	signature = base64.URLEncoding.EncodeToString(encrypted)
+	signature = base58.FastBase58Encoding(encrypted)
 	return
 }
 
