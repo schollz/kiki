@@ -135,6 +135,10 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	h.Write([]byte(strings.Join(l.To, ",")))
 	e.ID = base58.FastBase58Encoding(h.Sum(nil))
 
+	if l.FirstID == "" {
+		l.FirstID = e.ID
+	}
+
 	// Generate a passphrase to encrypt the letter
 	contentBytes, err := json.Marshal(l)
 	if err != nil {

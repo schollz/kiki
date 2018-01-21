@@ -352,8 +352,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		err = errors.New("cannot post with region key")
 		return
 	}
-	if l.Replaces != "" {
-		e, err2 := f.db.GetEnvelopeFromID(l.Replaces)
+	if l.FirstID != "" {
+		e, err2 := f.db.GetEnvelopeFromID(l.FirstID)
 		if err2 != nil {
 			return errors.New("problem replacing that")
 		}
@@ -470,6 +470,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	if strip.StripTags(l.Content) == "" && !strings.Contains(l.Content, "img") {
 		l.Content = ""
 	}
+
+	f.logger.Log.Infof("%+v", l)
 
 	// seal the letter
 	e, err := l.Seal(f.PersonalKey, f.RegionKey)
@@ -686,7 +688,7 @@ func (f *Feed) MakePostWithComments(e letter.Envelope) (post Post) {
 	basicPost := f.MakePost(e)
 	post = Post{
 		Post:     basicPost,
-		Comments: f.DetermineComments(basicPost.ID),
+		Comments: f.DetermineComments(basicPost.FirstID),
 	}
 	// f.caching.Set(e.ID, post, 3*time.Second)
 	return
@@ -750,6 +752,7 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		Content:    template.HTML(e.Letter.Content),
 		Date:       convertedTime,
 		TimeAgo:    utils.TimeAgo(convertedTime),
+		FirstID:    e.Letter.FirstID,
 		User: User{
 			Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
 			PublicKey: e.Sender.Public,
@@ -775,7 +778,7 @@ func (f *Feed) recurseComments(postID string, comments []BasicPost, depth int) [
 		comment.Depth = depth
 		comment.ReplyTo = postID
 		comments = append(comments, comment)
-		comments = f.recurseComments(comment.ID, comments, depth+1)
+		comments = f.recurseComments(comment.FirstID, comments, depth+1)
 	}
 	return comments
 }

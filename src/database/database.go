@@ -396,7 +396,7 @@ func (d *database) getRows(rows *sql.Rows) (s []letter.Envelope, err error) {
 		var opened int
 		// marshaled things
 		var mSender, mSealedRecipients, mTo string
-		err = rows.Scan(&e.ID, &e.Timestamp, &mSender, &e.Signature, &mSealedRecipients, &e.SealedLetter, &opened, &e.Letter.Purpose, &mTo, &e.Letter.Content, &e.Letter.Replaces, &e.Letter.ReplyTo)
+		err = rows.Scan(&e.ID, &e.Timestamp, &mSender, &e.Signature, &mSealedRecipients, &e.SealedLetter, &opened, &e.Letter.Purpose, &mTo, &e.Letter.Content, &e.Letter.FirstID, &e.Letter.ReplyTo)
 		e.Sender, err = keypair.FromPublic(mSender)
 		json.Unmarshal([]byte(mSealedRecipients), &e.SealedRecipients)
 		json.Unmarshal([]byte(mTo), &e.Letter.To)

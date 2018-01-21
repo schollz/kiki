@@ -44,7 +44,7 @@
   <main role="main" class="container">
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
-    <input type=hidden id="letterReplaces" value="" />
+    <input type=hidden id="letterFirstID" value="" />
     <input type=hidden id="letterTo" value="" />
     <!-- begin medium modal -->
     <!-- Modal -->
@@ -120,9 +120,9 @@
               <p class="blog-post-meta">
                 <span class="float-right">
                   &nbsp;
-                  <a href="#!" class="editmodal" data-title="Reply to {{ .Post.User.Name }}" data-replyto="{{ .Post.ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>
+                  <a href="#!" class="editmodal" data-title="Reply to {{ .Post.User.Name }}" data-replyto="{{ .Post.FirstID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>
                   &nbsp;
-                  <a href="#!" data-usecontent="{{.Post.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.Post.ID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>
+                  <a href="#!" data-usecontent="{{.Post.ID}}" data-title="Edit post" class="editmodal" data-firstid="{{.Post.FirstID}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>
                  &nbsp;
                 <a href="#!" data-id="{{.Post.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Post.Likes 1 }}x{{ .Post.Likes }}{{ end }}</a>
               </span>
@@ -146,9 +146,9 @@
                       <div class="row">
                         <div class="col-12">
 
-                          <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .ID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
+                          <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .FirstID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
 
-                                <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-replaces="{{.ID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
+                                <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-firstid="{{.FirstID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
                               <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
                             </span> {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
                           <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
@@ -394,7 +394,7 @@
         event.preventDefault();
         letter = {
           "purpose": $("#letterPurpose").val(),
-          "replaces": $("#letterReplaces").val(),
+          "first_id": $("#letterFirstID").val(),
           "reply_to": $("#letterReplyTo").val(),
           "to": ["self"],
           "content": editor.getContent(),
@@ -458,10 +458,10 @@
         } else {
           $("#letterReplyTo").val("");
         }
-        if ($(this).data("replaces")) {
-          $("#letterReplaces").val($(this).data("replaces"));
+        if ($(this).data("firstid")) {
+          $("#letterFirstID").val($(this).data("firstid"));
         } else {
-          $("#letterReplaces").val("");
+          $("#letterFirstID").val("");
         }
         if ($(this).data("letterto")) {
           $("#letterTo").val($(this).data("letterto"));
