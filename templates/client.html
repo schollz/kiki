@@ -227,7 +227,8 @@
                 <button class="btn btn-sm user-action change-name" title="Change username">
                     <i class="fas fa-comment-alt"></i>
                 </button>
-                <button class="edit-profile btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile">
+                <!-- <button class="edit-profile btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile"> -->
+                <button class="edit-profile btn btn-sm user-action">
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <button class="editmodal btn btn-sm user-action" title="Change profile image" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
@@ -463,8 +464,12 @@ UserClient.prototype.addListeners = function() {
         });
     });
 
-    $('.user-action.edit-profile').on('click', app.openModal);
-    // self.user.update();
+    $('.user-action.edit-profile').on('click', function() {
+        app.openModal('Edit profile', {
+            purpose: "action-assign/profile",
+            content: self.data.profile
+        });
+    });
 
     $(".toggle-list").on("click", function(){
         var self = this;
@@ -508,8 +513,6 @@ UserClient.prototype.addListeners = function() {
             }
         });
     });
-
-
 
 }
 
@@ -612,9 +615,6 @@ app.openModal = function(title, data) {
         $(".editable").html(
             data.content || "Write your post..."
         );
-        // if ($(this).data("makecontent")) {
-        //     $(".editable").html($(this).data("makecontent"));
-        // }
         $("#letterReplyTo").val(data.reply_to || "");
         $("#letterReplaces").val(data.replaces || "");
         $("#letterPurpose").val(data.purpose);
@@ -718,6 +718,8 @@ var updateInterval = setInterval(function(){
             //  - update letter
             if ("" != letter.reply_to) {
                 app.Posts.data[letter.reply_to].update();
+            } else if ("action-assign/profile" == letter.purpose) {
+                app.User.user.update();
             }
         });
       });

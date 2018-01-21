@@ -58,21 +58,6 @@ Post.prototype.onUpdate = function() {
     }
 }
 
-/*
-Post.prototype.edit = function(content) {
-    var letter = {
-        "purpose": this.data.purpose,
-        "replaces": this.getPostId(),
-        "reply_to": this.data.reply_to,
-        "to": ["self"],
-        "content": content
-    }
-    this.api.submitLetter(letter, function(err, res) {
-        console.log(err, res);
-    });
-}
-*/
-
 Post.prototype.update = function() {
     var self = this;
     if (this.api) {
@@ -265,6 +250,10 @@ PostsCollection.prototype.addPosts = function(data) {
 PostsCollection.prototype.fetchPosts = function(callback){
     var self = this;
     this.api.fetchPosts(function(err, res){
+        if (err) {
+            callback && callback(err, res);
+            return
+        }
         var posts = [];
         if(!err && res.data.posts) {
             posts = self.addPosts(res.data.posts);
@@ -275,50 +264,23 @@ PostsCollection.prototype.fetchPosts = function(callback){
 
 PostsCollection.prototype.fetchPost = function(post_id, callback) {
     var self = this;
-    if (this.data[post_id]) {
-        return callback(null, this.data[post_id]);
-    }
-    if (!this.callbacks[post_id]) {
-        this.callbacks[post_id] = [];
-    }
-    this.callbacks[post_id].push(callback);
-    // only fire one request
-    if (1 < this.callbacks[post_id].length){
-        return
-    };
     // fetch from api
     this.api.fetchPost(post_id, function(err, res){
         if (err) {
-            self.runCallbacks(err, post_id);
+            callback && callback(err);
             return;
         }
         if (res.data.posts && res.data.posts[0]) {
             self.data[post_id] = new Post(res.data.posts[0], self.api);
-            self.runCallbacks(null, post_id);
+            callback && callback(null, self.data[post_id]);
         } else {
-            self.runCallbacks(new Error("Not found"));
+            callback && callback(new Error("Not found"));
         }
     });
 }
 
 PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
     var self = this;
-    // if (!this.data[post_id]) {
-    //     return this.fetchPost(post_id, function(){
-    //         self.fetchPostComments(post_id, callback);
-    //     });
-    // }
-    // if (this.data[post_id] && this.data[post_id].comments) {
-    //     return callback(null, this.data[post_id].comments);
-    // }
-    // if (!this.callbacks['comments_'+post_id]) {
-    //     this.callbacks['comments_'+post_id] = [];
-    // }
-    // this.callbacks['comments_'+post_id].push(callback);
-    // // only fire one request
-    // if (1 < this.callbacks['comments_'+post_id].length){
-    //     return
-    // };
     // fetch from api
     this.api.fetchPostComments(post_id, function(err, res){
         if (err) {
@@ -334,7 +296,6 @@ PostsCollection.prototype.fetchPostComments = function(post_id, callback) {
         // self.runCommentCallbacks(null, post_id);
         callback && callback(err, self.data[post_id].comments);
     });
-
 }
 
 PostsCollection.prototype.runCommentCallbacks = function(err, post_id) {
