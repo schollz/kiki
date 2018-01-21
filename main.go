@@ -30,7 +30,7 @@ func main() {
 	flag.BoolVar(&NoSync, "no-sync", NoSync, "disable syncing")
 	debug := flag.Bool("debug", false, "turn on debug mode")
 	noBrowser := flag.Bool("no-browser", false, "do not open browser")
-	flag.StringVar(&Location, "path", ".", "path to the kiki database folder")
+	flag.StringVar(&Location, "path", "kiki", "path to the kiki data")
 	flag.BoolVar(&GenerateRegion, "generate-region", GenerateRegion, "generate keys for a new region")
 	flag.Parse()
 	if GenerateRegion {
