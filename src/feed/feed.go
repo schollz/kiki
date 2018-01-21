@@ -433,7 +433,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		// seal and add envelope
 		err2 = f.db.AddEnvelope(newEnvelope)
 		if err2 != nil {
-			return err2
+			// should throw error if its already added, so don't worry about
+			f.logger.Log.Warn(err2)
 		}
 		if l.Purpose == purpose.ActionImage {
 			newHTML = newEnvelope.ID
@@ -460,12 +461,13 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		}
 	}
 	l.Content = strings.TrimSpace(l.Content)
+	f.logger.Log.Warn(l.Content)
 
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {
 		l.Content = strip.StripTags(l.Content)
 	}
-	if strip.StripTags(l.Content) == "" {
+	if strip.StripTags(l.Content) == "" && !strings.Contains(l.Content, "img") {
 		l.Content = ""
 	}
 
@@ -476,7 +478,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 	err = f.db.AddEnvelope(e)
 	if err != nil {
-		return
+		return errors.Wrap(err, "processing letter")
 	}
 
 	return
