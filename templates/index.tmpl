@@ -26,6 +26,10 @@
           <a class="nav-link active" href="/">Kiki</a>
           <!-- <a class="nav-link" href="#">Help</a>
           <a class="nav-link" href="#">About</a> -->
+          <form class="form-inline mt-2 mt-md-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="searchText">
+            <button class="btn btn-primary my-2 my-sm-0" id="searchSubmit">Search</button>
+          </form>
         </nav>
       </div>
     </div>
@@ -521,7 +525,19 @@
         };
         submitLetter(letter);
       });
+      $("#searchSubmit").click(function(event) {
+        event.preventDefault();
+        console.log($("#searchText").val())
+        var loc = location.href;
+        // loc += loc.indexOf("?") === -1 ? "?" : "&";
 
+        location.href = loc + "?search="+encodeURIComponent($("#searchText").val());
+      });
+      $('#searchText').keypress(function (e) {
+        if (e.which == 13) {
+          $('#searchSubmit').click();
+        }
+      });
       var restrictInput = function(event) {
         $("img:not(.img-fluid)").addClass("img-fluid");
       }

@@ -8,12 +8,15 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/blevesearch/bleve"
 	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/pkg/errors"
@@ -256,6 +259,13 @@ func (f *Feed) UpdateEverything() {
 	if err != nil {
 		f.logger.Log.Error(err)
 	}
+
+	// make search index
+	err = f.MakeSearchIndex()
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
+
 }
 
 // DetermineHashtags will go through and find all the hashtags
@@ -640,7 +650,11 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
 		envelopes, err = f.db.GetBasicPostsForUser(p.User)
 	} else if p.Search != "" {
-
+		posts, err = f.SearchIndexedPosts(p.Search)
+		if err != nil {
+			f.logger.Log.Error(err)
+		}
+		return
 	} else {
 		f.logger.Log.Debug("getting all envelopes")
 		// return all envelopes
@@ -1120,8 +1134,69 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 	return
 }
 
+// MakeSearchIndex will make a search index
+func (f *Feed) MakeSearchIndex() (err error) {
+	t := time.Now()
+	os.RemoveAll(path.Join(f.storagePath, "search.bleve"))
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New(path.Join(f.storagePath, "search.bleve"), mapping)
+	if err != nil {
+		return errors.Wrap(err, "problem making index")
+	}
+	defer index.Close()
+	posts, err := f.ShowFeed(ShowFeedParameters{})
+	if err != nil {
+		return errors.Wrap(err, "problem getting posts")
+	}
+	for i, post := range posts {
+		err = index.Index(strconv.Itoa(i), post)
+		if err != nil {
+			return errors.Wrap(err, "problem indexing")
+		}
+	}
+
+	// marshal and save posts
+	bPosts, err := json.Marshal(posts)
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile(path.Join(f.storagePath, "search.bleve", "posts.json"), bPosts, 0644)
+	f.logger.Log.Infof("indexed %d posts in %s", len(posts), time.Since(t))
+	return
+}
+
+func (f *Feed) SearchIndexedPosts(search string) (posts []Post, err error) {
+	t := time.Now()
+	index, err := bleve.Open(path.Join(f.storagePath, "search.bleve"))
+	if err != nil {
+		return
+	}
+	defer index.Close()
+	query := bleve.NewFuzzyQuery(search)
+	searchRequest := bleve.NewSearchRequest(query)
+	searchResult, err := index.Search(searchRequest)
+	if err != nil {
+		return
+	}
+	f.logger.Log.Info(searchResult.Took)
+	bAllPosts, err := ioutil.ReadFile(path.Join(f.storagePath, "search.bleve", "posts.json"))
+	if err != nil {
+		return
+	}
+	var allPosts []Post
+	err = json.Unmarshal(bAllPosts, &allPosts)
+	if err != nil {
+		return
+	}
+	posts = make([]Post, len(searchResult.Hits))
+	for i, hit := range searchResult.Hits {
+		f.logger.Log.Info(hit)
+		id, _ := strconv.Atoi(hit.ID)
+		posts[i] = allPosts[id]
+	}
+	f.logger.Log.Infof("found %d posts in %s", len(searchResult.Hits), time.Since(t))
+	return
+}
+
 func (f *Feed) TestStuff() {
-	err := f.PingKikiInstance("http://localhost:8005")
-	f.logger.Log.Error(err.Error())
-	f.logger.Log.Error(err == nil)
 }
