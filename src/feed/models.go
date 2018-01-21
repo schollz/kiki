@@ -59,8 +59,8 @@ type Settings struct {
 // GenerateSettings create new instance of Something
 func GenerateSettings() Settings {
 	return Settings{
-		StoragePerPublicPerson: 5000000,  // 5 MB
-		StoragePerFriend:       50000000, // 50 MB
+		StoragePerPublicPerson: 5000000 / 4,  // 5 MB
+		StoragePerFriend:       50000000 / 4, // 50 MB
 		FriendsOfFriends:       true,
 		BlockPublicPhotos:      false,
 		HidePublicPosts:        false,

@@ -1098,6 +1098,7 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 		if err2 != nil {
 			return err2
 		}
+		f.logger.Log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
 
 		// don't proceed if the current space does not exceed
 		if currentSpace < limit {
