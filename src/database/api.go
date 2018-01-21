@@ -269,6 +269,8 @@ func (self DatabaseAPI) postJsonSql() string {
 func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 	var posts []ApiBasicPost
 
+	logger.Log.Info(self.FileName)
+
 	db, err := open(self.FileName)
 	if nil != err {
 		return posts, err

@@ -158,15 +158,15 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-info">
-                                        <input type="radio" name="options" id="writingToSelf" autocomplete="off">Self
-                                    </label>
-              <label class="btn btn-info">
-                                        <input type="radio" name="options" id="writingToFriends" autocomplete="off"> Friends
-                                    </label>
-              <label class="btn btn-info active">
-                                        <input type="radio" name="options" id="writingToPublic" autocomplete="off" checked> Public
-                                    </label>
+                <label class="btn btn-info">
+                    <input type="radio" class="read-permission" name="options" value="self" autocomplete="off">Self
+                </label>
+                <label class="btn btn-info">
+                    <input type="radio" class="read-permission" name="options" value="friends" autocomplete="off"> Friends
+                </label>
+                <label class="btn btn-info active">
+                    <input type="radio" class="read-permission" name="options" value="public" autocomplete="off" checked> Public
+                </label>
             </div>
             <button type="button" class="btn btn-primary" id="submit-writing">Submit</button>
           </div>
@@ -227,7 +227,6 @@
                 <button class="btn btn-sm user-action change-name" title="Change username">
                     <i class="fas fa-comment-alt"></i>
                 </button>
-                <!-- <button class="edit-profile btn btn-sm user-action" title="Edit profile" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile"> -->
                 <button class="edit-profile btn btn-sm user-action">
                     <i class="fas fa-user-circle"></i>
                 </button>
@@ -280,7 +279,6 @@
             <div class="sidebar-module followers">
                 <div class="toggle-list">
                     <i class="fa fa-caret-right"></i>
-                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
                      Followers (<span>0</span>)
                  </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
@@ -288,7 +286,6 @@
             <div class="sidebar-module friends">
                 <div class="toggle-list">
                     <i class="fa fa-caret-right"></i>
-                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
                      Friends (<span>0</span>)
                  </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
@@ -296,7 +293,6 @@
             <div class="sidebar-module connections">
                 <div class="toggle-list">
                     <i class="fa fa-caret-right"></i>
-                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
                      Connections (<span>0</span>)
                  </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
@@ -304,7 +300,6 @@
             <div class="sidebar-module blocked">
                 <div class="toggle-list">
                     <i class="fa fa-caret-right"></i>
-                    <!-- <i class="fa fa-caret-down" style="display:none"></i> -->
                      Blocked (<span>0</span>)
                  </div>
                 <div class="list-unstyled users-list" style="display:none;"></div>
@@ -631,6 +626,7 @@ app.openModal = function(title, data) {
         $("#letterReplaces").val(data.replaces || "");
         $("#letterPurpose").val(data.purpose);
     } else {
+        console.log("TODO - modal class")
         $("#writingModalLabel").text($(this).data('title'));
         $(".editable").focus(function() {
             $(this).select();
@@ -708,41 +704,38 @@ var updateInterval = setInterval(function(){
     });
     $(document).ready(function() {
     //   $("img").addClass("img-fluid");
-      $("#submit-writing").click(function(event) {
-        // Stop form from submitting normally
-        event.preventDefault();
-        letter = {
-          "purpose": $("#letterPurpose").val(),
-          "replaces": $("#letterReplaces").val(),
-          "reply_to": $("#letterReplyTo").val(),
-          "to": ["self"],
-          "content": editor.getContent(),
-        }
-        if ($("#writingToPublic").is(":checked") == true) {
-          letter["to"] = ["public"];
-        }
-        if ($("#writingToFriends").is(":checked") == true) {
-          letter["to"] = ["friends"];
-        }
-        console.log(letter);
-        app.Api.submitLetter(letter, function() {
-            // HACK
-            //  - update letter
-            if ("" != letter.reply_to) {
-                app.Posts.data[letter.reply_to].update();
-            } else if ("action-assign/profile" == letter.purpose) {
-                app.User.user.update();
-            } else if ("" != letter.replaces) {
-                var post = app.Posts.data[letter.replaces];
-                if (post.parent) {
-                    return post.parent.update();
-                }
-                app.Ui.update();
-            } else {
-                app.Ui.update();
+        $("#submit-writing").click(function(event) {
+            // Stop form from submitting normally
+            // event.preventDefault();
+            letter = {
+                "purpose": $("#letterPurpose").val(),
+                "replaces": $("#letterReplaces").val(),
+                "reply_to": $("#letterReplyTo").val(),
+                "to": [
+                    $('input.read-permission[name="options"]:checked').val()
+                ],
+                "content": editor.getContent()
             }
+            console.log(letter);
+            app.Api.submitLetter(letter, function() {
+                // HACK
+                //  - update letter
+                if ("" != letter.reply_to) {
+                    app.Posts.data[letter.reply_to].update();
+                } else if ("action-assign/profile" == letter.purpose) {
+                    app.User.user.update();
+                } else if ("" != letter.replaces) {
+                    var post = app.Posts.data[letter.replaces];
+                    if (post.parent) {
+                        return post.parent.update();
+                    }
+                    app.Ui.update();
+                } else {
+                    app.Ui.update();
+                }
+            });
+            $("#writingModal").modal('toggle');
         });
-      });
 
 
       // SCROLL TO TOP
