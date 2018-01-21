@@ -46,7 +46,7 @@ func (f *Feed) Debug(b bool) {
 func New(params ...string) (f *Feed, err error) {
 	regionKeyPublic := "rbcDfDMIe8qXq4QPtIUtuEylDvlGynx56QgeHUZUZBk="
 	regionKeyPrivate := "GQf6ZbBbnVGhiHZ_IqRv0AlfqQh1iofmSyFOcp1ti8Q="
-	locationToSaveData := "."
+	locationToSaveData := "kiki"
 	if len(params) > 0 {
 		locationToSaveData = params[0]
 		if len(params) == 3 {
