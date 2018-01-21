@@ -260,7 +260,7 @@ func (self DatabaseAPI) postJsonSql() string {
 			'"reply_to": "' ||  letter_replyto ||'",'||
 			'"purpose":"' ||  letter_purpose ||'",'||
 			'"likes": '|| (SELECT COUNT(*) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
-			'"num_comments": '|| (SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id)
+			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id )
 		||'}'
 	`
 }
