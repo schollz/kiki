@@ -19,6 +19,10 @@
   line-height: 1.0;
 }
 
+nav {
+  margin-bottom: 1rem;
+}
+
 img.img-fluid {
   padding-bottom: 1em;
 }

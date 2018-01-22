@@ -38,30 +38,32 @@
 
 </head>
 
-<body>
-  <header>
-    <div class="blog-masthead">
-      <div class="container">
-        <nav class="nav">
-          <a class="nav-link active" href="/"> <img class="kiki-pic" src="/static/kiki.png">
-</a>
-          <!-- <a class="nav-link" href="#">Help</a>
-          <a class="nav-link" href="#">About</a> -->
-          <form class="form-inline mt-2 mt-md-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="searchText">
-            <button class="btn btn-secondary my-2 my-sm-0" id="searchSubmit">Search</button>
-          </form>
-        </nav>
-      </div>
+<body style="background-color:#fffcfd;">
+
+<header>
+  <nav class="navbar navbar-expand" style="background-color:#e2b1c7;">
+    <div class="container" style="padding-left:15px;padding-right:10px;">
+    <a href="/" class="pull-left"><img src="/static/kiki.png" class="kiki-pic"></a>
+  <a class="navbar-brand" style="color:black;" href="/"><em>&nbsp;&nbsp;<strong>Kiki</strong></em></a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarsExample02">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/?hashtag=kikihelp" style="color:black;">Help</a>
+      </li>
+    </ul>
+    <div class="form-inline my-2 my-md-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="searchText">
     </div>
-    <!--         <div class="blog-header">
-                <div class="container">
-                    <h1 class="blog-title">The Bootstrap Blog</h1>
-                    <p class="lead blog-description">An example blog template built with Bootstrap.</p>
-                </div>
-            </div>
-        -->
-  </header>
+  </div>
+</div>
+</nav>
+</header>
+
+
   <main role="main" class="container">
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
@@ -74,9 +76,9 @@
         <div class="modal-content" id="writingModalBody">
           <div class="modal-header">
             <h5 class="modal-title" id="writingModalLabel"></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
-                            </button>
+                            </button> -->
           </div>
           <div class="modal-body">
             <div class="editable">
@@ -111,7 +113,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="nameModalLabel"><img id="modalNameImage" src="" class="align-middle profile-pic">&nbsp;
-                                <span id="modalNameName">Mark</span> <br><small>Pubkey: <code class="text-muted publickey" id="modalNamePublicKey">aasdlkfjas9jf93jfa</code></small></h5>
+                                <span id="modalNameName">Mark</span> <br><small>Pubkey: <code class="text-muted publickey" id="modalNamePublicKey">aasdlkfjas9jf93jfa</code></small>
+
+                              <small>Friend / Following / Followers = <span id="modalFriendsCount">0</span> / <span id="modalFollowingCount">0</span> / <span id="modalFollowersCount">0</span>
+                              </small>
+
+                              </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                                 </button>
@@ -126,7 +133,7 @@
             <a href="#!" id="filterButton"><button type="button" class="btn btn-info">Filter</button></a>
             <button type="button" class="btn btn-primary" id="followButton">Follow</button>
             <button type="button" class="btn btn-danger" id="blockButton">Block</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
           </div>
         </div>
       </div>
@@ -149,7 +156,7 @@
               </span>
 
                 <img src="/img/{{ .Post.User.Image }}" class="align-middle profile-pic">
-                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-content="{{ .Post.User.Profile }}" data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <small><em><span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span></em></small>
+                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-followers="{{ len .Post.User.Followers }}" data-following="{{ len .Post.User.Following }}" data-friends="{{ len .Post.User.Friends }}" data-content="{{ .Post.User.Profile }}" data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <small><em><span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span></em></small>
               </p>
               <hr>
               <div id="{{ .Post.ID }}">
@@ -172,7 +179,7 @@
                                 <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-firstid="{{.FirstID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
                               <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
                             </span> {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
-                          <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
+                          <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-followers="{{ len .User.Followers }}" data-following="{{ len .User.Following }}" data-friends="{{ len .User.Friends }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
 
                         </div>
                       </div>
@@ -207,36 +214,38 @@
       <!-- /.blog-main -->
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
-          <img src="/img/{{ .User.Image }}">
+          <img src="/img/{{ .User.Image }}" class="img-fluid">
           <h5><div id="current-name">{{ .User.Name }}</div></h5>
           <div id="current-profile">
             {{ .User.Profile }}
           </div>
           <div class="publickey">
           <small>Pubkey: <code>{{ .User.PublicKey }}</code></small>
-
           </div>
+          <center>
+            <a href='#!' class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name" title="Change name"><i class="fas fa-comment-alt"></i></a>
+            &nbsp;
+            <a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile" title="Edit profile"><i class="fas fa-child"></i></a>
+            &nbsp;
+            <a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image..." title="Change profile image"><i class="fas fa-upload"></i></a>
+
+         </center>
+
         </div>
         <div class="sidebar-module">
           <h5>Actions</h5>
           <ol class="list-unstyled">
             <li><a href="#!" class="editmodal" data-title="Write a post" data-purpose="share-text"><i class="fas fa-pencil-alt"></i>&nbsp; Share</a></li>
-            <li><a href="#!" class="editmodal" data-title="Edit profile" data-purpose="action-assign/profile" data-usecontent="current-profile"><i class="fas fa-child"></i>&nbsp;
-            Edit profile</a></li>
-            <li><a href="#" class="editmodal" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image..."><i class="fas fa-upload"></i>&nbsp;
-            Change profile image</a></li>
-            <li><a href="#!" class="editmodal" data-title="Change name" data-purpose="action-assign/name" data-usecontent="current-name"><i class="fas fa-comment-alt"></i>&nbsp;
-            Change name</a></li>
             <li><a href="#!" class="addserver"><i class="fas fa-plus-circle"></i>&nbsp;
             Add server</a></li>
             <li><a href="#!" class="syncup"><i class="fas fa-sync-alt"></i>&nbsp;
             Sync</a></li>
-            <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
+            <!-- <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
             Follow someone</a></li>
             <li><a href="#!" class="blocksomeone"><i class="fas fa-user-times"></i>&nbsp;
             Block someone</a></li>
             <li><a href="#!" class="eraseprofile"><i class="fas fa-trash-alt"></i>&nbsp;
-            Erase profile</a></li>
+            Erase profile</a></li> -->
           </ol>
         </div>
         <div class="sidebar-module">
@@ -268,7 +277,7 @@
           <h5>Connections ({{ len .Connected }})</h5>
           <ol class="list-unstyled">
             {{ range .Connected }}
-            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
+            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-followers="{{ len .Followers }}" data-following="{{ len .Following }}" data-friends="{{ len .Friends }}"  data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
             {{ end }}
           </ol>
         </div>
@@ -409,6 +418,7 @@
       }
     });
     $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip({delay: { "show": 500, "hide": 100 }})
       $("img").addClass("img-fluid");
       $("#submit-writing").click(function(event) {
         // Stop form from submitting normally
@@ -504,6 +514,9 @@
         $("#modalNamePublicKey").text($(this).data("publickey"));
         $("#modalNameContent").html($(this).data("content"));
         $("#modalNameImage").attr("src", $(this).data("image"));
+        $("#modalFriendsCount").text($(this).data("friends"));
+        $("#modalFollowersCount").text($(this).data("followers"));
+        $("#modalFollowingCount").text($(this).data("following"));
         $("#nameModal").modal();
         $("#followButton").attr("data-publickey", $(this).data("publickey"));
         $("#blockButton").attr("data-publickey", $(this).data("publickey"));
@@ -546,17 +559,13 @@
         };
         submitLetter(letter);
       });
-      $("#searchSubmit").click(function(event) {
-        event.preventDefault();
-        console.log($("#searchText").val())
-        var loc = location.href;
-        // loc += loc.indexOf("?") === -1 ? "?" : "&";
-
-        location.href = loc + "?search="+encodeURIComponent($("#searchText").val());
-      });
       $('#searchText').keypress(function (e) {
         if (e.which == 13) {
-          $('#searchSubmit').click();
+          console.log($("#searchText").val())
+          var loc = location.href;
+          // loc += loc.indexOf("?") === -1 ? "?" : "&";
+
+          location.href = loc + "?search="+encodeURIComponent($("#searchText").val());
         }
       });
       var restrictInput = function(event) {

@@ -759,7 +759,7 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		panic(err)
 	}
 	convertedTime := e.Timestamp.In(timeLocation)
-
+	followers, following, friends := f.db.Friends(e.Sender.Public)
 	post = BasicPost{
 		ID:         e.ID,
 		Recipients: strings.Join(recipients, ", "),
@@ -772,6 +772,9 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 			PublicKey: e.Sender.Public,
 			Profile:   template.HTML(f.db.GetProfile(e.Sender.Public)),
 			Image:     f.db.GetProfileImage(e.Sender.Public),
+			Friends:   friends,
+			Followers: followers,
+			Following: following,
 		},
 		Likes: f.db.NumberOfLikes(e.ID),
 	}
