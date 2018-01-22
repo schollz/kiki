@@ -7,11 +7,16 @@
   }
 }
 
-.publickey {
+/*.publickey {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 10rem;
+}*/
+.publickey {
+  /*max-width: 10rem;*/
+  word-wrap:break-word;
+  line-height: 1.0;
 }
 
 img.img-fluid {
