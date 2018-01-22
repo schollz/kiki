@@ -141,6 +141,20 @@ Post.prototype.buildUi = function() {
             });
         })
     }
+
+    // HACK
+    this.elements.content.find('.hashtag').on('click', function(event){
+        event.preventDefault();
+        event.stopImmediatePropagation()
+        var hashtag = $(this).text();
+        var currentSearch = '';
+        if ('' != $('#searchText').val()) {
+            currentSearch = $('#searchText').val() + '; ' ;
+        }
+        $('#searchText').val(currentSearch + hashtag);
+        $('#searchText').change();
+    });
+
     return $("<div>").addClass('post-container').append(
             $("<div>").addClass("post-header").append(
 
@@ -205,7 +219,10 @@ Post.prototype.buildUi = function() {
 
                 // recipients
                 $("<span>").append(
-                    " to ",
+                    // " -> ",
+                    " ",
+                    $('<i>').addClass('fa fa-angle-right'),
+                    " ",
                     (function(){
                         var elems = [];
                         var recipients = self.getRecipients();
