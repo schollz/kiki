@@ -2,6 +2,7 @@ package letter
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"strings"
 	"time"
@@ -148,7 +149,7 @@ func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envel
 	if err != nil {
 		return
 	}
-	e.SealedLetter = base58.FastBase58Encoding(encryptedLetter)
+	e.SealedLetter = base64.StdEncoding.EncodeToString(encryptedLetter)
 
 	// For each recipient, generate a key-encrypted passphrase
 	e.SealedRecipients = make([]string, len(recipients))
@@ -215,7 +216,7 @@ func (e2 Envelope) unseal(keysToTry []keypair.KeyPair, regionKey keypair.KeyPair
 		return
 	}
 
-	encryptedContent, err := base58.FastBase58Decoding(e.SealedLetter)
+	encryptedContent, err := base64.StdEncoding.DecodeString(e.SealedLetter)
 	if err != nil {
 		err = errors.Wrap(err, "content is corrupted")
 		return

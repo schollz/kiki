@@ -1,12 +1,12 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mr-tron/base58/base58"
 	"github.com/schollz/kiki/src/feed"
 	"github.com/schollz/kiki/src/letter"
 )
@@ -27,7 +27,7 @@ func handleImage(c *gin.Context) {
 		mimeType = "image/png"
 	}
 
-	imageBytes, err := base58.FastBase58Decoding(e.Letter.Content)
+	imageBytes, err := base64.StdEncoding.DecodeString(e.Letter.Content)
 	if err != nil {
 		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
 		return
@@ -45,7 +45,6 @@ func handleLetter(c *gin.Context) (err error) {
 		logger.Log.Error(err)
 		return
 	}
-	logger.Log.Debug(p)
 	err = f.ProcessLetter(p)
 
 	// when a new letter arrives, update everything and then sync servers
