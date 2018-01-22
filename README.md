@@ -1,6 +1,6 @@
 <p align="center">
 <img
-    src=""
+    src="https://user-images.githubusercontent.com/6550035/35201555-7014440a-feea-11e7-9f21-7fe831a35768.png"
     width="100%" border="0" alt="kiki">
 <br>
 <a href="https://travis-ci.org/schollz/kiki"><img src="https://travis-ci.org/schollz/kiki.svg?branch=master" alt="Build Status"></a>
@@ -173,3 +173,5 @@ By participating in this project you agree to abide by its terms.
 ### License
 
 This project is under the MIT license.
+
+The Kiki mascot is Copyright 2018 Jessie Doyle and Cloud Supernova.
