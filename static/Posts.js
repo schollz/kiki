@@ -151,6 +151,9 @@ Post.prototype.buildUi = function() {
         if ('' != $('#searchText').val()) {
             currentSearch = $('#searchText').val() + '; ' ;
         }
+        if (-1 != currentSearch.indexOf(hashtag)) {
+            return
+        };
         $('#searchText').val(currentSearch + hashtag);
         $('#searchText').change();
     });
