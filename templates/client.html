@@ -701,11 +701,6 @@ app.User = new UserClient(app.Api, function(user){
     app.Ui = new KiKiClient(app.Api, user);
 });
 
-var updateInterval = setInterval(function(){
-    console.log("update page");
-    app.Ui.update();
-}, 15000);
-
 
 
 
@@ -820,6 +815,18 @@ var updateInterval = setInterval(function(){
                 });
             }, 500);
         });
+
+
+        var updateInterval = setInterval(function(){
+            // dont update page while searching posts
+            if ("" == $("#searchText").val()) {
+                console.log("update page");
+                app.Ui.update();
+            }
+        }, 15000);
+
+
+
 
 
     });
