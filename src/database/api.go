@@ -78,7 +78,7 @@ func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, er
 		return
 	}
 
-	es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id IN ('%s') AND letter_replyto == '' GROUP BY letter_firstid ORDER BY time DESC;", strings.Join(ids, "','")))
+	es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id IN ('%s') AND letter_replyto == '' ORDER byROUP BY letter_firstid ORDER BY time DESC;", strings.Join(ids, "','")))
 	return
 }
 
@@ -170,7 +170,7 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 	// should not be replaced
 	// should be a reply
 	// ordered by time ascending
-	envelopes, err := db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM letters WHERE opened == 1 AND letter_purpose = '%s' AND letter_replyto == ? GROUP BY letter_firstid ORDER BY time", purpose.ShareText), id)
+	envelopes, err := db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM (SELECT * FROM letters WHERE opened == 1 AND letter_purpose = '%s' AND letter_replyto == ? ORDER BY time) GROUP BY letter_firstid ORDER BY time", purpose.ShareText), id)
 	if err != nil {
 		return
 	}
@@ -198,7 +198,7 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	// should not be empty
 	// should not be replaced (GROUP BY letter_firstid)
 	// should not be a reply
-	es, err := db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_replyto == '' GROUP BY letter_firstid ORDER BY time DESC")
+	es, err := db.getAllFromPreparedQuery("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_replyto == '' ORDER BY time) GROUP BY letter_firstid ORDER BY time DESC")
 	if err != nil {
 		return
 	}
@@ -225,7 +225,7 @@ func (api DatabaseAPI) GetBasicPostsForUser(publickey string) (e []letter.Envelo
 	// should not be empty
 	// should not be replaced
 	// should not be a reply
-	es, err := db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND sender == ? AND letter_replyto == '' GROUP BY letter_firstid ORDER BY time DESC;", publickey)
+	es, err := db.getAllFromPreparedQuery("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND sender == ? AND letter_replyto == '' ORDER BY time) GROUP BY letter_firstid ORDER BY time DESC;", publickey)
 	if err != nil {
 		return
 	}
@@ -253,7 +253,7 @@ func (api DatabaseAPI) GetBasicPostLatest(publickey string) (e letter.Envelope, 
 	// should not be empty
 	// should not be replaced
 	// should not be a reply
-	es, err := db.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND sender == ? ORDER BY time DESC LIMIT 1;", publickey)
+	es, err := db.getAllFromPreparedQuery("SELECT * FROM (SELECT * FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND sender == ? ORDER BY time DESC) GROUP BY letter_firstid ORDER BY time LIMIT 1;", publickey)
 	if err != nil {
 		return
 	}
