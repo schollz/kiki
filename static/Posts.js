@@ -32,6 +32,7 @@ Post.prototype.getContent = function() {
 
 Post.prototype.getPostId = function() {
     return this.data.id;
+    // return this.data.first_id;
 }
 
 Post.prototype.getOwnerId = function() {
@@ -105,7 +106,7 @@ Post.prototype.buildCommentUi = function() {
 Post.prototype.toLetter = function(action) {
     if ("edit" == action) {
         return {
-            replaces: this.getPostId(),
+            firstid: this.getPostId(),
             purpose: 'share-text',
             reply_to: this.data.reply_to,
             content: this.getContent()
