@@ -47,6 +47,11 @@ img.profile-pic {
   border-radius: 0.5rem;
 }
 
+img.thumbnail-pic {
+  max-width: 48px;
+  max-height: 48px;  
+}
+
 img.kiki-pic {
   border-radius: 0rem;
   padding: 0.1em;
