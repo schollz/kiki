@@ -35,6 +35,14 @@ img.profile-pic {
   height: 100%;
 }
 
+img.kiki-pic {
+  border-radius: 0rem;
+  padding: 0.1em;
+  max-width: 72px;
+  max-height: 72px;
+  height: 100%;
+}
+
 *:focus {
     outline: none;
 }
@@ -73,7 +81,7 @@ h6,
  */
 .blog-masthead {
   margin-bottom: 3rem;
-  background-color: #428bca;
+  background-color: #e2b1c7;
   box-shadow: inset 0 -.1rem .25rem rgba(0, 0, 0, .1);
 }
 
