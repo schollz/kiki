@@ -215,7 +215,7 @@
                                 <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-firstid="{{.FirstID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
                               <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
                             </span> 
-                            
+
                         </div>
                       </div>
                       <div role="tabpanel">
@@ -249,7 +249,7 @@
       <!-- /.blog-main -->
       <aside class="col-sm-3 ml-sm-auto blog-sidebar">
         <div class="sidebar-module sidebar-module-inset">
-          <img src="/img/{{ .User.Image }}" class="img-fluid">
+          <img src="/img/{{ .User.Image }}" class="img-fluid profile-pic" style="padding-bottom: 1rem;">
           <h5><div id="current-name">{{ .User.Name }}</div></h5>
           <div id="current-profile">
             {{ .User.Profile }}
@@ -287,7 +287,7 @@
           <h5>Following  ({{ len .Friends.Following }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Following }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic thumbnail-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
@@ -295,7 +295,7 @@
           <h5>Followers  ({{ len .Friends.Followers }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Followers }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic thumbnail-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
@@ -303,7 +303,7 @@
           <h5>Friends ({{ len .Friends.Friends }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Friends }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic thumbnail-pic">
               {{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
