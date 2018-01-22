@@ -113,6 +113,7 @@ func New(params ...string) (f *Feed, err error) {
 
 		// assign basic kiki image
 		// send welcome messasge
+		rand.Seed(time.Now().UTC().UnixNano())
 		err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{"public"},
 			Purpose: purpose.ActionImage,
@@ -365,6 +366,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		err = errors.New("cannot post with region key")
 		return
 	}
+	f.logger.Log.Debugf("%+v\n", l)
 	if l.FirstID != "" {
 		e, err2 := f.db.GetEnvelopeFromID(l.FirstID)
 		if err2 != nil {
