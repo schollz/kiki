@@ -129,6 +129,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/mr-tron/base58"
+  packages = ["base58"]
+  revision = "c1bdf7c52f59d6685ca597b9955a443ff95eeee6"
+
+[[projects]]
+  branch = "master"
   name = "github.com/mschoch/smat"
   packages = ["."]
   revision = "90eadee771aeab36e8bf796039b8c261bebebe4f"
@@ -194,10 +200,10 @@
   version = "v1.0.2"
 
 [[projects]]
-  branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
   revision = "9831f2c3ac1068a78f50999a30db84270f647af6"
+  version = "v1.1"
 
 [[projects]]
   name = "github.com/willf/bitset"
@@ -209,7 +215,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","nacl/box","nacl/secretbox","poly1305","salsa20/salsa"]
-  revision = "a6600008915114d9c087fad9f03d75087b1a74df"
+  revision = "39efaea5da11abd5e2b90a435b1f338cdb94619c"
 
 [[projects]]
   branch = "master"
@@ -221,7 +227,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "2c42eef0765b9837fbdab12011af7830f55f88f0"
+  revision = "af50095a40f9041b3b38960738837185c26e9419"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -244,6 +250,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1a9c7c2b729afe8363173fbc79305a1798db6280f189f8fa1bf8e6a63dcf9574"
+  inputs-digest = "2ca8646c8a6248231aed3842e31f66cea4769411efb149e3dd2ec4c94bdbde41"
   solver-name = "gps-cdcl"
   solver-version = 1
