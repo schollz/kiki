@@ -106,7 +106,7 @@ Post.prototype.buildCommentUi = function() {
 Post.prototype.toLetter = function(action) {
     if ("edit" == action) {
         return {
-            firstid: this.getPostId(),
+            first_id: this.getPostId(),
             purpose: 'share-text',
             reply_to: this.data.reply_to,
             content: this.getContent()
