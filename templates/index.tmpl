@@ -156,7 +156,7 @@
               </span>
 
                 <img src="/img/{{ .Post.User.Image }}" class="align-middle profile-pic">
-                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-followers="{{ len .Post.User.Followers }}" data-following="{{ len .Post.User.Following }}" data-friends="{{ len .Post.User.Friends }}" data-content="{{ .Post.User.Profile }}" data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <small><em><span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span></em></small>
+                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-followers="{{ len .Post.User.Followers }}" data-following="{{ len .Post.User.Following }}" data-friends="{{ len .Post.User.Friends }}" {{ .Post.User.ProfileContent }} data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <small><em><span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span></em></small>
               </p>
               <hr>
               <div id="{{ .Post.ID }}">
@@ -179,7 +179,7 @@
                                 <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-firstid="{{.FirstID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
                               <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
                             </span> {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
-                          <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-followers="{{ len .User.Followers }}" data-following="{{ len .User.Following }}" data-friends="{{ len .User.Friends }}" data-content="{{ .User.Profile }}" data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
+                          <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-followers="{{ len .User.Followers }}" data-following="{{ len .User.Following }}" data-friends="{{ len .User.Friends }}" {{ .User.ProfileContent }} data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
 
                         </div>
                       </div>
@@ -252,7 +252,7 @@
           <h5>Following  ({{ len .Friends.Following }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Following }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
@@ -260,7 +260,7 @@
           <h5>Followers  ({{ len .Friends.Followers }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Followers }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">{{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
         </div>
@@ -268,7 +268,7 @@
           <h5>Friends ({{ len .Friends.Friends }})</h5>
           <ol class="list-unstyled">
             {{ range .Friends.Friends }}
-            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">
+            <li><a href="#!" class="activatenamemodal publickey" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}"><div class="publickey"><img src="/img/{{ .Image }}" class="align-middle profile-pic">
               {{ .Name }} <small>{{ .PublicKey }}</small></div></a></li>
             {{ end }}
           </ol>
@@ -277,7 +277,7 @@
           <h5>Connections ({{ len .Connected }})</h5>
           <ol class="list-unstyled">
             {{ range .Connected }}
-            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-followers="{{ len .Followers }}" data-following="{{ len .Following }}" data-friends="{{ len .Friends }}"  data-publickey="{{ .PublicKey }}" data-content="{{ .Profile }}" data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
+            <li><a href="#!" class="activatenamemodal" data-name="{{ .Name }}" data-image="/img/{{ .Image }}" data-followers="{{ len .Followers }}" data-following="{{ len .Following }}" data-friends="{{ len .Friends }}"  data-publickey="{{ .PublicKey }}" {{ .ProfileContent }} data-image="/img/{{ .Image }}">{{ .Server }}</a></li>
             {{ end }}
           </ol>
         </div>

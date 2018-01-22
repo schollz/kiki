@@ -102,15 +102,16 @@ type BasicPost struct {
 // }
 
 type User struct {
-	Name      string        `json:"name"`
-	Profile   template.HTML `json:"profile"`
-	PublicKey string        `json:"public_key"`
-	Image     string        `json:"image"`
-	Followers []string      `json:"followers"`
-	Following []string      `json:"following"`
-	Friends   []string      `json:"friends"`
-	Blocked   []string      `json:"blocked"`
-	Server    string        `json:"server"`
+	Name           string            `json:"name"`
+	Profile        template.HTML     `json:"profile"`
+	ProfileContent template.HTMLAttr `json:"profile_attr"`
+	PublicKey      string            `json:"public_key"`
+	Image          string            `json:"image"`
+	Followers      []string          `json:"followers"`
+	Following      []string          `json:"following"`
+	Friends        []string          `json:"friends"`
+	Blocked        []string          `json:"blocked"`
+	Server         string            `json:"server"`
 }
 
 type UserFriends struct {
