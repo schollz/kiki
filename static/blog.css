@@ -28,10 +28,10 @@ visibility: visible;
 }
 
 img.profile-pic {
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   padding: 0.1em;
-  max-width: 48px;
-  max-height: 48px;
+  max-width: 54px;
+  max-height: 54px;
   height: 100%;
 }
 

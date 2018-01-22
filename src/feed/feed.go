@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -104,6 +105,18 @@ func New(params ...string) (f *Feed, err error) {
 			To:      []string{},
 			Purpose: purpose.ShareText,
 			Content: `<p>Welcome to KiKi!</p><p>To get started, you can change your name, edit your profile, upload an image, and make posts!</p> `,
+		})
+		if err2 != nil {
+			err = errors.Wrap(err2, "setup")
+			return
+		}
+
+		// assign basic kiki image
+		// send welcome messasge
+		err2 = f.ProcessLetter(letter.Letter{
+			To:      []string{"public"},
+			Purpose: purpose.ActionImage,
+			Content: `../static/kiki_` + strconv.Itoa(rand.Intn(100)) + `.png`,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")

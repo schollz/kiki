@@ -149,7 +149,7 @@
               </span>
 
                 <img src="/img/{{ .Post.User.Image }}" class="align-middle profile-pic">
-                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-content="{{ .Post.User.Profile }}" data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
+                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-content="{{ .Post.User.Profile }}" data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <small><em><span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span></em></small>
               </p>
               <hr>
               <div id="{{ .Post.ID }}">
