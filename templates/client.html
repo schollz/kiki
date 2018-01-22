@@ -623,7 +623,7 @@ app.openModal = function(title, data) {
             data.content || "Write your post..."
         );
         $("#letterReplyTo").val(data.reply_to || "");
-        $("#letterReplaces").val(data.replaces || "");
+        $("#letterReplaces").val(data.firstid || "");
         $("#letterPurpose").val(data.purpose);
     } else {
         console.log("TODO - modal class")
@@ -709,7 +709,7 @@ var updateInterval = setInterval(function(){
             // event.preventDefault();
             letter = {
                 "purpose": $("#letterPurpose").val(),
-                "replaces": $("#letterReplaces").val(),
+                "firstid": $("#letterReplaces").val(),
                 "reply_to": $("#letterReplyTo").val(),
                 "to": [
                     $('input.read-permission[name="options"]:checked').val()
@@ -724,8 +724,8 @@ var updateInterval = setInterval(function(){
                     app.Posts.data[letter.reply_to].update();
                 } else if ("action-assign/profile" == letter.purpose) {
                     app.User.user.update();
-                } else if ("" != letter.replaces) {
-                    var post = app.Posts.data[letter.replaces];
+                } else if ("" != letter.firstid) {
+                    var post = app.Posts.data[letter.firstid];
                     if (post.parent) {
                         return post.parent.update();
                     }

@@ -275,7 +275,7 @@ func (self DatabaseAPI) jsonFormatting(payload string) string {
 func (self DatabaseAPI) postJsonSql() string {
 	return `
 		'{'||
-			'"id": "' ||  id ||'",'||
+			'"id": "' ||  letter_firstid ||'",'||
 			'"timestamp": ' || strftime('%s',time) ||','||
 			'"recipients": ' ||  letter_to ||','||
 			'"owner_id": "' ||  sender ||'",'||
@@ -284,7 +284,7 @@ func (self DatabaseAPI) postJsonSql() string {
 			'"reply_to": "' ||  letter_replyto ||'",'||
 			'"purpose":"' ||  letter_purpose ||'",'||
 			'"likes": '|| (SELECT COUNT(*) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
-			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.id )
+			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.letter_firstid )
 		||'}'
 	`
 }
@@ -309,12 +309,6 @@ func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 				opened == 1
 			AND
 		        letter_purpose = 'share-text'
-		    AND
-		        letter_content != ''
-		    AND
-		        id NOT IN (
-		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
-		        )
 		    AND letter_replyto == ''
 		ORDER BY time DESC;
 `
@@ -372,12 +366,6 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, e
 				opened == 1
 			AND
 		        letter_purpose = 'share-text'
-		    AND
-		        letter_content != ''
-		    AND
-		        id NOT IN (
-		            SELECT letter_replaces FROM letters WHERE letter_replaces != ''
-		        )
 		    AND letter_replyto == ?
 		ORDER BY time DESC;
 `
