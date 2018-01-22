@@ -40,6 +40,13 @@
   <script src="https://unpkg.com/sweetalert2@7.4.1/dist/sweetalert2.all.js"></script>
 
     <style>
+
+        img.kiki-pic {
+            /*padding: 0.1em;*/
+            max-width: auto;
+            max-height: 40px;
+        }
+
         main {
             padding-top: 90px;
         }
@@ -99,7 +106,7 @@
             max-height: 200px;
         }
 
-        .sidebar {
+        /*.sidebar {
             position: fixed;
             overflow-y: auto;
             z-index: 100;
@@ -111,11 +118,11 @@
 
         .sidebar-wrapper {
             position: relative;
-        }
+        }*/
 
-        .logo {
+        /*.logo {
             color: white;
-        }
+        }*/
 
         .user-lists .sidebar-module {
             padding: 5px 10px;
@@ -142,20 +149,27 @@
 
     </style>
 
+
+
+
+
+
 </head>
 
 <body>
 
     <!-- <header></header> -->
     <nav class="blog-masthead navbar fixed-top">
-        <img class="kiki-pic img-fluid" src="/static/kiki.png">
         <form class="form-inline mt-2 mt-md-0">
+            <a class="navbar-brand">
+                <img class="kiki-pic img-fluid" src="/static/kiki.png">
+            </a>
             <input class="form-control mr-sm-2" type="text" placeholder="Search" id="searchText">
-            <!-- <button class="btn btn-secondary my-2 my-sm-0" id="searchSubmit">Search</button> -->
         </form>
     </nav>
 
   <main role="main" class="container-fluid">
+
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterReplaces" value="" />
@@ -236,6 +250,7 @@
 
 <!-- <nav>  -->
       <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar-wrapper">
+
 <div class="sidebar">
     <!-- User profile -->
         <div class="sidebar-module sidebar-module-inset">
@@ -784,6 +799,22 @@ var updateInterval = setInterval(function(){
             }
         });
 
+
+        // seach text
+        var searchPending;
+        $("#searchText").on('keyup', function(){
+            clearTimeout(searchPending);
+            searchPending = setTimeout(function(){
+                var searchText = $("#searchText").val().toLowerCase();
+                $("#posts .card").each(function(i,elem){
+                    if (-1 == $(elem).text().toLowerCase().indexOf(searchText)) {
+                        $(elem).fadeOut();
+                    } else {
+                        $(elem).fadeIn();
+                    }
+                });
+            }, 500);
+        });
 
 
     });
