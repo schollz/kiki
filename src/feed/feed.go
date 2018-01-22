@@ -2,6 +2,7 @@ package feed
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -17,7 +18,6 @@ import (
 
 	"github.com/blevesearch/bleve"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/mr-tron/base58/base58"
 
 	"github.com/pkg/errors"
 	cache "github.com/robfig/go-cache"
@@ -412,10 +412,12 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 
 	// determine if their are any images in envelope letter content that should be spliced out
+	f.logger.Log.Debug("capturing base64 images")
 	newHTML, images, err := web.CaptureBase64Images(l.Content)
 	if err != nil {
 		return
 	}
+	f.logger.Log.Debugf("captured %d images", len(images))
 	for name := range images {
 		p := purpose.SharePNG
 		if strings.Contains(name, ".jpg") {
@@ -423,14 +425,16 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		}
 		newLetter := letter.Letter{
 			To:      l.To,
-			Content: base58.FastBase58Encoding(images[name]),
+			Content: base64.StdEncoding.EncodeToString(images[name]),
 			Purpose: p,
 		}
+		f.logger.Log.Debug("sealing letter")
 		newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)
 		if err2 != nil {
 			return err2
 		}
 		// seal and add envelope
+		f.logger.Log.Debug("adding letter")
 		err2 = f.db.AddEnvelope(newEnvelope)
 		if err2 != nil {
 			// should throw error if its already added, so don't worry about
@@ -461,7 +465,6 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		}
 	}
 	l.Content = strings.TrimSpace(l.Content)
-	f.logger.Log.Warn(l.Content)
 
 	// remove tags from name change
 	if l.Purpose == purpose.ActionName {
@@ -470,8 +473,6 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	if strip.StripTags(l.Content) == "" && !strings.Contains(l.Content, "img") {
 		l.Content = ""
 	}
-
-	f.logger.Log.Infof("%+v", l)
 
 	// seal the letter
 	e, err := l.Seal(f.PersonalKey, f.RegionKey)
