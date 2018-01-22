@@ -124,6 +124,10 @@
             color: white;
         }*/
 
+        .sidebar-wrapper {
+            top: 90px;
+        }
+
         .user-lists .sidebar-module {
             padding: 5px 10px;
             border: 1px solid rgba(0,0,0,.125);
@@ -249,7 +253,7 @@
 
 
 <!-- <nav>  -->
-      <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar-wrapper">
+      <aside class="col-sm-3 ml-sm-auto blog-sidebar sidebar-wrapper fixed-top">
 
 <div class="sidebar">
     <!-- User profile -->
@@ -699,7 +703,8 @@ app.User = new UserClient(app.Api, function(user){
 
 var updateInterval = setInterval(function(){
     console.log("update page");
-},10000);
+    app.Ui.update();
+}, 15000);
 
 
 
