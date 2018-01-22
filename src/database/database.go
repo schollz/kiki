@@ -950,7 +950,7 @@ func (d *database) getFollowers(publicKey string) (s []string, err error) {
 }
 
 func (d *database) getAllVersions(id string) (s []string, err error) {
-	es, err := d.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND letter_firstid == ? ORDER BY time DESC", id)
+	es, err := d.getAllFromPreparedQuery("SELECT * FROM letters WHERE opened == 1 AND letter_firstid == (SELECT letter_firstid FROM letters WHERE opened ==1 AND id == ?) ORDER BY time DESC", id)
 	if err != nil {
 		return
 	}

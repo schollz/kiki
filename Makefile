@@ -1,4 +1,8 @@
-.PHONY: scratch, install
+.PHONY: scratch, install, basicbuild, server, server1, server2, server3, dev1, dev2, dev3
+
+basicbuild:
+	go-bindata static/... templates/...
+	go build
 
 server:
 	go-bindata static/... templates/...

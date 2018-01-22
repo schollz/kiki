@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -100,10 +101,23 @@ func New(params ...string) (f *Feed, err error) {
 		}
 
 		// send welcome messasge
-		err2 = f.ProcessLetter(letter.Letter{
+		_, err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{},
 			Purpose: purpose.ShareText,
 			Content: `<p>Welcome to KiKi!</p><p>To get started, you can change your name, edit your profile, upload an image, and make posts!</p> `,
+		})
+		if err2 != nil {
+			err = errors.Wrap(err2, "setup")
+			return
+		}
+
+		// assign basic kiki image
+		// send welcome messasge
+		rand.Seed(time.Now().UTC().UnixNano())
+		_, err2 = f.ProcessLetter(letter.Letter{
+			To:      []string{"public"},
+			Purpose: purpose.ActionImage,
+			Content: `../static/kiki_` + strconv.Itoa(rand.Intn(100)) + `.png`,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")
@@ -343,7 +357,7 @@ func (f *Feed) SyncServers() {
 }
 
 // ProcessLetter will determine where to put the letter
-func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
+func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 	if !purpose.Valid(l.Purpose) {
 		err = errors.New("invalid purpose")
 		return
@@ -352,13 +366,16 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		err = errors.New("cannot post with region key")
 		return
 	}
+	f.logger.Log.Debugf("%+v\n", l)
 	if l.FirstID != "" {
 		e, err2 := f.db.GetEnvelopeFromID(l.FirstID)
 		if err2 != nil {
-			return errors.New("problem replacing that")
+			err = errors.New("problem replacing that")
+			return
 		}
 		if f.PersonalKey.Public != e.Sender.Public {
-			return errors.New("refusing to replace someone else's post")
+			err = errors.New("refusing to replace someone else's post")
+			return
 		}
 		if e.Letter.ReplyTo != "" {
 			l.ReplyTo = e.Letter.ReplyTo
@@ -369,9 +386,11 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		// actions are always public
 		l.To = []string{f.RegionKey.Public}
 		if l.Purpose == purpose.ActionBlock && l.Content == f.PersonalKey.Public {
-			return errors.New("refusing to block yourself")
+			err = errors.New("refusing to block yourself")
+			return
 		} else if l.Purpose == purpose.ActionFollow && l.Content == f.PersonalKey.Public {
-			return errors.New("refusing to follow yourself")
+			err = errors.New("refusing to follow yourself")
+			return
 		}
 	} else {
 		// rewrite the letter.To array so that it contains
@@ -387,7 +406,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 			case "friends":
 				friendsKeyPairs, err2 := f.db.GetKeysFromSender(f.PersonalKey.Public)
 				if err2 != nil {
-					return err2
+					err = err2
+					return
 				}
 				alreadyAdded := make(map[string]struct{})
 				for _, friendsKeyPair := range friendsKeyPairs {
@@ -431,7 +451,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		f.logger.Log.Debug("sealing letter")
 		newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)
 		if err2 != nil {
-			return err2
+			err = err2
+			return
 		}
 		// seal and add envelope
 		f.logger.Log.Debug("adding letter")
@@ -452,6 +473,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
 		// sanitize
 		p := bluemonday.UGCPolicy()
+		p.AllowRelativeURLs(true)
+		p.AddTargetBlankToFullyQualifiedLinks(true)
 		l.Content = p.Sanitize(l.Content)
 		// replace hashtags with links to the hash tags
 		r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
@@ -481,7 +504,12 @@ func (f *Feed) ProcessLetter(l letter.Letter) (err error) {
 	}
 	err = f.db.AddEnvelope(e)
 	if err != nil {
-		return errors.Wrap(err, "processing letter")
+		err = errors.Wrap(err, "processing letter")
+		return
+	}
+	ue, err = e.Unseal([]keypair.KeyPair{f.PersonalKey}, f.RegionKey)
+	if err != nil {
+		err = errors.Wrap(err, "processing envelope")
 	}
 
 	return
@@ -746,7 +774,7 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		panic(err)
 	}
 	convertedTime := e.Timestamp.In(timeLocation)
-
+	followers, following, friends := f.db.Friends(e.Sender.Public)
 	post = BasicPost{
 		ID:         e.ID,
 		Recipients: strings.Join(recipients, ", "),
@@ -755,10 +783,14 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		TimeAgo:    utils.TimeAgo(convertedTime),
 		FirstID:    e.Letter.FirstID,
 		User: User{
-			Name:      strip.StripTags(f.db.GetName(e.Sender.Public)),
-			PublicKey: e.Sender.Public,
-			Profile:   template.HTML(f.db.GetProfile(e.Sender.Public)),
-			Image:     f.db.GetProfileImage(e.Sender.Public),
+			Name:           strip.StripTags(f.db.GetName(e.Sender.Public)),
+			PublicKey:      e.Sender.Public,
+			Profile:        template.HTML(f.db.GetProfile(e.Sender.Public)),
+			ProfileContent: template.HTMLAttr(fmt.Sprintf(`data-content="%s"`, strings.Replace(f.db.GetProfile(e.Sender.Public), `"`, `'`, -1))),
+			Image:          f.db.GetProfileImage(e.Sender.Public),
+			Friends:        friends,
+			Followers:      followers,
+			Following:      following,
 		},
 		Likes: f.db.NumberOfLikes(e.ID),
 	}
@@ -795,7 +827,7 @@ func (f *Feed) AddFriendsKey() (err error) {
 	myfriendsByte, err := json.Marshal(myfriends)
 
 	// share the friends key with yourself
-	err = f.ProcessLetter(letter.Letter{
+	_, err = f.ProcessLetter(letter.Letter{
 		To:      []string{"self"},
 		Purpose: purpose.ShareKey,
 		Content: string(myfriendsByte),

@@ -179,7 +179,7 @@ func respondWithJSON(c *gin.Context, message string, err error) {
 }
 
 func handlerLetter(c *gin.Context) {
-	respondWithJSON(c, "letter added", handleLetter(c))
+	handleLetter(c)
 }
 
 func handlerEnvelope(c *gin.Context) {

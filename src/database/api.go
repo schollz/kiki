@@ -133,6 +133,7 @@ func (api DatabaseAPI) GetLatestEnvelopeFromID(id string) (e letter.Envelope, er
 	}
 	es, err := db.getAllVersions(id)
 	if err != nil {
+		db.Close()
 		return
 	}
 	db.Close()
