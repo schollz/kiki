@@ -21,11 +21,13 @@ func (self HttpRestApi) AttachToRouter(router *gin.Engine) {
 	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/posts")
 	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/post/:post_id")
 	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/post/:post_id/comments")
+	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/post/:post_id/versions")
 	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/user")
 	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/user/:user_id")
 	router.GET("/api/v1/posts", self.GetPosts)
 	router.GET("/api/v1/post/:post_id", self.GetPost)
 	router.GET("/api/v1/post/:post_id/comments", self.GetPostComments)
+	router.GET("/api/v1/post/:post_id/versions", self.GetPostVersions)
 	router.GET("/api/v1/user", self.GetPrimaryUser)
 	router.GET("/api/v1/user/:user_id", self.GetUser)
 }
@@ -44,6 +46,12 @@ func (self HttpRestApi) GetPost(c *gin.Context) {
 func (self HttpRestApi) GetPostComments(c *gin.Context) {
 	post_id := c.Param("post_id")
 	posts, err := self.Db.GetPostCommentsForApi(post_id)
+	self.apiPostsHandler(c, posts, err)
+}
+
+func (self HttpRestApi) GetPostVersions(c *gin.Context) {
+	post_id := c.Param("post_id")
+	posts, err := self.Db.GetPostVersionsForApi(post_id)
 	self.apiPostsHandler(c, posts, err)
 }
 

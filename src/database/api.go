@@ -404,6 +404,60 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, e
 	return posts, nil
 }
 
+func (self DatabaseAPI) GetPostVersionsForApi(post_id string) ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
+
+	db, err := open(self.FileName)
+	if nil != err {
+		return posts, err
+	}
+	defer db.Close()
+
+	query := `
+		SELECT
+			` + self.postJsonSql() + `
+		FROM letters AS ltr
+		WHERE
+				opened == 1
+			AND
+		        letter_purpose = 'share-text'
+		    AND letter_firstid == ?
+		ORDER BY time DESC;
+`
+
+	// prepare statement
+	stmt, err := db.db.Prepare(query)
+	if nil != err {
+		return posts, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(post_id)
+	if nil != err {
+		return posts, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var text string
+		err = rows.Scan(&text)
+		if nil != err {
+			return posts, err
+		}
+
+		text = self.jsonFormatting(text)
+
+		var post ApiBasicPost
+		if err = post.Unmarshal(text); nil != err {
+			return posts, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
 func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
 	var posts []ApiBasicPost
 
