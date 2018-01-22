@@ -117,7 +117,7 @@ func New(params ...string) (f *Feed, err error) {
 		_, err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{"public"},
 			Purpose: purpose.ActionImage,
-			Content: `../static/kiki_` + strconv.Itoa(rand.Intn(100)) + `.png`,
+			Content: `../static/kiki_` + strconv.Itoa(rand.Intn(360)) + `.png`,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")

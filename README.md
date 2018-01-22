@@ -17,10 +17,13 @@ In *kiki*, you are part of the cloud. When you use *kiki* to post a private mess
 
 _Note:_ This software is experimental at the moment. It uses end-to-end encryption so it *should be secure*, but the codebase has not been audited so do not post a bank statement.
 
+## Why?
+
+Widespread centralized social networks are becoming increasingly odious: Twitter [abandoned "Do Not Track"](http://www.zdnet.com/article/twitter-abandons-do-not-track-privacy-protection/), LinkedIn [ignores user settings](https://petermolnar.net/linkedin-public-settings-ignored/) and [dissallows people accessing public content](https://arstechnica.com/tech-policy/2017/07/linkedin-its-illegal-to-scrape-our-website-without-permission/), and Facebook [has become increasingly hostile towards insulating your internet](https://daringfireball.net/2017/06/fuck_facebook). Al these centralized networks use your information and track your activities for their profit. As a remedy, there has been a resurgence of privacy-aware open-source decentralized social networks, like [Diaspora](https://github.com/diaspora/diaspora), [Mastodon](https://github.com/tootsuite/mastodon), and [Patchwork](https://github.com/ssbc/patchwork). *kiki* is heavily inspired by [Patchwork](https://github.com/ssbc/patchwork), but aims to improve some facets such as: simple federation, multi-computer logins, add in post editing/deletion and even profile deletion.
+
 
 ## Features
 
-*kiki* is heavily inspired by [Patchwork](https://github.com/ssbc/patchwork), but aims to improve some facets such as: simple federation, multi-computer logins, add in post editing/deletion and even profile deletion. Here are the main features of *kiki*:
 
 - You can use *kiki* offline.
 - You have all the data, all the time. 
