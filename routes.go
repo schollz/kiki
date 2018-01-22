@@ -43,9 +43,16 @@ func handleLetter(c *gin.Context) (err error) {
 	err = c.BindJSON(&p)
 	if err != nil {
 		logger.Log.Error(err)
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		return
 	}
-	err = f.ProcessLetter(p)
+	e, err := f.ProcessLetter(p)
+	if err != nil {
+		logger.Log.Error(err)
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"status": "ok", "message": "added " + e.ID, "envelope": e})
 
 	// when a new letter arrives, update everything and then sync servers
 	go f.UpdateEverythingAndSync()
