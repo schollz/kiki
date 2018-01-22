@@ -9,12 +9,14 @@
 <a href="https://goreportcard.com/report/github.com/schollz/kiki"><img src="https://goreportcard.com/badge/github.com/schollz/kiki" alt="Go Report Card"></a>
 </p>
 
-<p align="center"><em>kiki</em> is a new social network that's different. </p>
+<p align="center"><em>kiki</em> is an experimental social network. </p>
 
-How is *kiki* different? The main difference is that *the social network exists on your computer, all the time*. In *kiki*, you are part of the cloud. When you use *kiki* to post a private message to a friend, everyone in the network will store that message for you. Secure end-to-end encryption ensures that only your friend can read it, even though everyone has the message. 
+How is *kiki* different from other social networks? The main difference is that *the social network exists on your computer, all the time*. This means *kiki* will work offline, and it means there's nobody tracking your browsing. In *kiki*, you are part of the cloud. When you use *kiki* to post a private message to a friend, everyone in the network will store that message for you. Secure end-to-end encryption ensures that only your friend can read it, even though everyone has the message. 
+
 
 ## Features
 
+*kiki* is heavily inspired by [Patchwork](https://github.com/ssbc/patchwork), but aims to improve some facets such as: simple federation, multi-computer logins, add in post editing/deletion and even profile deletion. Here are the main features of *kiki*:
 
 - You can use *kiki* offline.
 - You have all the data, all the time. 
@@ -24,12 +26,8 @@ How is *kiki* different? The main difference is that *the social network exists 
 - Single binary (*kiki*), single settings file (*kiki.json*), and a setting database (*kiki.db*, an `sqlite3` db).
 - Cross-platform, with [binaries for every OS/architecture](https://github.com/schollz/kiki/releases/latest).
 - Easily federated (just a command line flag to federate).
+- Multi-machine use - just transfer your *kiki.json* settings file to each computer you want to use on.
 
-## Why?
-
-Does this already exist? Yes, of course.
-
-Scuttlebutt is the closest, but currently.
 
 ## Quickstart
 
@@ -51,7 +49,7 @@ and then run:
 kiki
 ```
 
-This will start your local server instance and open up a browser to `localhost:8003` so that you can interact with the network.
+This will start your local server instance and open up a browser to `localhost:8003` so that you can interact with the network. Right now, to sync you can add another open server (currently the only available one is https://kiki.network, but you can make your own).
 
 # The 50 precepts 
 
@@ -88,23 +86,23 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 *Access*
 
 32. A envelope is sealed using public-private key encryption so that only intended recipients can open it. You are also a recipient of your own letters.
-33. A **public** letter is one which is additionally sealed with the *region keypair*. Everyone on the network has this keypair and will be able to unseal the envelope.
-34. A **friends** letter is one that is sealed against the latest personal **friends keypair**.
-35. The **friends keypair** is just a keypair that is generated for each user on initiation.
-36. Two friends keypairs are shared upon making a **friend**.
-37. A **friend** is someone that you follow, that also follows you.
+33. A public letter is one which is additionally sealed with the *region keypair*. Everyone on the network has this keypair and will be able to unseal the envelope.
+34. A letter for a **friend** is one that is sealed against the latest personal *friends keypair.
+35. A **friend** is someone that you follow, that also follows you.
+36. The *friend keypair* from each friend are shared upon making a **friend**.
+36. The *friends keypair* is just a keypair that is generated for each user on initiation, that allows friends to decrypt your messages.
 38. By unfriending, you generate a new *friends keypair* which is transmitted to your remaining friends. Your ex-friend will still see your old content, but not the new content.
 39. You can also send a letter addressed to specific people by specifying their public keys.
 .
 *Editing and deletion*
 
-40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the previous letter using a **replaces** tag.
-41. You can delete anything you made on *kiki*. By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (__Note__: since letters are signed, you cannot delete someone else's profile).
+40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the original letter using a *first_id* tag.
+41. You can delete anything you made on *kiki*. By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (_Note_: since letters are signed, you cannot delete someone else's profile).
 
 *The Feed*
 
 42. Your **feed** is a representation of all the envelopes that are accessible to you (i.e. addressed to you, addressed to friends, or addressed to public).
-43. The representation of letters is most generally a website where shared images/text are aggregated in reverse-chronological order in a displayed **feed**. (__Note__: *kiki* is not a website - it is an infrastructure. Feel free to build your own display).
+43. The representation of letters is most generally a website where shared images/text are aggregated in reverse-chronological order in a displayed **feed**. (_Note_: *kiki* is not a website - it is an infrastructure. Feel free to build your own display).
 44. You can also hide things from showing up in the feed by editing a post so that its content is empty (effectively deleting it).
 45. When editing content, only the latest edit is shown in the feed.
 46. All functions of *kiki* are accessible from the feed (e.g. sending letters of various purposes).
@@ -112,9 +110,9 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 
 *The files*
 
-48. The entire program is a single binary: *kiki*.
-49. The entire database of envelopes is a single `sqlite3` database: *kiki.db*.
-50. The settings file, containing your personal key, is a single file: *kiki.json*.
+48. The settings file, containing your personal key, is a single file: *kiki.json*. *You can transfer this file to any computer to reconstitute your entire social network!*
+49. The entire program is a single binary: *kiki*.
+50. The entire database of envelopes is a single `sqlite3` database: *kiki.db*.
 
 # Federation
 
@@ -156,13 +154,7 @@ Please report issues through
 
 ## Community
 
-All kiki users should subscribe `WORLD1` to see the public sharing of ideas, knowledge, and code for building *kiki*:
-
-```
-kiki -region-public 'iXBCWwVSzEPRDBH645mssgKuDi0Z5a_hRy4I6qjTYiQ=' -region-private 'E6yz0wKVoo2vMgHPuWOM5h84Tjo3q9J-eqiJOqgZIL8=' -path world1
-```
-
-You can send @schollz a message at `zzbo1SZvn20bOd5KQQaVYJRLy_qFm5KrbI63W8_C4TI=`.
+We use *kiki* for development and questions. For development, check out [#kikidev](http://localhost:8003/?hashtag=kikidev) and for general help checkout [#kikihelp](http://localhost:8003/?hashtag=kikihelp).
 
 
 ### Code of Conduct
