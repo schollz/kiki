@@ -11,15 +11,15 @@
 
 <p align="center"><em>kiki</em> is an experimental social network. </p>
 
-How is *kiki* different from other social networks? The main difference is that *the social network exists on your computer, all the time*. This means *kiki* will work offline, and it means there's nobody tracking your browsing. 
+How is *kiki* different from other social networks? The main difference is that *the social network exists on your computer, all the time*. This means *kiki* will work offline, and nobody will ever track you. 
 
 In *kiki*, you are part of the cloud. When you use *kiki* to post a private message to a friend, everyone in the network will store that message for you. Secure end-to-end encryption ensures that only your friend can read it, even though everyone has the message. 
 
-_Note:_ This software is experimental at the moment. It uses end-to-end encryption so it *should be secure*, but the codebase has not been audited so do not post a bank statement.
+_Note:_ This software is experimental at the moment. It uses end-to-end encryption so it *should be secure*, but the codebase has not been audited so do not post your bank statement.
 
 ## Why?
 
-Widespread centralized social networks are becoming increasingly odious: Twitter [abandoned "Do Not Track"](http://www.zdnet.com/article/twitter-abandons-do-not-track-privacy-protection/), LinkedIn [ignores user settings](https://petermolnar.net/linkedin-public-settings-ignored/) and [dissallows people accessing public content](https://arstechnica.com/tech-policy/2017/07/linkedin-its-illegal-to-scrape-our-website-without-permission/), and Facebook [has become increasingly hostile towards insulating your internet](https://daringfireball.net/2017/06/fuck_facebook). Al these centralized networks use your information and track your activities for their profit. As a remedy, there has been a resurgence of privacy-aware open-source decentralized social networks, like [Diaspora](https://github.com/diaspora/diaspora), [Mastodon](https://github.com/tootsuite/mastodon), and [Patchwork](https://github.com/ssbc/patchwork). *kiki* is heavily inspired by [Patchwork](https://github.com/ssbc/patchwork), but aims to improve some facets such as: simple federation, multi-computer logins, add in post editing/deletion and even profile deletion.
+Widespread centralized social networks are becoming increasingly odious: Twitter [abandoned "Do Not Track"](http://www.zdnet.com/article/twitter-abandons-do-not-track-privacy-protection/), LinkedIn [ignores user settings](https://petermolnar.net/linkedin-public-settings-ignored/) and [dissallows people accessing public content](https://arstechnica.com/tech-policy/2017/07/linkedin-its-illegal-to-scrape-our-website-without-permission/), while Facebook [has become increasingly hostile towards insulating your internet](https://daringfireball.net/2017/06/fuck_facebook). All these centralized networks use your information and track your activities for their profit. As a remedy, there has been a resurgence of privacy-aware open-source decentralized social networks, like [Diaspora](https://github.com/diaspora/diaspora), [Mastodon](https://github.com/tootsuite/mastodon), and [Patchwork](https://github.com/ssbc/patchwork). *kiki* is heavily inspired by [Patchwork](https://github.com/ssbc/patchwork), but aims to improve some facets such as: simple federation, multi-computer logins, add in post editing/deletion and even profile deletion.
 
 
 ## Features
@@ -121,7 +121,7 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 49. The entire program is a single binary: *kiki*.
 50. The entire database of envelopes is a single `sqlite3` database: *kiki.db*.
 
-# Neat features
+# Usage
 
 ## Simple API for posting
 
@@ -187,7 +187,7 @@ kiki -region-public 'X' -region-private 'Y'
 
 Please contribute! Try *kiki* out, ask questions, submit PRs. Anything is welcome.
 
-### Reporting issues
+## Reporting issues
 
 Please report issues through
 [our issue tracker](https://github.com/kiki/kiki/issues).
@@ -203,8 +203,8 @@ We use *kiki* for development and questions. For development, check out [#kikide
 Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md).
 By participating in this project you agree to abide by its terms.
 
-### License
+# License
 
 This project is under the MIT license.
 
-The Kiki mascot is Copyright 2018 Jessie Doyle and Cloud Supernova.
+The *kiki* mascot is Copyright 2018 Jessie Doyle and Cloud Supernova. All Rights Reserved.
