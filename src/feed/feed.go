@@ -473,6 +473,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
 		// sanitize
 		p := bluemonday.UGCPolicy()
+		p.AllowRelativeURLs(true)
+		p.AddTargetBlankToFullyQualifiedLinks(true)
 		l.Content = p.Sanitize(l.Content)
 		// replace hashtags with links to the hash tags
 		r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
