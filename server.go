@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"io"
 	"mime/multipart"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -150,24 +149,24 @@ func Run() (err error) {
 	publicRouter.GET("/download/:id", handleDownload) // download a specific envelope
 
 	// find a pair of ports
-	for {
-		ln1, err1 := net.Listen("tcp", ":"+PublicPort)
-		ln2, err2 := net.Listen("tcp", ":"+PrivatePort)
-		if err1 == nil {
-			ln1.Close()
-		}
-		if err2 == nil {
-			ln2.Close()
-		}
-		if err1 != nil || err2 != nil {
-			portNum, _ := strconv.Atoi(PublicPort)
-			PublicPort = strconv.Itoa(portNum + 2)
-			portNum, _ = strconv.Atoi(PrivatePort)
-			PrivatePort = strconv.Itoa(portNum + 2)
-		} else {
-			break
-		}
-	}
+	// for {
+	// 	ln1, err1 := net.Listen("tcp", ":"+PublicPort)
+	// 	ln2, err2 := net.Listen("tcp", ":"+PrivatePort)
+	// 	if err1 == nil {
+	// 		ln1.Close()
+	// 	}
+	// 	if err2 == nil {
+	// 		ln2.Close()
+	// 	}
+	// 	if err1 != nil || err2 != nil {
+	// 		portNum, _ := strconv.Atoi(PublicPort)
+	// 		PublicPort = strconv.Itoa(portNum + 2)
+	// 		portNum, _ = strconv.Atoi(PrivatePort)
+	// 		PrivatePort = strconv.Itoa(portNum + 2)
+	// 	} else {
+	// 		break
+	// 	}
+	// }
 
 	go (func() {
 		fmt.Printf("\n\nRunning public router on 0.0.0.0:%s\n\n", PublicPort)

@@ -1,3 +1,4 @@
+
 /*
  * Globals
  */
@@ -19,24 +20,31 @@
   line-height: 1.0;
 }
 
+.card-body {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
+
+.card-header {
+  padding-top: 0.5rem; 
+  padding-bottom: 0.5rem;
+}
+
+
 nav {
   margin-bottom: 1rem;
 }
 
-img.img-fluid {
-  padding-bottom: 1em;
+/*img.img-fluid {
+  padding-bottom: 0em;
 }
-
+*/
 .medium-editor-toolbar-form-active {
 visibility: visible;
 }
 
 img.profile-pic {
   border-radius: 0.5rem;
-  padding: 0.1em;
-  max-width: 54px;
-  max-height: 54px;
-  height: 100%;
 }
 
 img.kiki-pic {

@@ -112,7 +112,7 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="nameModalLabel"><img id="modalNameImage" src="" class="align-middle profile-pic">&nbsp;
+            <h5 class="modal-title" id="nameModalLabel"><img id="modalNameImage" style="max-width:54px;" src="" class="align-middle profile-pic">&nbsp;
                                 <span id="modalNameName">Mark</span> <br><small>Pubkey: <code class="text-muted publickey" id="modalNamePublicKey">aasdlkfjas9jf93jfa</code></small>
 
                               <small>Friend / Following / Followers = <span id="modalFriendsCount">0</span> / <span id="modalFollowingCount">0</span> / <span id="modalFollowersCount">0</span>
@@ -143,9 +143,26 @@
         {{ range .Posts }}
         <!--begin blog post -->
         <div class="card">
-          <div class="card-body">
-            <div class="blog-post">
-              <p class="blog-post-meta">
+          <div class="card-header bg-transparent">
+            <div class="container">
+              <div class="row">
+                <div class="col-1" style="padding-left: 0.1rem; padding-right: 0.1rem;">
+                  <img src="/img/{{ .Post.User.Image }}" class="align-middle img-fluid profile-pic">
+                </div>
+                <div class="col-11">
+                  <code>
+                    <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-followers="{{ len .Post.User.Followers }}" data-following="{{ len .Post.User.Following }}" data-friends="{{ len .Post.User.Friends }}" {{ .Post.User.ProfileContent }} data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}<small>{{ .Post.User.PublicKey }}</small>{{ end }}</a>
+                  <small>
+                    <br>
+                    -> [ {{ .Post.Recipients }} ]
+                  </small>
+                  </code>
+                </div>
+              </div>
+            </div>
+            <small><em>  
+              <a href="/?id={{.Post.ID}}" class="text-muted">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a>
+            </em></small>
                 <span class="float-right">
                   &nbsp;
                   <a href="#!" class="editmodal" data-title="Reply to {{ .Post.User.Name }}" data-replyto="{{ .Post.FirstID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>
@@ -154,11 +171,11 @@
                  &nbsp;
                 <a href="#!" data-id="{{.Post.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Post.Likes 1 }}x{{ .Post.Likes }}{{ end }}</a>
               </span>
+          </div>
+          <div class="card-body">
+            <div class="blog-post">
+              <p class="blog-post-meta">
 
-                <img src="/img/{{ .Post.User.Image }}" class="align-middle profile-pic">
-                <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-followers="{{ len .Post.User.Followers }}" data-following="{{ len .Post.User.Following }}" data-friends="{{ len .Post.User.Friends }}" {{ .Post.User.ProfileContent }} data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}{{ .Post.User.PublicKey }}{{ end }}</a>                to {{ .Post.Recipients }} <br> <small><em><span class="text-muted"><a href="/?id={{.Post.ID}}">{{ .Post.Date.Format "January 2, 2006 3:04:05PM" }}</a></span></em></small>
-              </p>
-              <hr>
               <div id="{{ .Post.ID }}">
                 {{ .Post.Content }}
               </div>
@@ -173,14 +190,32 @@
                     <div class="item">
                       <div class="row">
                         <div class="col-12">
+              <div class="container">
+                <div class="row">
+                  <div class="col-1" style="padding-left: 0.1rem; padding-right: 0.1rem;">
+                    <img src="/img/{{ .User.Image }}" class="align-middle profile-pic img-fluid">
+                  </div>
+                  <div class="col-11">
+                    <code>
+                      <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-followers="{{ len .User.Followers }}" data-following="{{ len .User.Following }}" data-friends="{{ len .User.Friends }}" {{ .User.ProfileContent }} data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>
+                    <small>
+                      <br>
+                      -> [ {{ .Recipients }} ]
+                    </small>
+                    </code>
+                  </div>
+                </div>
+              </div>
+              <small><em>  
+              <a href="/?id={{.ID}}" class="text-muted">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a>
+              </em></small>
 
                           <span class="float-right"><a href="#!" class="editmodal" data-title="Reply to {{ .User.Name }}" data-replyto="{{ .FirstID }}" data-purpose="share-text"><i class="fas fa-reply"></i></a>&nbsp;
 
                                 <a href="#!" data-usecontent="{{.ID}}" data-title="Edit post" class="editmodal" data-firstid="{{.FirstID}}" data-replyto="{{.ReplyTo}}" data-purpose="share-text"><i class="fas fa-edit"></i></a>&nbsp;
                               <a href="#!" data-id="{{.ID}}" class="likebutton"><i class="fas fa-heart"></i> {{ if gt .Likes 1 }}x{{ .Likes }}{{ end }}</a>
-                            </span> {{ if .User.Image }}<img src="/img/{{ .User.Image }}" class="align-middle profile-pic">{{ end }}
-                          <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-followers="{{ len .User.Followers }}" data-following="{{ len .User.Following }}" data-friends="{{ len .User.Friends }}" {{ .User.ProfileContent }} data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>                          to {{ .Recipients }} <br> <span class="text-muted"><a href="/?id={{.ID}}">{{ .Date.Format "January 2, 2006 3:04:05PM" }}</a></span>
-
+                            </span> 
+                            
                         </div>
                       </div>
                       <div role="tabpanel">
