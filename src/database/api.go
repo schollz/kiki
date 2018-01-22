@@ -283,7 +283,7 @@ func (self DatabaseAPI) postJsonSql() string {
 			'"content": "' ||  replace(letter_content, '"',  '''') ||'",'||
 			'"reply_to": "' ||  letter_replyto ||'",'||
 			'"purpose":"' ||  letter_purpose ||'",'||
-			'"likes": '|| (SELECT COUNT(*) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.id) ||','||
+			'"likes": '|| (SELECT COUNT(*) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.letter_firstid) ||','||
 			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.letter_firstid )
 		||'}'
 	`
@@ -309,7 +309,9 @@ func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 				opened == 1
 			AND
 		        letter_purpose = 'share-text'
-		    AND letter_replyto == ''
+		    AND
+				letter_replyto == ''
+		GROUP BY letter_firstid
 		ORDER BY time DESC;
 `
 
@@ -335,8 +337,6 @@ func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 		}
 
 		text = self.jsonFormatting(text)
-
-		// logger.Log.Info(text)
 
 		var post ApiBasicPost
 		if err = post.Unmarshal(text); nil != err {
@@ -367,6 +367,7 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, e
 			AND
 		        letter_purpose = 'share-text'
 		    AND letter_replyto == ?
+		GROUP BY letter_firstid
 		ORDER BY time DESC;
 `
 
@@ -421,8 +422,8 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
 			AND
 				letter_purpose = 'share-text'
 			AND
-				id = ?
-		ORDER BY time DESC;
+				letter_firstid = ?
+		ORDER BY time DESC LIMIT 1;
 `
 
 	// prepare statement
