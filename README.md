@@ -134,6 +134,16 @@ The API for posting to *kiki* is very simple, making it easily extensible to oth
 
 For posting to yourself, just omit `to`, and for posting to friends you can change `"public"` to `"friends"`.
 
+## Make new profiles
+
+Its easy to make a new profile. Each *kiki* instance is stored in a folder, (default: `.kiki`). For a new profile, just add the `-path` flag:
+
+```
+kiki -path zack-profile
+```
+
+which will create a new profile in the `./zack-profile` folder. Just use the same command to reload it when you stop the program.
+
 ## Make your own sync hub
 
 Currently the only public syncing up is https://kiki.network. To make your own, just start up a new instance of *kiki* and reverse proxy to the external port (port `8004` by default). Other instances will be able to exchange with this server but will not be able to modify the user data (which is only accessible via the private port, `8003` by default).
