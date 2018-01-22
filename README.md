@@ -5,13 +5,17 @@
 <br>
 <a href="https://travis-ci.org/schollz/kiki"><img src="https://travis-ci.org/schollz/kiki.svg?branch=master" alt="Build Status"></a>
 <a href="https://github.com/schollz/kiki/releases/latest"><img src="https://img.shields.io/badge/version-0.1.0-brightgreen.svg?style=flat-square" alt="Version"></a>
-<a href="https://gitter.im/schollz/kiki?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://img.shields.io/badge/chat-on%20gitter-brightgreen.svg?style=flat-square" alt="Gitter"></a>
+<a href="https://kiki.network/?hashtag=kikihelp"><img src="https://img.shields.io/badge/chat-on%20kiki-brightgreen.svg?style=flat-square" alt="Kiki"></a>
 <a href="https://goreportcard.com/report/github.com/schollz/kiki"><img src="https://goreportcard.com/badge/github.com/schollz/kiki" alt="Go Report Card"></a>
 </p>
 
 <p align="center"><em>kiki</em> is an experimental social network. </p>
 
-How is *kiki* different from other social networks? The main difference is that *the social network exists on your computer, all the time*. This means *kiki* will work offline, and it means there's nobody tracking your browsing. In *kiki*, you are part of the cloud. When you use *kiki* to post a private message to a friend, everyone in the network will store that message for you. Secure end-to-end encryption ensures that only your friend can read it, even though everyone has the message. 
+How is *kiki* different from other social networks? The main difference is that *the social network exists on your computer, all the time*. This means *kiki* will work offline, and it means there's nobody tracking your browsing. 
+
+In *kiki*, you are part of the cloud. When you use *kiki* to post a private message to a friend, everyone in the network will store that message for you. Secure end-to-end encryption ensures that only your friend can read it, even though everyone has the message. 
+
+_Note:_ This software is experimental at the moment. It uses end-to-end encryption so it *should be secure*, but the codebase has not been audited so do not post a bank statement.
 
 
 ## Features
@@ -93,7 +97,7 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 36. The *friends keypair* is just a keypair that is generated for each user on initiation, that allows friends to decrypt your messages.
 38. By unfriending, you generate a new *friends keypair* which is transmitted to your remaining friends. Your ex-friend will still see your old content, but not the new content.
 39. You can also send a letter addressed to specific people by specifying their public keys.
-.
+
 *Editing and deletion*
 
 40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the original letter using a *first_id* tag.
@@ -114,7 +118,20 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 49. The entire program is a single binary: *kiki*.
 50. The entire database of envelopes is a single `sqlite3` database: *kiki.db*.
 
-# Federation
+# Neat features
+
+## Make your own sync hub
+
+Currently the only public syncing up is https://kiki.network. To make your own, just start up a new instance of *kiki* and reverse proxy to the external port (port `8004` by default). Other instances will be able to exchange with this server but will not be able to modify the user data (which is only accessible via the private port, `8003` by default).
+
+
+## Multi-computer user
+
+Since everything on *kiki* is stored in a cloud, you can use *kiki* on multiple computers by just transfering your key file - `kiki.json` to another computer (by default at `.kiki/kiki.json`). Once you re-connect to a hub, it will download and parse your entire feed and recapitulate everything you had before! 
+
+Since letters are bagged (and not appended to a log) you can have multiple instances out-of-sync without causing any problems.
+
+## Federation
 
 By federating, you will have your network of *kiki* instances which can only communicate among themselves. Only people that have been given the region keys will be able to join this federated system.
 
@@ -130,21 +147,18 @@ This will generate a unique public-private keypair for you to use and a way to s
 kiki -region-public 'X' -region-private 'Y'
 ```
 
-
 # Project
 
 ## Status
 
-*kiki* is in alpha status. You can use it, but breaking changes may still occur. *kiki* has rough edges, and is not yet suitable for non-technical users.
+*kiki* is in alpha status. You can use it, but breaking changes might still occur. *kiki* has rough edges, and is not yet suitable for non-technical users.
 
 [![Build Status](https://travis-ci.org/schollz/kiki.svg?branch=master)](https://travis-ci.org/schollz/kiki)
 
 
 ## Contributing
 
-See the [Contribution Guidelines](CONTRIBUTING.md)
-for more information on contributing to the project.
-
+Please contribute! Try *kiki* out, ask questions, submit PRs. Anything is welcome.
 
 ### Reporting issues
 
