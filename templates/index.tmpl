@@ -87,6 +87,7 @@
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterFirstID" value="" />
     <input type=hidden id="letterTo" value="" />
+    <pre class="markdown" id="markdownInput" type="hidden" style="display:none;"></pre>
     <!-- begin medium modal -->
     <!-- Modal -->
     <div class="modal fade" id="writingModal" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
@@ -371,6 +372,7 @@
   <script src="/static/popper.min.js"></script>
   <script src="/static/bootstrap.min.js"></script>
   <script src="/static/medium-editor.min.js"></script>
+  <script src="/static/me-markdown.standalone.js"></script>
   <script src="/static/toastr.min.js"></script>
   <script>
     function submitLetter(letter, callback) {
@@ -446,7 +448,13 @@
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
     }
+    var markDownEl = document.querySelector(".markdown");
     var editor = new MediumEditor('.editable', {
+      extensions: {
+                markdown: new MeMarkdown(function (md) {
+                    markDownEl.textContent = md;
+                })
+              },
       toolbar: {
         relativeContainer: document.querySelector("#writingModalBody"),
         allowMultiParagraphSelection: true,
@@ -471,6 +479,13 @@
       }
     });
     $(document).ready(function() {
+      // editor.subscribe("editableKeydownEnter", function (event, element) {
+      //     if (event.keyCode == 13) {
+      //         event.preventDefault()
+      //         var node = MediumEditor.selection.getSelectionStart(editor.options.ownerDocument)
+      //         MediumEditor.util.insertHTMLCommand(editor.options.ownerDocument, "<br>")
+      //     }
+      // })
       $('[data-toggle="tooltip"]').tooltip({delay: { "show": 500, "hide": 100 }})
       $("img").addClass("img-fluid");
       $("#exitKiki").click(function(event) {
@@ -490,7 +505,7 @@
           "first_id": $("#letterFirstID").val(),
           "reply_to": $("#letterReplyTo").val(),
           "to": ["self"],
-          "content": editor.getContent(),
+          "content": $("#markdownInput")[0].innerText,
         }
         if ($("#writingToPublic").is(":checked") == true) {
           letter["to"] = ["public"];
