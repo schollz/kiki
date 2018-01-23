@@ -2,8 +2,7 @@
 
 
 VERSION=$(shell git describe)
-HASH=$(shell git log --pretty=format:"%hb" | head -n1)
-LDFLAGS=-ldflags "-s -w -X main.Version=${VERSION}-${HASH}"
+LDFLAGS=-ldflags "-s -w -X main.Version=${VERSION}"
 
 basicbuild:
 	go-bindata static/... templates/...
