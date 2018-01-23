@@ -40,6 +40,13 @@ func BenchmarkGetHashtags(b *testing.B) {
 	}
 }
 
+func BenchmarkGetHashtags1(b *testing.B) {
+	api := Setup(".", "kiki.db")
+	for i := 0; i < b.N; i++ {
+		api.GetEnvelopesFromTag1("hashtag")
+	}
+}
+
 func TestGetVersions(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	s, err := api.GetAllVersions("alskdjflkasjdf")
