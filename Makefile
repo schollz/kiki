@@ -1,8 +1,21 @@
 .PHONY: scratch, install, basicbuild, server, server1, server2, server3, dev1, dev2, dev3
 
+
+VERSION=$(shell git describe)
+HASH=$(shell git log --pretty=format:"%hb" | head -n1)
+LDFLAGS=-ldflags "-s -w -X main.Version=${VERSION}-${HASH}"
+
 basicbuild:
 	go-bindata static/... templates/...
-	go build
+	go build ${LDFLAGS}
+
+release:
+	docker pull karalabe/xgo-latest
+	go get github.com/karalabe/xgo
+	go-bindata static/... templates/...
+	mkdir -p bin 
+	xgo -dest bin ${LDFLAGS} -targets linux/amd64 github.com/schollz/kiki
+
 
 server:
 	go-bindata static/... templates/...

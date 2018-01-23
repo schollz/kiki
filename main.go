@@ -57,7 +57,7 @@ func main() {
 	if !*noBrowser {
 		go openurl.Open("http://localhost:" + PrivatePort)
 	}
-
+	logging.Log.Infof("kiki version %s", Version)
 	os.Mkdir(Location, 0755)
 
 	err := Run(*debug)
