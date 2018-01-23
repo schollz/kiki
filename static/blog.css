@@ -31,6 +31,7 @@
 }
 
 
+
 nav {
   margin-bottom: 1rem;
 }
@@ -110,13 +111,15 @@ h6,
 }
 .nav-link:hover,
 .nav-link:focus {
-  color: #fff;
+/*  color: #fff;
+*/  
   background-color: transparent;
 }
 
 /* Active state gets a caret at the bottom */
 .nav-link.active {
-  color: #fff;
+/*  color: #fff;
+*/
 }
 .nav-link.active::after {
   position: absolute;
@@ -211,4 +214,9 @@ h6,
 }
 .blog-footer p:last-child {
   margin-bottom: 0;
+}
+
+.menu-item {
+  color:black;
+  font-style: italic;
 }
