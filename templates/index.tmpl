@@ -609,10 +609,7 @@
       $('#searchText').keypress(function (e) {
         if (e.which == 13) {
           console.log($("#searchText").val())
-          var loc = location.href;
-          // loc += loc.indexOf("?") === -1 ? "?" : "&";
-
-          location.href = loc + "?search="+encodeURIComponent($("#searchText").val());
+          location.href = "/?search="+encodeURIComponent($("#searchText").val());
         }
       });
       var restrictInput = function(event) {
