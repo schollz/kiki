@@ -45,8 +45,8 @@
 
     <nav class="navbar navbar-expand-md"  style="background-color:#e2b1c7;">
       <div class="container">
-        <a href="/" class="pull-left"><img src="/static/kiki.png" class="kiki-pic"></a>
-        <a class="navbar-brand" style="color:black;" href="/"><em>&nbsp;&nbsp;<strong>kiki.network</strong></em></a>
+        <a href="/home" class="pull-left"><img src="/static/kiki.png" class="kiki-pic"></a>
+        <a class="navbar-brand" style="color:black;" href="/home"><em>&nbsp;&nbsp;<strong>kiki.network</strong></em></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
           <i class="fas fa-bars"></i>
         </button>
@@ -54,14 +54,17 @@
         <div class="collapse navbar-collapse" id="navbarsExample07">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link menu-item" href="/?public=1">public</a>
+              <a class="nav-link menu-item" href="/home">home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link menu-item" href="/">public</a>
             </li>
             
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle menu-item" href="http://example.com" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">help</a>
               <div class="dropdown-menu menu-item" aria-labelledby="dropdown07">
-                <a class="dropdown-item menu-item" href="#">ask a question</a>
-                <a class="dropdown-item menu-item" href="#">get source code</a>
+                <a class="dropdown-item menu-item" href="/?hashtag=kikihelp&public=1">ask a question</a>
+                <a class="dropdown-item menu-item" href="https://github.com/schollz/kiki">get source code</a>
                 <a class="dropdown-item menu-item" href="#">report a bug</a>
               </div>
             </li>

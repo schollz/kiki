@@ -662,19 +662,17 @@ func (f *Feed) UpdateFriends() (err error) {
 }
 
 type ShowFeedParameters struct {
-	ID         string // view a single post
-	Hashtag    string // filter by channel
-	User       string // filter by user
-	Search     string // filter by search term
-	Latest     bool   // get the latest
-	PublicFeed bool   // show everything
+	ID      string // view a single post
+	Hashtag string // filter by channel
+	User    string // filter by user
+	Search  string // filter by search term
+	Latest  bool   // get the latest
 }
 
 func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	t := time.Now()
 	var envelopes []letter.Envelope
 	if p.ID != "" {
-		p.PublicFeed = true // getting ID should not be filtered
 		envelopes = make([]letter.Envelope, 1)
 		if p.Latest {
 			envelopes[0], err = f.db.GetLatestEnvelopeFromID(p.ID)
@@ -695,7 +693,6 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		return
 	} else {
 		f.logger.Log.Debug("getting all envelopes")
-		// return all envelopes
 		envelopes, err = f.db.GetBasicPosts()
 	}
 	if err != nil {
@@ -703,27 +700,33 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	}
 	posts = make([]Post, len(envelopes))
 	i := 0
-	var u User
-	var following map[string]struct{}
-	if !p.PublicFeed {
-		u = f.GetUser()
-		following = make(map[string]struct{})
-		for _, pubkey := range u.Following {
-			following[pubkey] = struct{}{}
-		}
-		following[f.PersonalKey.Public] = struct{}{}
-	}
 	for _, e := range envelopes {
-		if !p.PublicFeed {
-			if _, ok := following[e.Sender.Public]; !ok {
-				continue
-			}
-		}
 		posts[i] = f.MakePostWithComments(e)
 		i++
 	}
 	posts = posts[:i]
-	f.logger.Log.Debugf("XX found %d posts (public=%v) in %s", len(posts), p.PublicFeed, time.Since(t))
+	f.logger.Log.Debugf("XX found %d posts in %s", len(posts), time.Since(t))
+	return
+}
+
+// OnlyIncludePostsFromFollowing will filter the posts to include only things from people the user is following
+func (f *Feed) OnlyIncludePostsFromFollowing(posts []Post) (filteredPosts []Post) {
+	u := f.GetUser()
+	following := make(map[string]struct{})
+	for _, pubkey := range u.Following {
+		following[pubkey] = struct{}{}
+	}
+	following[f.PersonalKey.Public] = struct{}{}
+	filteredPosts = make([]Post, len(posts))
+	i := 0
+	for _, post := range posts {
+		if _, ok := following[post.Post.User.PublicKey]; !ok {
+			continue
+		}
+		filteredPosts[i] = post
+		i++
+	}
+	filteredPosts = filteredPosts[:i]
 	return
 }
 

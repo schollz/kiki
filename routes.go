@@ -11,6 +11,38 @@ import (
 	"github.com/schollz/kiki/src/letter"
 )
 
+func handleView(c *gin.Context) (posts []feed.Post) {
+	p := feed.ShowFeedParameters{}
+	p.ID = c.DefaultQuery("id", "")
+	p.Hashtag = c.DefaultQuery("hashtag", "")
+	p.User = c.DefaultQuery("user", "")
+	p.Search = c.DefaultQuery("search", "")
+	p.Latest = c.DefaultQuery("latest", "") == "1"
+	posts, _ = f.ShowFeed(p)
+	return
+}
+
+func handleSlash(c *gin.Context) {
+	posts := handleView(c)
+	showPosts(c, posts)
+}
+
+func handleHome(c *gin.Context) {
+	posts := handleView(c)
+	posts = f.OnlyIncludePostsFromFollowing(posts)
+	showPosts(c, posts)
+}
+
+func showPosts(c *gin.Context, posts []feed.Post) {
+	c.HTML(http.StatusOK, "index.tmpl", gin.H{
+		"Posts":     posts,
+		"User":      f.GetUser(),
+		"Friends":   f.GetUserFriends(),
+		"Connected": f.GetConnected(),
+		"Hashtags":  f.GetHashTags(),
+	})
+}
+
 // GET /img
 func handleImage(c *gin.Context) {
 	id := c.Param("id")
