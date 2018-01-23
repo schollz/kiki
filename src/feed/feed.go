@@ -674,6 +674,7 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	t := time.Now()
 	var envelopes []letter.Envelope
 	if p.ID != "" {
+		p.PublicFeed = true // getting ID should not be filtered
 		envelopes = make([]letter.Envelope, 1)
 		if p.Latest {
 			envelopes[0], err = f.db.GetLatestEnvelopeFromID(p.ID)
