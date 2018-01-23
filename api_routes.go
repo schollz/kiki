@@ -18,12 +18,12 @@ type HttpRestApi struct {
 }
 
 func (self HttpRestApi) AttachToRouter(router *gin.Engine) {
-	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/posts")
-	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/post/:post_id")
-	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/post/:post_id/comments")
-	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/post/:post_id/versions")
-	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/user")
-	logger.Log.Info("Attaching HTTP handler for route: GET /api/v1/user/:user_id")
+	logger.Log.Debug("Attaching HTTP handler for route: GET /api/v1/posts")
+	logger.Log.Debug("Attaching HTTP handler for route: GET /api/v1/post/:post_id")
+	logger.Log.Debug("Attaching HTTP handler for route: GET /api/v1/post/:post_id/comments")
+	logger.Log.Debug("Attaching HTTP handler for route: GET /api/v1/post/:post_id/versions")
+	logger.Log.Debug("Attaching HTTP handler for route: GET /api/v1/user")
+	logger.Log.Debug("Attaching HTTP handler for route: GET /api/v1/user/:user_id")
 	router.GET("/api/v1/posts", self.GetPosts)
 	router.GET("/api/v1/post/:post_id", self.GetPost)
 	router.GET("/api/v1/post/:post_id/comments", self.GetPostComments)
@@ -66,7 +66,7 @@ func (self HttpRestApi) GetUser(c *gin.Context) {
 }
 
 func (self HttpRestApi) apiSuccessHandler(c *gin.Context, h gin.H) {
-	logger.Log.Info(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, http.StatusOK))
+	logger.Log.Debug(fmt.Sprintf("%v %v %v [%v]", c.Request.RemoteAddr, c.Request.Method, c.Request.URL, http.StatusOK))
 	c.JSON(http.StatusOK, h)
 }
 

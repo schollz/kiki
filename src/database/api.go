@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
+	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/purpose"
 )
 
@@ -27,7 +28,7 @@ func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) 
 	api = DatabaseAPI{
 		FileName: path.Join(locationToDatabase, name),
 	}
-	fmt.Printf("setup database at '%s'\n", api.FileName)
+	logging.Log.Debugf("setup database at '%s'\n", api.FileName)
 	return
 }
 
@@ -67,19 +68,13 @@ func (api DatabaseAPI) AddTags(idToTags map[string][]string) (err error) {
 	return
 }
 
-// GetEnvelopesFromTag
+// GetEnvelopesFromTag uses the hashtag table to get the latest post for a hashtag.
 func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, err error) {
 	db, err := open(api.FileName)
 	if err != nil {
 		return
 	}
 	defer db.Close()
-	// ids, err := db.GetIDsFromTag(tag)
-	// if err != nil {
-	// 	return
-	// }
-
-	// es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id IN ('%s') AND letter_replyto == '' ORDER BY TIME) GROUP BY letter_firstid ORDER BY time DESC;", strings.Join(ids, "','")))
 	es, err = db.getAllFromPreparedQuery(fmt.Sprintf(`
 		SELECT * FROM
 			(

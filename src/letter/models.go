@@ -10,7 +10,6 @@ import (
 	"github.com/mr-tron/base58/base58"
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
-	"github.com/schollz/kiki/src/logging"
 
 	"github.com/schollz/kiki/src/symmetric"
 )
@@ -106,8 +105,6 @@ func (e *Envelope) Close() {
 
 // Seal creates an envelope and seals it for the specified recipients
 func (l Letter) Seal(sender keypair.KeyPair, regionkey keypair.KeyPair) (e Envelope, err error) {
-	logging.Log.Info("creating letter")
-
 	// generate a list of keypairs for each public key of the recipients in letter.To
 	newTo := make([]string, len(l.To)+1)
 	recipients := make([]keypair.KeyPair, len(l.To)+1)

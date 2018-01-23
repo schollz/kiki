@@ -62,7 +62,7 @@ func main() {
 
 	os.Mkdir(Location, 0755)
 
-	err := Run()
+	err := Run(*debug)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}

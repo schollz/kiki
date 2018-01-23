@@ -35,7 +35,7 @@ import (
 
 func (f *Feed) Debug(b bool) {
 	if !b {
-		f.logger.SetLevel("warn")
+		f.logger.SetLevel("info")
 	} else {
 		f.logger.SetLevel("debug")
 	}
@@ -44,28 +44,18 @@ func (f *Feed) Debug(b bool) {
 }
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
-func New(params ...string) (f *Feed, err error) {
-	regionKeyPublic := "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33"
-	regionKeyPrivate := "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
-	locationToSaveData := "kiki"
-	if len(params) > 0 {
-		locationToSaveData = params[0]
-		if len(params) == 3 {
-			regionKeyPublic = params[1]
-			regionKeyPrivate = params[2]
-		}
-	}
-
+func New(locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug bool) (f *Feed, err error) {
 	locationToSaveData, err = filepath.Abs(locationToSaveData)
 	if err != nil {
 		return
 	}
 
 	f = new(Feed)
+	f.logger = logging.New()
+	f.Debug(debug)
 	f.Settings = GenerateSettings()
 	f.db = database.Setup(locationToSaveData)
 	f.storagePath = locationToSaveData
-	f.logger = logging.New()
 	f.caching = cache.New(1*time.Minute, 5*time.Minute)
 	f.servers.Lock()
 	f.servers.connected = make(map[string]User)
@@ -75,7 +65,7 @@ func New(params ...string) (f *Feed, err error) {
 	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
 	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "kiki.json"))
 	if errLoad != nil {
-		fmt.Println("generating new feed")
+		f.logger.Log.Info("generating new feed")
 
 		// define region key
 		err = f.SetRegionKey(regionKeyPublic,
@@ -157,7 +147,7 @@ func (f *Feed) Save() (err error) {
 }
 
 func (f *Feed) Cleanup() {
-	fmt.Println("cleaning up...")
+	f.logger.Log.Info("cleaning up...")
 }
 
 func (f *Feed) UpdateBlockedUsers() (err error) {
@@ -177,7 +167,7 @@ func (f *Feed) UpdateBlockedUsers() (err error) {
 }
 
 func (f *Feed) SignalUpdate() {
-	f.logger.Log.Info("signaling")
+	f.logger.Log.Debug("signaling")
 	f.servers.Lock()
 	f.servers.syncingCount++
 	f.servers.Unlock()
@@ -227,7 +217,7 @@ func (f *Feed) UpdateEverythingAndSync() {
 }
 
 func (f *Feed) UpdateEverything() {
-	f.logger.Log.Info("updating everything")
+	f.logger.Log.Debug("updating everything")
 	// unseal any new letters
 	err := f.UnsealLetters()
 	if err != nil {
@@ -314,7 +304,6 @@ func (f *Feed) DetermineHashtags() (err error) {
 		}
 	}
 	f.logger.Log.Debugf("Found %d tags", len(tagCounts))
-	f.logger.Log.Info(tagCounts)
 	err = f.db.Set("globals", "tags", tagCounts)
 	if err != nil {
 		f.logger.Log.Error(err)
@@ -341,7 +330,7 @@ func (f *Feed) GetHashTags() (tags []string) {
 }
 
 func (f *Feed) SyncServers() {
-	f.logger.Log.Info("Starting syncing")
+	f.logger.Log.Debug("Starting syncing")
 	needToUpdate := false
 	for _, server := range f.Settings.AvailableServers {
 		err := f.Sync(server)
@@ -420,9 +409,9 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 			default:
 				_, err2 := keypair.FromPublic(to)
 				if err2 != nil {
-					f.logger.Log.Infof("Not a valid public key: '%s'", to)
+					f.logger.Log.Debugf("Not a valid public key: '%s'", to)
 				} else if to == f.RegionKey.Public {
-					f.logger.Log.Info("cannot post as public!")
+					f.logger.Log.Debug("cannot post as public!")
 				} else {
 					newTo = append(newTo, to)
 				}
@@ -703,7 +692,7 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 		i++
 	}
 	posts = posts[:i]
-	f.logger.Log.Info(time.Since(t))
+	f.logger.Log.Debug(time.Since(t))
 	return
 }
 
@@ -1091,7 +1080,7 @@ func (f *Feed) AddAddressToServers(address string, r Response) {
 
 	f.servers.Lock()
 	defer f.servers.Unlock()
-	f.logger.Log.Infof("connected to new server %s: %+v", address, u)
+	f.logger.Log.Debugf("connected to new server %s: %+v", address, u)
 	f.servers.connected[address] = u
 	alreadyRecorded := false
 	for _, currentAddress := range f.Settings.AvailableServers {
@@ -1134,7 +1123,7 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 		if err2 != nil {
 			return err2
 		}
-		f.logger.Log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
+		f.logger.Log.Debugf("user: %s: space: %d / %d", user, currentSpace, limit)
 
 		// don't proceed if the current space does not exceed
 		if currentSpace < limit {
@@ -1156,7 +1145,7 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 		}
 
 		for {
-			f.logger.Log.Infof("user: %s: space: %d / %d", user, currentSpace, limit)
+			f.logger.Log.Debugf("user: %s: space: %d / %d", user, currentSpace, limit)
 			if currentSpace < limit {
 				break
 			}
@@ -1200,7 +1189,7 @@ func (f *Feed) MakeSearchIndex() (err error) {
 		return
 	}
 	err = ioutil.WriteFile(path.Join(f.storagePath, "search.bleve", "posts.json"), bPosts, 0644)
-	f.logger.Log.Infof("indexed %d posts in %s", len(posts), time.Since(t))
+	f.logger.Log.Debugf("indexed %d posts in %s", len(posts), time.Since(t))
 	return
 }
 
@@ -1217,7 +1206,7 @@ func (f *Feed) SearchIndexedPosts(search string) (posts []Post, err error) {
 	if err != nil {
 		return
 	}
-	f.logger.Log.Info(searchResult.Took)
+	f.logger.Log.Debug(searchResult.Took)
 	bAllPosts, err := ioutil.ReadFile(path.Join(f.storagePath, "search.bleve", "posts.json"))
 	if err != nil {
 		return
@@ -1229,11 +1218,11 @@ func (f *Feed) SearchIndexedPosts(search string) (posts []Post, err error) {
 	}
 	posts = make([]Post, len(searchResult.Hits))
 	for i, hit := range searchResult.Hits {
-		f.logger.Log.Info(hit)
+		f.logger.Log.Debug(hit)
 		id, _ := strconv.Atoi(hit.ID)
 		posts[i] = allPosts[id]
 	}
-	f.logger.Log.Infof("found %d posts in %s", len(searchResult.Hits), time.Since(t))
+	f.logger.Log.Debugf("found %d posts in %s", len(searchResult.Hits), time.Since(t))
 	return
 }
 
