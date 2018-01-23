@@ -11,12 +11,11 @@ import (
 )
 
 var (
-	// Port defines what port the carrier should listen on
+	Version        = "0.1.0"
 	PrivatePort    = "8003"
 	PublicPort     = "8004"
 	RegionPublic   = "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33"
 	RegionPrivate  = "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
-	NoSync         = false
 	GenerateRegion = false
 	// Location defines where to open up the kiki database
 	Location = "."
@@ -27,7 +26,6 @@ func main() {
 	flag.StringVar(&PrivatePort, "internal-port", PrivatePort, "internal port for the data (this) server")
 	flag.StringVar(&RegionPublic, "region-public", RegionPublic, "region public key")
 	flag.StringVar(&RegionPrivate, "region-private", RegionPrivate, "region private key")
-	flag.BoolVar(&NoSync, "no-sync", NoSync, "disable syncing")
 	debug := flag.Bool("debug", false, "turn on debug mode")
 	noBrowser := flag.Bool("no-browser", false, "do not open browser")
 	flag.StringVar(&Location, "path", ".kiki", "path to the kiki data")
