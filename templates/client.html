@@ -96,6 +96,10 @@
             text-decoration: none;
         }
 
+        .user-actions a {
+            font-size: 14px;
+        }
+
         .users-list {
             max-height: 300px;
             overflow-y: auto;
@@ -270,15 +274,21 @@
             <div>
                 <h5 id="user-name"></h5>
             </div>
+            <div>
+                <small>
+                    Public key:
+                    <code id="user-public-key"></code>
+                </small>
+            </div>
             <div id="user-profile"></div>
             <div>
-                <button class="btn btn-sm user-action change-name" title="Change username">
+                <button class="btn btn-sm btn-link user-action change-name" title="Change username">
                     <i class="fas fa-comment-alt"></i>
                 </button>
-                <button class="edit-profile btn btn-sm user-action">
+                <button class="edit-profile btn btn-sm btn-link  user-action">
                     <i class="fas fa-user-circle"></i>
                 </button>
-                <button class="editmodal btn btn-sm user-action" title="Change profile image" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
+                <button class="editmodal btn btn-sm btn-link user-action" title="Change profile image" data-title="Update image" data-purpose="action-assign/image" data-makecontent="Drag and drop an image...">
                     <i class="fas fa-upload"></i>
                 </button>
             </div>
@@ -608,6 +618,8 @@ UserClient.prototype.buildUserUi = function(){
     if (this.data) {
 
         this.clearUserUi();
+
+        $("#user-public-key").text(this.data.public_key);
 
         $("#user-name").text( this.data.name || this.data.public_key );
         $("#user-profile").append( this.data.profile );
