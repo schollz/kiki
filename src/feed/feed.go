@@ -592,14 +592,15 @@ func (f *Feed) GetUser(public ...string) (u User) {
 	followers, following, friends := f.db.Friends(publicKey)
 	blocked, _ := f.db.ListBlockedUsers(publicKey)
 	u = User{
-		Name:      strip.StripTags(name),
-		PublicKey: publicKey,
-		Profile:   template.HTML(profile),
-		Image:     image,
-		Followers: followers,
-		Following: following,
-		Friends:   friends,
-		Blocked:   blocked,
+		Name:           strip.StripTags(name),
+		PublicKey:      publicKey,
+		Profile:        template.HTML(profile),
+		ProfileContent: template.HTMLAttr(fmt.Sprintf(`data-content="%s"`, strings.Replace(profile, `"`, `'`, -1))),
+		Image:          image,
+		Followers:      followers,
+		Following:      following,
+		Friends:        friends,
+		Blocked:        blocked,
 	}
 	return
 }
@@ -763,7 +764,6 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		panic(err)
 	}
 	convertedTime := e.Timestamp.In(timeLocation)
-	followers, following, friends := f.db.Friends(e.Sender.Public)
 	post = BasicPost{
 		ID:         e.ID,
 		Recipients: strings.Join(recipients, ", "),
@@ -771,17 +771,8 @@ func (f *Feed) MakePost(e letter.Envelope) (post BasicPost) {
 		Date:       convertedTime,
 		TimeAgo:    utils.TimeAgo(convertedTime),
 		FirstID:    e.Letter.FirstID,
-		User: User{
-			Name:           strip.StripTags(f.db.GetName(e.Sender.Public)),
-			PublicKey:      e.Sender.Public,
-			Profile:        template.HTML(f.db.GetProfile(e.Sender.Public)),
-			ProfileContent: template.HTMLAttr(fmt.Sprintf(`data-content="%s"`, strings.Replace(f.db.GetProfile(e.Sender.Public), `"`, `'`, -1))),
-			Image:          f.db.GetProfileImage(e.Sender.Public),
-			Friends:        friends,
-			Followers:      followers,
-			Following:      following,
-		},
-		Likes: f.db.NumberOfLikes(e.ID),
+		User:       f.GetUser(e.Sender.Public),
+		Likes:      f.db.NumberOfLikes(e.ID),
 	}
 	return
 }
