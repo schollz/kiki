@@ -15,6 +15,7 @@ type ApiBasicPost struct {
 	Likes       int64    `json:"likes"`
 	NumComments int64    `json:"num_comments"`
 	Purpose     string   `json:"purpose,omitempty"`
+	HashTags    []string `json:"hashtags"`
 }
 
 func (self *ApiBasicPost) Unmarshal(text string) error {
