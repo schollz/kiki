@@ -17,6 +17,10 @@ In *kiki*, you are part of the cloud. When you use *kiki* to post a private mess
 
 _Note:_ This software is experimental at the moment. It uses end-to-end encryption so it *should be secure*, but the codebase has not been audited so do not post your bank statement.
 
+## Screenshot
+
+![Screenshot](https://user-images.githubusercontent.com/6550035/35279033-d33c95ca-0019-11e8-9d70-ac13039b6a74.png)
+
 ## Why?
 
 Widespread centralized social networks are becoming increasingly odious: Twitter [abandoned "Do Not Track"](http://www.zdnet.com/article/twitter-abandons-do-not-track-privacy-protection/), LinkedIn [ignores user settings](https://petermolnar.net/linkedin-public-settings-ignored/) and [dissallows people accessing public content](https://arstechnica.com/tech-policy/2017/07/linkedin-its-illegal-to-scrape-our-website-without-permission/), while Facebook [has become increasingly hostile towards insulating your internet](https://daringfireball.net/2017/06/fuck_facebook). All these centralized networks use your information and track your activities for their profit. As a remedy, there has been a resurgence of privacy-aware open-source decentralized social networks, like [Diaspora](https://github.com/diaspora/diaspora), [Mastodon](https://github.com/tootsuite/mastodon), and [Patchwork](https://github.com/ssbc/patchwork). *kiki* is heavily inspired by [Patchwork](https://github.com/ssbc/patchwork), but aims to improve some facets such as: simple federation, multi-computer logins, add in post editing/deletion and even profile deletion.
