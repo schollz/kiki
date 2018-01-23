@@ -28,6 +28,7 @@ func main() {
 	flag.StringVar(&RegionPublic, "region-public", RegionPublic, "region public key")
 	flag.StringVar(&RegionPrivate, "region-private", RegionPrivate, "region private key")
 	debug := flag.Bool("debug", false, "turn on debug mode")
+	versionPrint := flag.Bool("version", false, "print version")
 	noBrowser := flag.Bool("no-browser", false, "do not open browser")
 	flag.StringVar(&Location, "path", ".kiki", "path to the kiki data")
 	flag.BoolVar(&GenerateRegion, "generate-region", GenerateRegion, "generate keys for a new region")
@@ -47,6 +48,10 @@ func main() {
 	kiki -region-public '%s' -region-private '%s'
 
 			`, keys.Public, keys.Private, keys.Public, keys.Private)
+		os.Exit(1)
+	}
+	if *versionPrint {
+		fmt.Println(Version)
 		os.Exit(1)
 	}
 	if *debug {
