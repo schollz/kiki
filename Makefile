@@ -1,8 +1,9 @@
 .PHONY: scratch, install, basicbuild, server, server1, server2, server3, dev1, dev2, dev3
 
 
-VERSION=$(shell git describe)
-LDFLAGS=-ldflags "-s -w -X main.Version=${VERSION}"
+TAG=$(shell git tag)
+HASH=$(shell git log --pretty=format:"%h" -n 1)
+LDFLAGS=-ldflags "-s -w -X main.Version=${TAG}-${HASH} -X main.RegionPublic=GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33 -X main.RegionPrivate=6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
 
 basicbuild:
 	go-bindata static/... templates/...
@@ -13,8 +14,7 @@ release:
 	go get github.com/karalabe/xgo
 	go-bindata static/... templates/...
 	mkdir -p bin 
-	xgo -dest bin ${LDFLAGS} -targets linux/amd64 github.com/schollz/kiki
-
+	xgo -dest bin ${LDFLAGS} -targets linux/amd64,linux/arm-6,darwin/amd64,windows/amd64 github.com/schollz/kiki
 
 server:
 	go-bindata static/... templates/...

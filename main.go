@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/darkowlzz/openurl"
 	"github.com/schollz/kiki/src/keypair"
@@ -55,7 +56,10 @@ func main() {
 	}
 
 	if !*noBrowser {
-		go openurl.Open("http://localhost:" + PrivatePort)
+		go func() {
+			time.Sleep(1 * time.Second)
+			openurl.Open("http://localhost:" + PrivatePort)
+		}()
 	}
 	logging.Log.Infof("kiki version %s", Version)
 	os.Mkdir(Location, 0755)
