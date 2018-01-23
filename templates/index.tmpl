@@ -65,7 +65,7 @@
               <div class="dropdown-menu menu-item" aria-labelledby="dropdown07">
                 <a class="dropdown-item menu-item" href="/?hashtag=kikihelp&public=1">ask a question</a>
                 <a class="dropdown-item menu-item" href="https://github.com/schollz/kiki">get source code</a>
-                <a class="dropdown-item menu-item" href="#">report a bug</a>
+                <a class="dropdown-item menu-item" href="https://github.com/schollz/kiki/issues/new">report a bug</a>
               </div>
             </li>
             <li class="nav-item">
@@ -173,7 +173,8 @@
                     <a href="#!" class="activatenamemodal" data-name="{{ .Post.User.Name }}" data-image="/img/{{ .Post.User.Image }}" data-publickey="{{ .Post.User.PublicKey }}" data-followers="{{ len .Post.User.Followers }}" data-following="{{ len .Post.User.Following }}" data-friends="{{ len .Post.User.Friends }}" {{ .Post.User.ProfileContent }} data-image="/img/{{ .Post.User.Image }}">{{ if .Post.User.Name }}{{ .Post.User.Name }}{{ else }}<small>{{ .Post.User.PublicKey }}</small>{{ end }}</a>
                   <small>
                     <br>
-                    -> [ {{ .Post.Recipients }} ]
+                    <i class="fa fa-caret-right" aria-hidden="true"></i>
+[ {{ .Post.Recipients }} ]
                   </small>
                   </code>
                 </div>
@@ -219,7 +220,8 @@
                       <a href="#!" class="activatenamemodal" data-name="{{ .User.Name }}" data-image="/img/{{ .User.Image }}" data-publickey="{{ .User.PublicKey }}" data-followers="{{ len .User.Followers }}" data-following="{{ len .User.Following }}" data-friends="{{ len .User.Friends }}" {{ .User.ProfileContent }} data-image="/img/{{ .User.Image }}">{{ if .User.Name }}{{ .User.Name }}{{ else }}{{ .User.PublicKey }}{{ end }}</a>
                     <small>
                       <br>
-                      -> [ {{ .Recipients }} ]
+                      <i class="fa fa-caret-right" aria-hidden="true"></i>
+[ {{ .Recipients }} ]
                     </small>
                     </code>
                   </div>

@@ -1,3 +1,7 @@
 vendor/* linguist-vendored
 doc/* linguist-vendored
 kikiscratch/* linguist-vendored
+static/* linguist-vendored
+templates/* linguist-vendored
+misc/* linguist-vendored
+.github/* linguist-vendored
