@@ -52,6 +52,7 @@ func (api DatabaseAPI) Get(bucket, key string, value interface{}) (err error) {
 
 // AddTags will add the tags to the database
 func (api DatabaseAPI) AddTags(idToTags map[string][]string) (err error) {
+	logger.Log.Debug(len(idToTags))
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -70,6 +71,7 @@ func (api DatabaseAPI) AddTags(idToTags map[string][]string) (err error) {
 
 // GetEnvelopesFromTag uses the hashtag table to get the latest post for a hashtag.
 func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, err error) {
+	logger.Log.Debug(tag)
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -100,6 +102,7 @@ func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, er
 }
 
 func (api DatabaseAPI) AddEnvelope(e letter.Envelope) (err error) {
+	logger.Log.Debug(e.ID)
 	_, err = api.GetEnvelopeFromID(e.ID)
 	if err == nil {
 		return errors.New("envelope already exists")
@@ -113,6 +116,8 @@ func (api DatabaseAPI) AddEnvelope(e letter.Envelope) (err error) {
 }
 
 func (api DatabaseAPI) UpdateEnvelope(e letter.Envelope) (err error) {
+	logger.Log.Debug(e.ID)
+
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -123,6 +128,8 @@ func (api DatabaseAPI) UpdateEnvelope(e letter.Envelope) (err error) {
 
 // GetEnvelopeFromID returns a single envelope from its ID and returns an error if it does not exist.
 func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err error) {
+	logger.Log.Debug(id)
+
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -144,6 +151,8 @@ func (api DatabaseAPI) GetEnvelopeFromID(id string) (e letter.Envelope, err erro
 
 // GetLatestEnvelopeFromID returns a single envelope from its ID, trying to find the latest version of it
 func (api DatabaseAPI) GetLatestEnvelopeFromID(id string) (e letter.Envelope, err error) {
+	logger.Log.Debug(id)
+
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -159,6 +168,8 @@ func (api DatabaseAPI) GetLatestEnvelopeFromID(id string) (e letter.Envelope, er
 
 // GetAllEnvelopes returns all envelopes determined by whether they are opened
 func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err error) {
+	logger.Log.Debug(len(opened) > 0)
+
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -177,6 +188,8 @@ func (api DatabaseAPI) GetAllEnvelopes(opened ...bool) (e []letter.Envelope, err
 
 // GetReplies returns all envelopes that are replies to a specific envelope
 func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
+	logger.Log.Debug(id)
+
 	db, err := open(api.FileName)
 	if err != nil {
 		return
@@ -216,6 +229,8 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 }
 
 func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
+	logger.Log.Debug("basic")
+
 	db, err := open(api.FileName)
 	if err != nil {
 		return

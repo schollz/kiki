@@ -588,6 +588,10 @@ func (f *Feed) GetUser(public ...string) (u User) {
 	if len(public) > 0 {
 		publicKey = public[0]
 	}
+	if userInterface, ok := f.caching.Get("user-" + publicKey); ok {
+		return userInterface.(User)
+	}
+
 	name, profile, image := f.db.GetUser(publicKey)
 	followers, following, friends := f.db.Friends(publicKey)
 	blocked, _ := f.db.ListBlockedUsers(publicKey)
@@ -602,6 +606,8 @@ func (f *Feed) GetUser(public ...string) (u User) {
 		Friends:        friends,
 		Blocked:        blocked,
 	}
+
+	f.caching.Set("user-"+publicKey, u, 3*time.Second)
 	return
 }
 

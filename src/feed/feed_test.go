@@ -22,8 +22,17 @@ func init() {
 	}
 }
 
+func TestShowFeed(t *testing.T) {
+	f.Debug(true)
+	_, err := f.ShowFeed(ShowFeedParameters{})
+	assert.Nil(t, err)
+	f.Debug(false)
+}
+
 func TestGetUser(t *testing.T) {
 	u := f.GetUser()
+	assert.Equal(t, "8cjeQPadXXCTGe9WbqER44CqduSHpqepX4tgAoEEFH4w", u.PublicKey)
+	u = f.GetUser()
 	assert.Equal(t, "8cjeQPadXXCTGe9WbqER44CqduSHpqepX4tgAoEEFH4w", u.PublicKey)
 }
 
