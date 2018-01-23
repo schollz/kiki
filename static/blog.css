@@ -116,6 +116,10 @@ h6,
   background-color: transparent;
 }
 
+.main-content {
+  display:none;
+}
+
 /* Active state gets a caret at the bottom */
 .nav-link.active {
 /*  color: #fff;

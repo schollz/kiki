@@ -43,7 +43,7 @@
 <header>
 
 
-    <nav class="navbar navbar-expand-sm"  style="background-color:#e2b1c7;">
+    <nav class="navbar navbar-expand-md"  style="background-color:#e2b1c7;">
       <div class="container">
         <a href="/" class="pull-left"><img src="/static/kiki.png" class="kiki-pic"></a>
         <a class="navbar-brand" style="color:black;" href="/"><em>&nbsp;&nbsp;<strong>kiki.network</strong></em></a>
@@ -65,6 +65,9 @@
                 <a class="dropdown-item menu-item" href="#">report a bug</a>
               </div>
             </li>
+            <li class="nav-item">
+              <a class="nav-link menu-item" href="/exit" id="exitKiki">exit</a>
+            </li>
           </ul>
           <div class="form-inline my-2 my-md-0">
             <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="searchText">
@@ -76,7 +79,7 @@
 </header>
 
 
-  <main role="main" class="container">
+  <main role="main" class="container" id="main-content">
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterFirstID" value="" />
@@ -467,6 +470,15 @@
     $(document).ready(function() {
       $('[data-toggle="tooltip"]').tooltip({delay: { "show": 500, "hide": 100 }})
       $("img").addClass("img-fluid");
+      $("#exitKiki").click(function(event) {
+        event.preventDefault();
+        $.get( "/exit" )
+        .done(function( response ) {
+          if (response.status == 'ok') {
+            // TODO
+          }
+        });
+      })
       $("#submit-writing").click(function(event) {
         // Stop form from submitting normally
         event.preventDefault();
@@ -616,6 +628,7 @@
         $("img:not(.img-fluid)").addClass("img-fluid");
       }
       editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
+      $('#main-content').fadeIn();
     });
   </script>
 </body>

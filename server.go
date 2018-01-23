@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
@@ -144,6 +145,14 @@ func Run(verbose bool) (err error) {
 		message := ""
 		f.TestStuff()
 		c.JSON(http.StatusOK, gin.H{"success": err == nil, "message": message})
+	})
+	r.GET("/exit", func(c *gin.Context) {
+		f.Cleanup()
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "exited"})
+		go func() {
+			time.Sleep(200 * time.Millisecond)
+			os.Exit(0)
+		}()
 	})
 
 	// PUBLIC FACING ROUTES
