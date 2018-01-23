@@ -182,6 +182,7 @@
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterReplaces" value="" />
+    <pre class="markdown" id="markdownInput" type="hidden" style="display:none;"></pre>
     <!-- begin medium modal -->
     <!-- Modal -->
     <div class="modal fade" id="writingModal" role="dialog" aria-labelledby="writingModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
@@ -373,6 +374,7 @@
   <script src="/static/popper.min.js"></script>
   <script src="/static/bootstrap.min.js"></script>
   <script src="/static/medium-editor.min.js"></script>
+  <script src="/static/me-markdown.standalone.js"></script>
   <script src="/static/toastr.min.js"></script>
 
   <script src="/static/Api.js"></script>
@@ -727,7 +729,15 @@ app.User = new UserClient(app.Api, function(user){
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
     }
+
+
+    var markDownEl = document.querySelector(".markdown");
     var editor = new MediumEditor('.editable', {
+      extensions: {
+                markdown: new MeMarkdown(function (md) {
+                    markDownEl.textContent = md;
+                })
+              },
       toolbar: {
         relativeContainer: document.querySelector("#writingModalBody"),
         allowMultiParagraphSelection: true,
@@ -742,9 +752,19 @@ app.User = new UserClient(app.Api, function(user){
         /* options which only apply when static is true */
         align: 'center',
         sticky: false,
-        updateOnEmptySelection: false
+        updateOnEmptySelection: false,
+        placeholder: {
+          /* This example includes the default options for placeholder,
+             if nothing is passed this is what it used */
+          text: 'Type your text',
+          hideOnClick: true
+        }
       }
     });
+
+
+
+
     $(document).ready(function() {
     //   $("img").addClass("img-fluid");
         $("#submit-writing").click(function(event) {
@@ -757,7 +777,8 @@ app.User = new UserClient(app.Api, function(user){
                 "to": [
                     $('input.read-permission[name="options"]:checked').val()
                 ],
-                "content": editor.getContent()
+                // "content": editor.getContent()
+                "content": $("#markdownInput")[0].innerText
             }
             console.log(letter);
             app.Api.submitLetter(letter, function() {
