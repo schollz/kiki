@@ -74,7 +74,7 @@ func CaptureBase64Images(startingHTML string) (newHTML string, images map[string
 			continue
 		}
 		images[filename] = f.Bytes()
-		newHTML = strings.Replace(newHTML, img, fmt.Sprintf(`src="/img/%s"`, filename), -1)
+		newHTML = strings.Replace(newHTML, img, fmt.Sprintf(`class="img-fluid" src="/img/%s"`, filename), -1)
 
 	}
 	if err != nil {
