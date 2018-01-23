@@ -469,8 +469,6 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 	}
 	l.Content = newHTML
 	if l.Purpose == purpose.ShareText {
-		// convert Markdown -> HTML
-		l.Content = string(blackfriday.Run([]byte(l.Content)))
 		// sanitize
 		p := bluemonday.UGCPolicy()
 		p.AllowRelativeURLs(true)
