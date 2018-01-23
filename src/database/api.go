@@ -192,7 +192,17 @@ func (api DatabaseAPI) GetReplies(id string) (e []letter.Envelope, err error) {
 	// should not be replaced
 	// should be a reply
 	// ordered by time ascending
-	envelopes, err := db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM (SELECT * FROM letters WHERE opened == 1 AND letter_purpose = '%s' AND letter_replyto == ? ORDER BY time) GROUP BY letter_firstid ORDER BY time", purpose.ShareText), id)
+	envelopes, err := db.getAllFromPreparedQuery(`
+		SELECT * FROM (
+			SELECT * FROM letters
+			WHERE opened == 1
+			AND letter_purpose = 'share-text'
+			AND letter_replyto == ?
+			ORDER BY time
+		)
+		GROUP BY letter_firstid
+		ORDER BY time
+	`, id)
 	if err != nil {
 		return
 	}
@@ -296,7 +306,17 @@ func (api DatabaseAPI) GetBasicPostLatest(publickey string) (e letter.Envelope, 
 	// should not be empty
 	// should not be replaced
 	// should not be a reply
-	es, err := db.getAllFromPreparedQuery("SELECT * FROM (SELECT * FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND sender == ? ORDER BY time DESC) GROUP BY letter_firstid ORDER BY time LIMIT 1;", publickey)
+	es, err := db.getAllFromPreparedQuery(`
+		SELECT * FROM (
+			SELECT * FROM letters
+			WHERE opened == 1
+			AND letter_purpose = 'share-text'
+			AND sender == ?
+			ORDER BY time DESC
+		)
+		GROUP BY letter_firstid
+		ORDER BY time LIMIT 1;
+	`, publickey)
 	if err != nil {
 		return
 	}
@@ -328,16 +348,14 @@ func (self DatabaseAPI) postJsonSql() string {
 			'"reply_to": "' ||  letter_replyto ||'",'||
 			'"purpose":"' ||  letter_purpose ||'",'||
 			'"likes": '|| (SELECT COUNT(*) FROM letters WHERE opened == 1 AND letter_purpose == 'action-like' AND letter_content=ltr.letter_firstid) ||','||
-			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.letter_firstid )
+			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.letter_firstid ) ||','||
+			'"hashtags": [' ||
+				(SELECT IFNULL(GROUP_CONCAT(tag), '') FROM (
+					SELECT '"'||tag||'"' AS tag FROM tags WHERE tags.e_id=ltr.id
+				))
+			|| ']'
 		||'}'
 	`
-	/*
-		'"hashtags": || [' ||
-			SELECT GROUP_CONCAT(tag) FROM (
-				SELECT '"'||tag||'", ' AS tag FROM tags WHERE e_id=ltr.id
-			)
-		|| ']'
-	*/
 }
 
 func (self DatabaseAPI) processRowsToPosts(rows *sql.Rows) ([]ApiBasicPost, error) {
