@@ -115,6 +115,9 @@ func Run(verbose bool) (err error) {
 			c.Data(http.StatusOK, web.ContentType(filename), data)
 		}
 	})
+
+	r.GET("/profile_image", handleProfileImage)
+
 	r.GET("/ping", handlePing)
 	r.POST("/handshake", handleHandshake)
 	r.GET("/img/:id", handleImage)
