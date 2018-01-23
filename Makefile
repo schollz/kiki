@@ -15,6 +15,7 @@ release:
 	go-bindata static/... templates/...
 	mkdir -p bin 
 	xgo -dest bin ${LDFLAGS} -targets linux/amd64,linux/arm-6,darwin/amd64,windows/amd64 github.com/schollz/kiki
+	cd bin && upx --brute kiki-linux-amd64
 
 server:
 	go-bindata static/... templates/...
