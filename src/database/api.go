@@ -73,12 +73,33 @@ func (api DatabaseAPI) GetEnvelopesFromTag(tag string) (es []letter.Envelope, er
 		return
 	}
 	defer db.Close()
-	ids, err := db.GetIDsFromTag(tag)
-	if err != nil {
-		return
-	}
+	// ids, err := db.GetIDsFromTag(tag)
+	// if err != nil {
+	// 	return
+	// }
 
-	es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id IN ('%s') AND letter_replyto == '' ORDER BY TIME) GROUP BY letter_firstid ORDER BY time DESC;", strings.Join(ids, "','")))
+	// es, err = db.getAllFromPreparedQuery(fmt.Sprintf("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_content != '' AND id IN ('%s') AND letter_replyto == '' ORDER BY TIME) GROUP BY letter_firstid ORDER BY time DESC;", strings.Join(ids, "','")))
+	es, err = db.getAllFromPreparedQuery(fmt.Sprintf(`
+		SELECT * FROM
+			(
+				SELECT
+					*
+				FROM
+					letters
+				INNER JOIN tags
+		            ON tags.tag ='%s'
+		            AND tags.e_id = letters.id
+				WHERE
+					opened ==1
+				AND
+					letter_purpose = 'share-text'
+				AND
+					letter_content != ''
+				AND
+					letter_replyto == ''
+				ORDER BY time
+			) GROUP BY letter_firstid ORDER BY time DESC;
+		`, tag))
 	return
 }
 
