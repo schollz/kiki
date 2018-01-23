@@ -332,11 +332,11 @@ func (self DatabaseAPI) postJsonSql() string {
 		||'}'
 	`
 	/*
-		'"hashtags": ||'
-
-		SELECT IFNULL(GROUP_CONCAT(tag), '') FROM (
-			SELECT IFNULL('"'||sender||'"', '') AS ids FROM letters WHERE letter_purpose = 'action-follow' AND letter_content = ?
-		)
+		'"hashtags": || [' ||
+			SELECT GROUP_CONCAT(tag) FROM (
+				SELECT '"'||tag||'", ' AS tag FROM tags WHERE e_id=ltr.id
+			)
+		|| ']'
 	*/
 }
 
