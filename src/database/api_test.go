@@ -33,6 +33,13 @@ func BenchmarkGetIDs(b *testing.B) {
 	}
 }
 
+func BenchmarkGetHashtags(b *testing.B) {
+	api := Setup(".", "kiki.db")
+	for i := 0; i < b.N; i++ {
+		api.GetEnvelopesFromTag("hashtag")
+	}
+}
+
 func TestGetVersions(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	s, err := api.GetAllVersions("alskdjflkasjdf")
@@ -41,12 +48,6 @@ func TestGetVersions(t *testing.T) {
 	ids, err := api.GetIDs()
 	assert.Nil(t, err)
 	assert.True(t, len(ids) > 0)
-	for id := range ids {
-		s, err = api.GetAllVersions(id)
-		assert.Nil(t, err)
-		assert.True(t, len(s) > 0)
-		break
-	}
 }
 
 func TestGettingPosts(t *testing.T) {
