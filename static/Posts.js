@@ -90,11 +90,18 @@ Post.prototype.fetchComments = function() {
     }
 }
 
+Post.prototype.updateUi = function() {
+    this.$el = this.buildUi();
+}
+
 Post.prototype.buildCommentUi = function() {
     var self = this;
     this.elements.comments.html('');
     for (var i=0; i<self.comments.length; i++) {
         app.Ui.collectUsersFromPost(self.comments[i]);
+        // HACK
+        self.comments[i].updateUi();
+        //.end
         this.elements.comments.append(
             $('<div>').addClass('col-12').append(
                 self.comments[i].$el
