@@ -7,6 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	logger.SetLevel("error")
+}
 func BenchmarkOpening(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		db, err := open("kiki.db")
@@ -41,7 +44,7 @@ func TestGetVersions(t *testing.T) {
 	for id := range ids {
 		s, err = api.GetAllVersions(id)
 		assert.Nil(t, err)
-		assert.Equal(t, 1, len(s))
+		assert.True(t, len(s) > 0)
 		break
 	}
 }
@@ -50,6 +53,7 @@ func TestGettingPosts(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	e, err := api.GetBasicPosts()
 	assert.Nil(t, err)
+	assert.True(t, len(e) > 0)
 }
 
 func TestOpenClose(t *testing.T) {
