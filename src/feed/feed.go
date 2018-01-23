@@ -94,7 +94,14 @@ func New(locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug boo
 		_, err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{},
 			Purpose: purpose.ShareText,
-			Content: `<p>Welcome to KiKi!</p><p>To get started, you can change your name, edit your profile, upload an image, and make posts!</p> `,
+			Content: `## Welcome to Kiki!
+
+To get started, you can change your name, edit your profile, and upload a profile image.
+
+Right now your feed is empty. If you'd like to join the network, click "Add server" and add a server. Then you can see the public feed by clicking [public](/?public=1). Otherwise, you will just see posts from people you follow here.
+
+If you need any help, try using the help above.
+`,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")
@@ -655,11 +662,12 @@ func (f *Feed) UpdateFriends() (err error) {
 }
 
 type ShowFeedParameters struct {
-	ID      string // view a single post
-	Hashtag string // filter by channel
-	User    string // filter by user
-	Search  string // filter by search term
-	Latest  bool   // get the latest
+	ID         string // view a single post
+	Hashtag    string // filter by channel
+	User       string // filter by user
+	Search     string // filter by search term
+	Latest     bool   // get the latest
+	PublicFeed bool   // show everything
 }
 
 func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
@@ -673,8 +681,8 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 			envelopes[0], err = f.db.GetEnvelopeFromID(p.ID)
 		}
 	} else if p.Hashtag != "" {
-		envelopes, err = f.db.GetEnvelopesFromTag(strings.ToLower(p.Hashtag))
-		f.logger.Log.Debugf("Got %d envelopes searching for '#%s'", len(envelopes), p.Hashtag)
+		envelopes, err = f.db.GetEnvelopesFromTag1(strings.ToLower(p.Hashtag))
+		f.logger.Log.Debugf("Got %d envelopes with hashtag '#%s'", len(envelopes), p.Hashtag)
 	} else if p.User != "" {
 		f.logger.Log.Debugf("gettting posts for '%s'", p.User)
 		envelopes, err = f.db.GetBasicPostsForUser(p.User)
@@ -694,12 +702,27 @@ func (f *Feed) ShowFeed(p ShowFeedParameters) (posts []Post, err error) {
 	}
 	posts = make([]Post, len(envelopes))
 	i := 0
+	var u User
+	var following map[string]struct{}
+	if !p.PublicFeed {
+		u = f.GetUser()
+		following = make(map[string]struct{})
+		for _, pubkey := range u.Following {
+			following[pubkey] = struct{}{}
+		}
+		following[f.PersonalKey.Public] = struct{}{}
+	}
 	for _, e := range envelopes {
+		if !p.PublicFeed {
+			if _, ok := following[e.Sender.Public]; !ok {
+				continue
+			}
+		}
 		posts[i] = f.MakePostWithComments(e)
 		i++
 	}
 	posts = posts[:i]
-	f.logger.Log.Debug(time.Since(t))
+	f.logger.Log.Debugf("XX found %d posts (public=%v) in %s", len(posts), p.PublicFeed, time.Since(t))
 	return
 }
 

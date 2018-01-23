@@ -89,7 +89,8 @@ func Run(verbose bool) (err error) {
 		p.User = c.DefaultQuery("user", "")
 		p.Search = c.DefaultQuery("search", "")
 		p.Latest = c.DefaultQuery("latest", "") == "1"
-
+		p.PublicFeed = c.DefaultQuery("public", "") == "1"
+		logger.Log.Debugf("XX %+v", p)
 		posts, _ := f.ShowFeed(p)
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Posts":     posts,
