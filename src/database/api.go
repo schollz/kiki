@@ -2,6 +2,7 @@ package database
 
 import (
 	// "encoding/json"
+	"database/sql"
 	"fmt"
 	"path"
 	"strings"
@@ -219,7 +220,19 @@ func (api DatabaseAPI) GetBasicPosts() (e []letter.Envelope, err error) {
 	// should not be empty
 	// should not be replaced (GROUP BY letter_firstid)
 	// should not be a reply
-	es, err := db.getAllFromPreparedQuery("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND letter_replyto == '' ORDER BY time) GROUP BY letter_firstid ORDER BY time DESC")
+	es, err := db.getAllFromPreparedQuery(`
+		SELECT
+			*
+		FROM
+			(
+				SELECT * FROM letters
+				WHERE opened ==1
+				AND letter_purpose = 'share-text'
+				AND letter_replyto == ''
+				ORDER BY time
+			)
+		GROUP BY letter_firstid ORDER BY time DESC
+	`)
 	if err != nil {
 		return
 	}
@@ -246,7 +259,16 @@ func (api DatabaseAPI) GetBasicPostsForUser(publickey string) (e []letter.Envelo
 	// should not be empty
 	// should not be replaced
 	// should not be a reply
-	es, err := db.getAllFromPreparedQuery("SELECT * FROM (SELECT * FROM letters WHERE opened ==1 AND letter_purpose = 'share-text' AND sender == ? AND letter_replyto == '' ORDER BY time) GROUP BY letter_firstid ORDER BY time DESC;", publickey)
+	es, err := db.getAllFromPreparedQuery(`
+		SELECT * FROM (
+			SELECT * FROM letters
+			WHERE opened ==1
+			AND letter_purpose = 'share-text'
+			AND sender == ?
+			AND letter_replyto == ''
+			ORDER BY time
+		) GROUP BY letter_firstid ORDER BY time DESC;
+	`, publickey)
 	if err != nil {
 		return
 	}
@@ -309,13 +331,40 @@ func (self DatabaseAPI) postJsonSql() string {
 			'"num_comments": '|| ( SELECT count(*) FROM letters WHERE opened == 1 AND letter_purpose = 'share-text' AND letter_replyto = ltr.letter_firstid )
 		||'}'
 	`
+	/*
+		'"hashtags": ||'
+
+		SELECT IFNULL(GROUP_CONCAT(tag), '') FROM (
+			SELECT IFNULL('"'||sender||'"', '') AS ids FROM letters WHERE letter_purpose = 'action-follow' AND letter_content = ?
+		)
+	*/
+}
+
+func (self DatabaseAPI) processRowsToPosts(rows *sql.Rows) ([]ApiBasicPost, error) {
+	var posts []ApiBasicPost
+	for rows.Next() {
+		var text string
+		err := rows.Scan(&text)
+
+		if nil != err {
+			return posts, err
+		}
+
+		text = self.jsonFormatting(text)
+
+		var post ApiBasicPost
+		if err = post.Unmarshal(text); nil != err {
+			return posts, err
+		}
+
+		posts = append(posts, post)
+	}
+	return posts, nil
 }
 
 // json1 needs to be loaded...
 func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 	var posts []ApiBasicPost
-
-	logger.Log.Info(self.FileName)
 
 	db, err := open(self.FileName)
 	if nil != err {
@@ -350,25 +399,7 @@ func (self DatabaseAPI) GetPostsForApi() ([]ApiBasicPost, error) {
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		var text string
-		err = rows.Scan(&text)
-
-		if nil != err {
-			return posts, err
-		}
-
-		text = self.jsonFormatting(text)
-
-		var post ApiBasicPost
-		if err = post.Unmarshal(text); nil != err {
-			return posts, err
-		}
-
-		posts = append(posts, post)
-	}
-
-	return posts, nil
+	return self.processRowsToPosts(rows)
 }
 
 func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, error) {
@@ -406,24 +437,7 @@ func (self DatabaseAPI) GetPostCommentsForApi(post_id string) ([]ApiBasicPost, e
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		var text string
-		err = rows.Scan(&text)
-		if nil != err {
-			return posts, err
-		}
-
-		text = self.jsonFormatting(text)
-
-		var post ApiBasicPost
-		if err = post.Unmarshal(text); nil != err {
-			return posts, err
-		}
-
-		posts = append(posts, post)
-	}
-
-	return posts, nil
+	return self.processRowsToPosts(rows)
 }
 
 func (self DatabaseAPI) GetPostVersionsForApi(post_id string) ([]ApiBasicPost, error) {
@@ -460,24 +474,7 @@ func (self DatabaseAPI) GetPostVersionsForApi(post_id string) ([]ApiBasicPost, e
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		var text string
-		err = rows.Scan(&text)
-		if nil != err {
-			return posts, err
-		}
-
-		text = self.jsonFormatting(text)
-
-		var post ApiBasicPost
-		if err = post.Unmarshal(text); nil != err {
-			return posts, err
-		}
-
-		posts = append(posts, post)
-	}
-
-	return posts, nil
+	return self.processRowsToPosts(rows)
 }
 
 func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
@@ -515,24 +512,7 @@ func (self DatabaseAPI) GetPostForApi(post_id string) ([]ApiBasicPost, error) {
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		var text string
-		err = rows.Scan(&text)
-		if nil != err {
-			return posts, err
-		}
-
-		text = self.jsonFormatting(text)
-
-		var post ApiBasicPost
-		if err = post.Unmarshal(text); nil != err {
-			return posts, err
-		}
-
-		posts = append(posts, post)
-	}
-
-	return posts, nil
+	return self.processRowsToPosts(rows)
 }
 
 func (self DatabaseAPI) GetUserForApi(user_id string) (ApiUser, error) {
