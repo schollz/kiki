@@ -31,8 +31,8 @@ Post.prototype.getContent = function() {
 }
 
 Post.prototype.getPostId = function() {
+    // server sends this as the letter.first_id
     return this.data.id;
-    // return this.data.first_id;
 }
 
 Post.prototype.getOwnerId = function() {
@@ -221,8 +221,7 @@ Post.prototype.buildUi = function() {
                 //.end
 
                 // recipients
-                $("<span>").append(
-                    // " -> ",
+                $("<span>").addClass("recipients").append(
                     " ",
                     $('<i>').addClass('fa fa-angle-right'),
                     " ",
@@ -233,11 +232,16 @@ Post.prototype.buildUi = function() {
                             // dont display owner
                             // owner can always see their data
                             if (self.getOwnerId() != recipients[i]) {
+                                var display_name = recipients[i]
+                                if (app.Users.data[recipients[i]]) {
+                                    display_name = app.Users.data[recipients[i]].getDisplayName();
+                                }
+
                                 elems.push(
                                     "[",
                                     $("<span>", {
                                         owner_id: recipients[i]
-                                    }).addClass('recipient').append(recipients[i]),
+                                    }).addClass('recipient').append(display_name),
                                     "]"
                                 );
                             }
