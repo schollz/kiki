@@ -16,7 +16,7 @@ var f *Feed
 
 func init() {
 	var err error
-	f, err = New("testdb", "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33", "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3", false)
+	f, err = New("testdb", "4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6", "btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu", false)
 	if err != nil {
 		panic(err)
 	}

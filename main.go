@@ -20,8 +20,8 @@ var (
 	MessageFile    = ""
 	HTMLMessage    = template.HTML("")
 	PublicPort     = "8004"
-	RegionPublic   = "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33"
-	RegionPrivate  = "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
+	RegionPublic   = "4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6"
+	RegionPrivate  = "btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
 	GenerateRegion = false
 	// Location defines where to open up the kiki database
 	Location = "."

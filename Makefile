@@ -3,7 +3,7 @@
 
 TAG=$(shell git tag)
 HASH=$(shell git log --pretty=format:"%h" -n 1)
-LDFLAGS=-ldflags "-s -w -X main.Version=${TAG}-${HASH} -X main.RegionPublic=GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33 -X main.RegionPrivate=6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
+LDFLAGS=-ldflags "-s -w -X main.Version=${TAG}-${HASH} -X main.RegionPublic=4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6 -X main.RegionPrivate=btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
 
 
 basicbuild:
