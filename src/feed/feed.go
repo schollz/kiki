@@ -98,7 +98,9 @@ func New(locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug boo
 
 To get started, you can change your name, edit your profile, and upload a profile image.
 
-Right now your feed is empty. If you'd like to join the network, click "Add server" and add a server. Then you can see the public feed by clicking [public](/?public=1). Otherwise, you will just see posts from people you follow here.
+Right now your feed is empty. If you'd like to join the network, click "Add server" and add a server. 
+
+Once you are synced up, you can see the public feed by clicking [public](/). Otherwise, you will just see posts from people you follow on your [home feed](/home). *Note*: all the photos from the public feed will be disabled unless you follow that person. Following someone also will allow their posts to show up in your home feed.
 
 If you need any help, try using the help above.
 `,
