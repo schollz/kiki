@@ -29,8 +29,8 @@ var (
 
 func main() {
 	flag.StringVar(&MessageFile, "message-file", MessageFile, "a markdown file for leaving a message")
-	flag.StringVar(&PublicPort, "external-port", PublicPort, "external port for the data (this) server")
-	flag.StringVar(&PrivatePort, "internal-port", PrivatePort, "internal port for the data (this) server")
+	flag.StringVar(&PublicPort, "port-external", PublicPort, "external port for the data (this) server")
+	flag.StringVar(&PrivatePort, "port-internal", PrivatePort, "internal port for the data (this) server")
 	flag.StringVar(&RegionPublic, "region-public", RegionPublic, "region public key")
 	flag.StringVar(&RegionPrivate, "region-private", RegionPrivate, "region private key")
 	debug := flag.Bool("debug", false, "turn on debug mode")
