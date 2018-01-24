@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/letter"
-	"github.com/schollz/kiki/src/logging"
 	"github.com/schollz/kiki/src/purpose"
 )
 
@@ -28,7 +27,6 @@ func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) 
 	api = DatabaseAPI{
 		FileName: path.Join(locationToDatabase, name),
 	}
-	logging.Log.Debugf("setup database at '%s'\n", api.FileName)
 	return
 }
 
@@ -660,7 +658,7 @@ func (api DatabaseAPI) GetName(publicKey string) (name string) {
 	defer db.Close()
 	name, err = db.getName(publicKey)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 	}
 	return
 }
@@ -674,7 +672,7 @@ func (api DatabaseAPI) GetProfile(publicKey string) (name string) {
 	defer db.Close()
 	name, err = db.getProfile(publicKey)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 	}
 	return
 }
@@ -688,7 +686,7 @@ func (api DatabaseAPI) GetProfileImage(publicKey string) (imageID string) {
 	defer db.Close()
 	imageID, err = db.getProfileImage(publicKey)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 	}
 	return
 }
@@ -726,7 +724,7 @@ func (api DatabaseAPI) RemoveLetters(ids []string) (err error) {
 	for _, id := range ids {
 		err2 := db.deleteLetterFromID(id)
 		if err2 != nil {
-			log.Warn(err2)
+			logger.Log.Warn(err2)
 		}
 	}
 	return
@@ -824,7 +822,7 @@ func (api DatabaseAPI) NumberOfLikes(postID string) (likes int64) {
 	defer db.Close()
 	likes, err = db.numLikesPerPost(postID)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 	}
 	return
 }
@@ -841,11 +839,11 @@ func (api DatabaseAPI) Friends(publicKey string) (followers, following, friends 
 	defer db.Close()
 	followers, err = db.getFollowers(publicKey)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 	}
 	following, err = db.getFollowing(publicKey)
 	if err != nil {
-		log.Warn(err)
+		logger.Log.Warn(err)
 	}
 	followingMap := make(map[string]struct{})
 	for _, f := range following {

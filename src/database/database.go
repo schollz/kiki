@@ -427,7 +427,7 @@ func (d *database) getKeys(sender ...string) (s []keypair.KeyPair, err error) {
 	} else {
 		query = fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' ORDER BY time DESC;", purpose.ShareKey)
 	}
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getKeys")
@@ -494,7 +494,7 @@ func (d *database) getIDs(sender ...string) (s []string, err error) {
 // getName returns the name of a person
 func (d *database) getName(person string) (name string, err error) {
 	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ActionName, person)
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getName")
@@ -522,7 +522,7 @@ func (d *database) getName(person string) (name string, err error) {
 // getProfile returns the profile of a person
 func (d *database) getProfile(person string) (profile string, err error) {
 	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ActionProfile, person)
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getProfile")
@@ -550,7 +550,7 @@ func (d *database) getProfile(person string) (profile string, err error) {
 // getProfileImage returns the ID of the profile image of a person
 func (d *database) getProfileImage(person string) (imageID string, err error) {
 	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ORDER BY time DESC;", purpose.ActionImage, person)
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getProfileImage")
@@ -577,7 +577,7 @@ func (d *database) getProfileImage(person string) (imageID string, err error) {
 
 func (d *database) getFriendsName(publicKey string) (name string) {
 	query := "SELECT sender FROM letters WHERE opened == 1 AND letter_purpose == '" + purpose.ShareKey + "' AND letter_content LIKE '%" + publicKey + "%' LIMIT 1;"
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		return
@@ -607,7 +607,7 @@ func (d *database) deleteLetterFromID(id string) (err error) {
 		return errors.Wrap(err, "deleteLetterFromID")
 	}
 	query := "DELETE FROM letters WHERE id == ?"
-	log.Debug(query)
+	logger.Log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteLetterFromID")
@@ -634,7 +634,7 @@ func (d *database) deleteLettersFromSender(sender string) (err error) {
 		return errors.Wrap(err, "deleteLettersFromSender")
 	}
 	query := "DELETE FROM letters WHERE sender == ?"
-	log.Debug(query, sender)
+	logger.Log.Debug(query, sender)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteLettersFromSender")
@@ -660,9 +660,9 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldestPost")
 	}
-	log.Debug(publicKey)
+	logger.Log.Debug(publicKey)
 	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND letter_purpose IN ('share-text','share-image/png','share-image/jpg') AND sender == ? ORDER BY time LIMIT 1);"
-	log.Debug(query)
+	logger.Log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldestPost")
@@ -688,7 +688,7 @@ func (d *database) deleteUsers() (err error) {
 		return errors.Wrap(err, "deleteUser")
 	}
 	query := "DELETE FROM letters WHERE sender IN (SELECT sender FROM letters WHERE letter_purpose == '" + purpose.ActionErase + "');"
-	log.Debug(query)
+	logger.Log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteUser")
@@ -714,7 +714,7 @@ func (d *database) deleteUser(publicKey string) (err error) {
 		return errors.Wrap(err, "deleteUser")
 	}
 	query := "DELETE FROM letters WHERE sender == ?;"
-	log.Debug(query)
+	logger.Log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteUser")
@@ -739,9 +739,9 @@ func (d *database) deleteUsersOldActions(publicKey string, purpose string) (err 
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldActions")
 	}
-	log.Debug(publicKey, purpose)
+	logger.Log.Debug(publicKey, purpose)
 	query := "DELETE FROM letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND letter_purpose == ? AND sender == ? ORDER BY time DESC LIMIT 1000000000 OFFSET 1);"
-	log.Debug(query)
+	logger.Log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return errors.Wrap(err, "deleteUsersOldActions")
@@ -826,7 +826,7 @@ func (d *database) numLikesPerPost(idPost string) (likes int64, err error) {
 
 func (d *database) listUsers() (s []string, err error) {
 	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters;")
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "listUsers")
@@ -853,7 +853,7 @@ func (d *database) listUsers() (s []string, err error) {
 
 func (d *database) listBlockedUsers(publicKey string) (s []string, err error) {
 	query := fmt.Sprintf("SELECT letter_content FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' AND letter_content != '';", purpose.ActionBlock, publicKey)
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "listBlockedUsers")
@@ -881,7 +881,7 @@ func (d *database) listBlockedUsers(publicKey string) (s []string, err error) {
 
 func (d *database) getFollowing(publicKey string) (s []string, err error) {
 	query := fmt.Sprintf("SELECT DISTINCT(letter_content) FROM letters WHERE opened == 1 AND letter_purpose == '%s' AND sender == '%s' ;", purpose.ActionFollow, publicKey)
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getFollowing")
@@ -916,7 +916,7 @@ func (d *database) getFollowing(publicKey string) (s []string, err error) {
 
 func (d *database) getFollowers(publicKey string) (s []string, err error) {
 	query := fmt.Sprintf("SELECT DISTINCT(sender) FROM letters WHERE opened==1 AND letter_purpose == '%s' AND letter_content == '%s';", purpose.ActionFollow, publicKey)
-	log.Debug(query)
+	logger.Log.Debug(query)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		err = errors.Wrap(err, "getFollowers")

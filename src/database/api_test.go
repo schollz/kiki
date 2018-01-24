@@ -47,6 +47,13 @@ func BenchmarkGetHashtags1(b *testing.B) {
 	}
 }
 
+func BenchmarkGetFriends(b *testing.B) {
+	api := Setup(".", "kiki.db")
+	for i := 0; i < b.N; i++ {
+		api.Friends("9khErfNFBB6ACNM43vBmcY4YVgQ6aF9CR9qDQWHyF6uW")
+	}
+}
+
 func TestGetVersions(t *testing.T) {
 	api := Setup(".", "kiki.db")
 	s, err := api.GetAllVersions("alskdjflkasjdf")
