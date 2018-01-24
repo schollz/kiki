@@ -104,6 +104,7 @@ type User struct {
 	Profile        template.HTML     `json:"profile"`
 	ProfileContent template.HTMLAttr `json:"profile_attr"`
 	PublicKey      string            `json:"public_key"`
+	PublicHash     string            `json:"public_hash"`
 	Image          string            `json:"image"`
 	Followers      []string          `json:"followers"`
 	Following      []string          `json:"following"`

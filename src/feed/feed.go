@@ -621,6 +621,7 @@ func (f *Feed) GetUser(public ...string) (u User) {
 	u = User{
 		Name:           strip.StripTags(name),
 		PublicKey:      publicKey,
+		PublicHash:     utils.StringToReadableHash(publicKey),
 		Profile:        template.HTML(profile),
 		ProfileContent: template.HTMLAttr(fmt.Sprintf(`data-content="%s"`, strings.Replace(profile, `"`, `'`, -1))),
 		Image:          image,
