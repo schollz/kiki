@@ -3,12 +3,16 @@ package keypair
 import (
 	"bytes"
 	crypto_rand "crypto/rand"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"io"
+	"strings"
 
 	"github.com/mr-tron/base58/base58"
+	"github.com/schollz/mnemonicode"
 	"golang.org/x/crypto/nacl/box"
 )
 
@@ -32,6 +36,17 @@ func New() (kp KeyPair) {
 		panic(err)
 	}
 	return
+}
+
+func (kp KeyPair) Hash() string {
+	result := []string{}
+	h := fnv.New32a()
+	h.Write(kp.public[:])
+	h.Write(kp.private[:])
+	bs := make([]byte, 4)
+	binary.LittleEndian.PutUint32(bs, h.Sum32())
+	result = mnemonicode.EncodeWordList(result, bs)
+	return strings.Join(result, "-")
 }
 
 func (kp KeyPair) PublicKey() (kpPublic KeyPair) {

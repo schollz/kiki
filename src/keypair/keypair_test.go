@@ -92,6 +92,10 @@ func TestMarshaling(t *testing.T) {
 	assert.Equal(t, kp3.Public, kp4.Public)
 }
 
+func TestStringEncode(t *testing.T) {
+	a := New()
+	fmt.Println(a.Hash())
+}
 func TestSigning(t *testing.T) {
 	shared := New()
 	bob := New()
