@@ -81,7 +81,7 @@
 
 </header>
 
-  <main role="main" class="container" id="main-content-loading">
+<!--   <main role="main" class="container" id="main-content-loading">
     <div class="jumbotron lead">
       <center>
       <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
@@ -89,6 +89,7 @@
       <center>
     </div>
   </main>
+ -->  
   <main role="main" class="container" id="main-content" style="display:none;">
     {{ with .Message }}
     <div class="jumbotron lead">
@@ -665,7 +666,7 @@
         $("img:not(.img-fluid)").addClass("img-fluid");
       }
       editor.on(document.querySelector(".editable"), 'keypress', restrictInput);
-      $('#main-content-loading').fadeOut("slow");
+      // $('#main-content-loading').fadeOut("fast");
       $('#main-content').fadeIn("slow");
     });
   </script>
