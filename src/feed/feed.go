@@ -733,6 +733,9 @@ func (f *Feed) OnlyIncludePostsFromFollowing(posts []Post) (filteredPosts []Post
 	for _, pubkey := range u.Following {
 		following[pubkey] = struct{}{}
 	}
+	for _, pubkey := range u.Friends {
+		following[pubkey] = struct{}{}
+	}
 	following[f.PersonalKey.Public] = struct{}{}
 	filteredPosts = make([]Post, len(posts))
 	i := 0
