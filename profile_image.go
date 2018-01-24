@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"fmt"
+	// "fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -20,7 +20,7 @@ func randomInt(min, max int) int {
 }
 
 func randomKikiFile() string {
-	files := []string{"./misc/grey_scale/kiki-0.png",
+	files := []string{"./misc/grey_scale/kiki_0.png",
 		"./misc/grey_scale/kiki_1.png",
 		"./misc/grey_scale/kiki_2.png",
 		"./misc/grey_scale/kiki_3.png",
@@ -35,6 +35,10 @@ func randomKikiFile() string {
 func handleProfileImage(c *gin.Context) {
 	// imgfile, err := os.Open("./static/kiki_0.png")
 	imgfile, err := os.Open(randomKikiFile())
+	if err != nil {
+		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
+		return
+	}
 
 	img, err := png.Decode(imgfile)
 	if err != nil {
@@ -42,7 +46,7 @@ func handleProfileImage(c *gin.Context) {
 		return
 	}
 
-	var colors = make(map[string]int)
+	// var colors = make(map[string]int)
 
 	bounds := img.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
@@ -55,13 +59,11 @@ func handleProfileImage(c *gin.Context) {
 			changed := false
 			r, g, b, a := img.At(x, y).RGBA()
 			if 0 != r && 0 != g && 0 != b && 0 != a {
-
-				_c := fmt.Sprintf("r=%v g=%v b=%v a=%v", r, g, b, a)
-				if _, ok := colors[_c]; !ok {
-					colors[_c] = 0
-				}
-				colors[_c]++
-
+				// _c := fmt.Sprintf("r=%v g=%v b=%v a=%v", r, g, b, a)
+				// if _, ok := colors[_c]; !ok {
+				// 	colors[_c] = 0
+				// }
+				// colors[_c]++
 				if 47031 == r && 47031 == g && 47031 == b && 65535 == a {
 					new_img.Set(x, y, color.RGBA{nr, ng, nb, 255})
 					changed = true
@@ -74,9 +76,9 @@ func handleProfileImage(c *gin.Context) {
 		}
 	}
 
-	for v := range colors {
-		fmt.Println(v, colors[v])
-	}
+	// for v := range colors {
+	// 	fmt.Println(v, colors[v])
+	// }
 
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, new_img)
