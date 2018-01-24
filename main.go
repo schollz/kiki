@@ -77,7 +77,7 @@ func main() {
 	if !*noBrowser {
 		go func() {
 			time.Sleep(1 * time.Second)
-			openurl.Open("http://localhost:" + PrivatePort)
+			openurl.Open("http://localhost:" + PrivatePort + "/home")
 		}()
 	}
 	logging.Log.Infof("kiki version %s", Version)
