@@ -51,7 +51,7 @@ go get -u github.com/jteeuwen/go-bindata/...
 go get github.com/schollz/kiki
 cd $GOPATH/src/github.com/schollz/kiki
 go-bindata static/... templates/...
-go build -v
+go install -v
 ```
 
 and then run:
