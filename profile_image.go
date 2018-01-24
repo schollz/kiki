@@ -47,7 +47,7 @@ func handleProfileImage(c *gin.Context) {
 	if len(id) > 1 {
 		imageBytesInterface, found := imageCaching.Get(id)
 		if found {
-			logger.Log.Debugf("using cache for /kiki/%s", id)
+			logger.Log.Debugf("using cache for /kiki%s", id)
 			imageBytes, _ := base64.StdEncoding.DecodeString(imageBytesInterface.(string))
 			c.Data(http.StatusOK, "image/png", imageBytes)
 			return

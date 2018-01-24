@@ -34,12 +34,14 @@ func handleHome(c *gin.Context) {
 }
 
 func showPosts(c *gin.Context, posts []feed.Post) {
+
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"Posts":     posts,
 		"User":      f.GetUser(),
 		"Friends":   f.GetUserFriends(),
 		"Connected": f.GetConnected(),
 		"Hashtags":  f.GetHashTags(),
+		"Message":   HTMLMessage,
 	})
 }
 

@@ -3,17 +3,22 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html/template"
+	"io/ioutil"
 	"os"
 	"time"
 
 	"github.com/darkowlzz/openurl"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/logging"
+	blackfriday "gopkg.in/russross/blackfriday.v2"
 )
 
 var (
 	Version        = "0.1.0"
 	PrivatePort    = "8003"
+	MessageFile    = ""
+	HTMLMessage    = template.HTML("")
 	PublicPort     = "8004"
 	RegionPublic   = "GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33"
 	RegionPrivate  = "6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
@@ -23,6 +28,7 @@ var (
 )
 
 func main() {
+	flag.StringVar(&MessageFile, "message-file", MessageFile, "a markdown file for leaving a message")
 	flag.StringVar(&PublicPort, "external-port", PublicPort, "external port for the data (this) server")
 	flag.StringVar(&PrivatePort, "internal-port", PrivatePort, "internal port for the data (this) server")
 	flag.StringVar(&RegionPublic, "region-public", RegionPublic, "region public key")
@@ -59,7 +65,15 @@ func main() {
 	} else {
 		logging.SetLoggingLevel("info")
 	}
-
+	if MessageFile != "" {
+		bMsg, err := ioutil.ReadFile(MessageFile)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		bMsg = blackfriday.Run(bMsg)
+		HTMLMessage = template.HTML(string(bMsg))
+	}
 	if !*noBrowser {
 		go func() {
 			time.Sleep(1 * time.Second)

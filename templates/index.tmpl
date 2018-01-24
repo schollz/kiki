@@ -83,6 +83,12 @@
 
 
   <main role="main" class="container" id="main-content">
+    {{ with .Message }}
+    <div class="jumbotron lead">
+        {{.}}
+    </div>
+    {{ end }}
+
     <input type=hidden id="letterPurpose" value="" />
     <input type=hidden id="letterReplyTo" value="" />
     <input type=hidden id="letterFirstID" value="" />
