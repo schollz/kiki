@@ -430,8 +430,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 	}
 
 	// determine if their are any images in envelope letter content that should be spliced out
-	if l.Purpose == purpose.ShareText {
-		f.logger.Log.Info(l.Content)
+	if l.Purpose == purpose.ShareText || l.Purpose == purpose.ActionProfile {
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
 	}
 	f.logger.Log.Debug("capturing base64 images")
