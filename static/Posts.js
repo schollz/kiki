@@ -193,7 +193,8 @@ Post.prototype.buildUi = function() {
                 ),
 
                 $("<img>", {
-                    owner_id: self.getOwnerId()
+                    owner_id: self.getOwnerId(),
+                    src: '/kiki/'+self.getOwnerId()
                 }).addClass("align-middle profile-pic"),
 
                 // activatenamemodal
