@@ -101,7 +101,7 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
 
 [[projects]]
   branch = "master"
@@ -171,6 +171,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/schollz/mnemonicode"
+  packages = ["."]
+  revision = "15c9654387fad6d257aa28f9be57b9f124101955"
+
+[[projects]]
+  branch = "master"
   name = "github.com/shurcooL/sanitized_anchor_name"
   packages = ["."]
   revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
@@ -197,7 +203,7 @@
   name = "github.com/tinylib/msgp"
   packages = ["msgp"]
   revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
-  version = "v1.0.2"
+  version = "1.0.2"
 
 [[projects]]
   name = "github.com/ugorji/go"
@@ -215,19 +221,25 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","nacl/box","nacl/secretbox","poly1305","salsa20/salsa"]
-  revision = "39efaea5da11abd5e2b90a435b1f338cdb94619c"
+  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","html","html/atom"]
-  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "af50095a40f9041b3b38960738837185c26e9419"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/text"
+  packages = ["transform"]
+  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -250,6 +262,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2ca8646c8a6248231aed3842e31f66cea4769411efb149e3dd2ec4c94bdbde41"
+  inputs-digest = "9321371279c703536d7387cc80b26f93df82fcabb3533f63bcb6d4deb1ed908f"
   solver-name = "gps-cdcl"
   solver-version = 1
