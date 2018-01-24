@@ -53,7 +53,12 @@ func handleImage(c *gin.Context) {
 		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
 		return
 	}
-
+	if f.Settings.BlockPublicPhotos {
+		if !f.AmFollowing(e.Sender.Public) {
+			c.Data(http.StatusInternalServerError, "text/plain", []byte("not allowing public photos"))
+			return
+		}
+	}
 	mimeType := "image/jpeg"
 	if strings.Contains(e.Letter.Purpose, "png") {
 		mimeType = "image/png"
