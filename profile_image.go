@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"hash/fnv"
 	"image"
 	"image/color"
@@ -12,13 +13,16 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	cache "github.com/robfig/go-cache"
 )
 
 var r *rand.Rand
+var imageCaching *cache.Cache
 
 func init() {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r = rand.New(s1)
+	imageCaching = cache.New(5*time.Minute, 10*time.Minute)
 }
 
 func randomInt(min, max int) int {
@@ -41,6 +45,13 @@ func randomKikiFile() string {
 func handleProfileImage(c *gin.Context) {
 	id := c.Param("id")
 	if len(id) > 1 {
+		imageBytesInterface, found := imageCaching.Get(id)
+		if found {
+			logger.Log.Debugf("using cache for /kiki/%s", id)
+			imageBytes, _ := base64.StdEncoding.DecodeString(imageBytesInterface.(string))
+			c.Data(http.StatusOK, "image/png", imageBytes)
+			return
+		}
 		alg := fnv.New32a()
 		alg.Write([]byte(id))
 		s1 := rand.NewSource(int64(alg.Sum32()))
@@ -98,9 +109,11 @@ func handleProfileImage(c *gin.Context) {
 		return
 	}
 
-	mimeType := "image/png"
-
-	c.Data(http.StatusOK, mimeType, buf.Bytes())
+	if len(id) > 1 {
+		img := base64.StdEncoding.EncodeToString(buf.Bytes())
+		imageCaching.Set(id, img, 5*time.Minute)
+	}
+	c.Data(http.StatusOK, "image/png", buf.Bytes())
 }
 
 // THE FOLLOWING IS FROM github.com/hansrodtang/randomcolor
