@@ -5,10 +5,21 @@ TAG=$(shell git tag)
 HASH=$(shell git log --pretty=format:"%h" -n 1)
 LDFLAGS=-ldflags "-s -w -X main.Version=${TAG}-${HASH} -X main.RegionPublic=GoAabW4QeCcyeeDWZxu9wFaPAoWhbrwvrFM83JToWk33 -X main.RegionPrivate=6ptaZoSaepphHTqQyCBRBBRF3WyKGoahXUUTVTL5BAQ3"
 
+
 basicbuild:
 	go-bindata static/... templates/...
 	go build ${LDFLAGS}
 
+update:
+	dep ensure -v
+	dep ensure -v -u
+	# remove things that import "testing" so that the flags are not included
+	rm -rf vendor/github.com/blevesearch/bleve/index/store/test
+	rm -rf vendor/golang.org/x/text/internal/testtext/
+	rm -rf vendor/golang.org/x/net/nettest
+	rm -rf vendor/github.com/blevesearch/go-porterstemmer/porterstemmer_has_suffix.go
+	go build -v -a
+	
 release:
 	docker pull karalabe/xgo-latest
 	go get github.com/karalabe/xgo
