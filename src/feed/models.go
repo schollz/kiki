@@ -52,7 +52,6 @@ type Settings struct {
 	StoragePerFriend       int64    `json:"storage_per_friend"`  // maximum size in bytes to store of friend messages. Once exceeded, old messages are purged
 	FriendsOfFriends       bool     `json:"friends_of_friends"`  // whether you want to share your friends friend keys with new friends, effectively making a new friend friends with all your friends. This also means that when you make a new friend, that friends key is emitted to all your current friends. (default: true)
 	BlockPublicPhotos      bool     `json:"block_public_photos"` // if true, block the transfer of any public photos to your computer
-	HidePublicPosts        bool     `json:"hide_public_posts"`   // if true, works as a diary basically
 	AvailableServers       []string `json:"available_servers"`
 }
 
@@ -62,8 +61,7 @@ func GenerateSettings() Settings {
 		StoragePerPublicPerson: 5000000 / 4,  // 5 MB
 		StoragePerFriend:       50000000 / 4, // 50 MB
 		FriendsOfFriends:       true,
-		BlockPublicPhotos:      false,
-		HidePublicPosts:        false,
+		BlockPublicPhotos:      true,
 		AvailableServers:       []string{},
 	}
 }

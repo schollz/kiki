@@ -591,6 +591,18 @@ func (f *Feed) UnsealLetters() (err error) {
 	return
 }
 
+// AmFollowing checks whether the current user is following the public key
+func (f *Feed) AmFollowing(publickey string) bool {
+	u := f.GetUser()
+	following := make(map[string]struct{})
+	for _, pubkey := range u.Following {
+		following[pubkey] = struct{}{}
+	}
+	following[f.PersonalKey.Public] = struct{}{}
+	_, ok := following[publickey]
+	return ok
+}
+
 // GetUser returns the information for a specific user
 func (f *Feed) GetUser(public ...string) (u User) {
 	publicKey := f.PersonalKey.Public
