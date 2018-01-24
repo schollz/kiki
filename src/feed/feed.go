@@ -350,7 +350,7 @@ func (f *Feed) SyncServers() {
 		}
 	}
 	if needToUpdate {
-		f.UpdateEverything()
+		go f.UpdateEverything()
 	}
 }
 

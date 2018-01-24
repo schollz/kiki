@@ -190,6 +190,7 @@ func handleSync(c *gin.Context) (err error) {
 	logger.Log.Debug("syncing...")
 	err = f.Sync(p.Address)
 	if err != nil {
+		go f.UpdateEverything()
 		logger.Log.Error(err)
 		return
 	}
