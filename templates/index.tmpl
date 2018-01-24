@@ -301,7 +301,7 @@
             <li><a href="#!" class="addserver"><i class="fas fa-plus-circle"></i>&nbsp;
             Add server</a></li>
             <li><a href="#!" class="syncup"><i class="fas fa-sync-alt"></i>&nbsp;
-            Sync</a></li>
+            Sync</a>&nbsp;<i class="fa fa-cog fa-spin fa-lg" id="syncSpinner"></i></li>
             <!-- <li><a href="#!" class="followsomeone"><i class="fas fa-user-plus"></i>&nbsp;
             Follow someone</a></li>
             <li><a href="#!" class="blocksomeone"><i class="fas fa-user-times"></i>&nbsp;
@@ -487,6 +487,7 @@
       }
     });
     $(document).ready(function() {
+      $("#syncSpinner").hide();
       // editor.subscribe("editableKeydownEnter", function (event, element) {
       //     if (event.keyCode == 13) {
       //         event.preventDefault()
@@ -533,9 +534,11 @@
         var server = prompt("Enter a server to connect to", "https://kiki.network");
         if (server != null) {
           // Send the data using post
+          $("#syncSpinner").show();
          var posting = $.post( "/sync", JSON.stringify({ "address": server }) );
          // Put the results in a div
          posting.done(function( data ) {
+           $("#syncSpinner").hide();
            console.log(data);
            toastr["success"](data['message'], "Updating Kiki");
          });
@@ -543,8 +546,10 @@
       })
       $(".syncup").click(function(event){
         event.preventDefault();
+        $("#syncSpinner").show();
         var posting = $.post( "/sync",JSON.stringify({ "address": "" })  );
         posting.done(function( data ) {
+                $("#syncSpinner").hide();
           toastr["success"](data['message'], "Updating Kiki");
         });
       })
