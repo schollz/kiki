@@ -9,7 +9,6 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -27,14 +26,14 @@ func randomInt(min, max int) int {
 }
 
 func randomKikiFile() string {
-	files := []string{"./misc/grey_scale/kiki_0.png",
-		"./misc/grey_scale/kiki_1.png",
-		"./misc/grey_scale/kiki_2.png",
-		"./misc/grey_scale/kiki_3.png",
-		"./misc/grey_scale/kiki_4.png",
-		"./misc/grey_scale/kiki_5.png",
-		"./misc/grey_scale/kiki_6.png",
-		"./misc/grey_scale/kiki_7.png"}
+	files := []string{"static/grey_scale/kiki_0.png",
+		"static/grey_scale/kiki_1.png",
+		"static/grey_scale/kiki_2.png",
+		"static/grey_scale/kiki_3.png",
+		"static/grey_scale/kiki_4.png",
+		"static/grey_scale/kiki_5.png",
+		"static/grey_scale/kiki_6.png",
+		"static/grey_scale/kiki_7.png"}
 	idx := randomInt(0, 7)
 	return files[idx]
 }
@@ -51,14 +50,14 @@ func handleProfileImage(c *gin.Context) {
 		r = rand.New(s1)
 	}
 
-	// imgfile, err := os.Open("./static/kiki_0.png")
-	imgfile, err := os.Open(randomKikiFile())
+	// imgfile, err := os.Open(randomKikiFile())
+	imgfile, err := Asset(randomKikiFile())
 	if err != nil {
 		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
 		return
 	}
-
-	img, err := png.Decode(imgfile)
+	imgfileBytes := bytes.NewReader(imgfile)
+	img, err := png.Decode(imgfileBytes)
 	if err != nil {
 		c.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
 		return
