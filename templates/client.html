@@ -267,7 +267,7 @@
     <!-- User profile -->
         <div class="sidebar-module sidebar-module-inset">
             <div>
-                <img id="user-profile-image" class="user-profile-image" src="/profile_image">
+                <img id="user-profile-image" class="user-profile-image" src="/kiki/">
             </div>
             <div>
                 <h5 id="user-name"></h5>
@@ -563,7 +563,8 @@ UserClient.prototype.addListeners = function() {
             title: 'Server connection',
             text: 'Enter a server to connect to:',
             type: 'warning',
-            input: 'url',
+            // input: 'url',
+            input: 'text',
             inputPlaceholder: 'https://kiki.network',
             showCancelButton: true,
             confirmButtonText: 'Yes',
@@ -623,6 +624,8 @@ UserClient.prototype.buildUserUi = function(){
         $("#user-profile").append( this.data.profile );
         if (this.data.image && "" != this.data.image) {
             $("#user-profile-image").attr("src", "/img/"+ this.data.image);
+        } else {
+            $("#user-profile-image").attr("src", "/kiki/"+ this.data.public_key);
         }
 
         $(".following span").text(this.data.following.length);

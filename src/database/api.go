@@ -357,7 +357,8 @@ func (api DatabaseAPI) GetBasicPostLatest(publickey string) (e letter.Envelope, 
 }
 
 func (self DatabaseAPI) jsonFormatting(payload string) string {
-	payload = strings.Replace(payload, "\n", "", -1)
+	payload = strings.Replace(payload, "\n", "\\n", -1)
+	payload = strings.Replace(payload, "\t", "\\t", -1)
 	payload = strings.Replace(payload, "\"null\"", "null", -1)
 	payload = strings.Replace(payload, ",]", "]", -1)
 	return payload
