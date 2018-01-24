@@ -13,7 +13,7 @@ release:
 	docker pull karalabe/xgo-latest
 	go get github.com/karalabe/xgo
 	mkdir -p bin 
-	xgo -dest bin ${LDFLAGS} -targets linux/amd64,linux/arm-6,darwin/amd64,windows/amd64 github.com/schollz/kiki
+	xgo -go "1.9.2" -dest bin ${LDFLAGS} -targets linux/amd64,linux/arm-6,darwin/amd64,windows/amd64 github.com/schollz/kiki
 	cd bin && upx --brute kiki-linux-amd64
 
 server:
