@@ -890,9 +890,7 @@ func (d *database) getFollowing(publicKey string) (s []string, err error) {
 	defer rows.Close()
 
 	// parse rows
-	s = make([]string, 1000000)
-	sI := 0
-	// loop through rows
+	s = []string{}
 	for rows.Next() {
 		var mID string
 		err = rows.Scan(&mID)
@@ -903,10 +901,8 @@ func (d *database) getFollowing(publicKey string) (s []string, err error) {
 		if mID == "" {
 			continue
 		}
-		s[sI] = mID
-		sI++
+		s = append(s, mID)
 	}
-	s = s[:sI]
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getFollowing")
@@ -924,10 +920,7 @@ func (d *database) getFollowers(publicKey string) (s []string, err error) {
 	}
 	defer rows.Close()
 
-	// parse rows
-	s = make([]string, 1000000)
-	sI := 0
-	// loop through rows
+	s = []string{}
 	for rows.Next() {
 		var mID string
 		err = rows.Scan(&mID)
@@ -938,10 +931,8 @@ func (d *database) getFollowers(publicKey string) (s []string, err error) {
 		if mID == "" {
 			continue
 		}
-		s[sI] = mID
-		sI++
+		s = append(s, mID)
 	}
-	s = s[:sI]
 	err = rows.Err()
 	if err != nil {
 		err = errors.Wrap(err, "getFollowers")
