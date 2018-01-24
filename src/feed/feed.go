@@ -902,7 +902,7 @@ func (f *Feed) GetConnected() (us []User) {
 
 // Sync will try to sync with the respective address
 func (f *Feed) Sync(address string) (err error) {
-	f.logger.Log.Debugf("syncing with %s", address)
+	f.logger.Log.Infof("syncing with %s", address)
 
 	// get the information about the kiki server
 	err = f.PingKikiInstance(address)
