@@ -203,7 +203,7 @@
   name = "github.com/tinylib/msgp"
   packages = ["msgp"]
   revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
-  version = "1.0.2"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/ugorji/go"

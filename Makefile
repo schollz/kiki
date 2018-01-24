@@ -12,7 +12,7 @@ basicbuild:
 
 update:
 	dep ensure -v
-	dep ensure -v -u
+	dep ensure -v -update
 	# remove things that import "testing" so that the flags are not included
 	rm -rf vendor/github.com/blevesearch/bleve/index/store/test
 	rm -rf vendor/golang.org/x/text/internal/testtext/
