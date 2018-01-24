@@ -116,7 +116,7 @@ func Run(verbose bool) (err error) {
 		}
 	})
 
-	r.GET("/profile_image/*id", handleProfileImage)
+	r.GET("/kiki/*id", handleProfileImage)
 
 	r.GET("/ping", handlePing)
 	r.POST("/handshake", handleHandshake)
