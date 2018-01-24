@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"hash/fnv"
 	// "fmt"
 	"image"
 	"image/color"
@@ -14,9 +15,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var r *rand.Rand
+
+func init() {
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r = rand.New(s1)
+}
+
 func randomInt(min, max int) int {
-	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(max-min) + min
+	return r.Intn(max-min) + min
 }
 
 func randomKikiFile() string {
@@ -33,6 +40,17 @@ func randomKikiFile() string {
 }
 
 func handleProfileImage(c *gin.Context) {
+	id := c.Param("id")
+	if len(id) > 1 {
+		alg := fnv.New32a()
+		alg.Write([]byte(id))
+		s1 := rand.NewSource(int64(alg.Sum32()))
+		r = rand.New(s1)
+	} else {
+		s1 := rand.NewSource(time.Now().UnixNano())
+		r = rand.New(s1)
+	}
+
 	// imgfile, err := os.Open("./static/kiki_0.png")
 	imgfile, err := os.Open(randomKikiFile())
 	if err != nil {
@@ -59,11 +77,6 @@ func handleProfileImage(c *gin.Context) {
 			changed := false
 			r, g, b, a := img.At(x, y).RGBA()
 			if 0 != r && 0 != g && 0 != b && 0 != a {
-				// _c := fmt.Sprintf("r=%v g=%v b=%v a=%v", r, g, b, a)
-				// if _, ok := colors[_c]; !ok {
-				// 	colors[_c] = 0
-				// }
-				// colors[_c]++
 				if 47031 == r && 47031 == g && 47031 == b && 65535 == a {
 					new_img.Set(x, y, color.RGBA{nr, ng, nb, 255})
 					changed = true
