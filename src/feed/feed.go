@@ -961,7 +961,6 @@ func (f *Feed) Sync(address string) (err error) {
 		}
 	}
 
-	f.UpdateEverything()
 	return
 }
 
