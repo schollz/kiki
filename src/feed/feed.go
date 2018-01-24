@@ -116,7 +116,7 @@ If you need any help, try using the help above.
 		_, err2 = f.ProcessLetter(letter.Letter{
 			To:      []string{"public"},
 			Purpose: purpose.ActionImage,
-			Content: `../static/kiki_` + strconv.Itoa(rand.Intn(360)) + `.png`,
+			Content: `../kiki/` + f.PersonalKey.Public,
 		})
 		if err2 != nil {
 			err = errors.Wrap(err2, "setup")
