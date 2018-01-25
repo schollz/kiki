@@ -53,15 +53,21 @@
 
         <div class="collapse navbar-collapse" id="navbarsExample07">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link menu-item" href="/home">home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link menu-item" href="/">public</a>
-            </li>
+          	<li>
+          	<a href="#!" class="nav-item nav-link editmodal" data-title="Write a post" data-purpose="share-text" style="color:black;"><i class="fas fa-pencil-alt"></i></a>
+          </li>
+
             
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle menu-item" href="http://example.com" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">help</a>
+              <a class="nav-link dropdown-toggle menu-item" href="http://example.com" id="dropdown08" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-rss"></i></a>
+              <div class="dropdown-menu menu-item" aria-labelledby="dropdown07">
+              <a class="dropdown-item menu-item" href="/home">home</a>
+              <a class="dropdown-item menu-item" href="/">public</a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle menu-item" href="http://example.com" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-question"></i></a>
               <div class="dropdown-menu menu-item" aria-labelledby="dropdown07">
                 <a class="dropdown-item menu-item" href="/?hashtag=kikihelp&public=1">ask a question</a>
                 <a class="dropdown-item menu-item" href="https://github.com/schollz/kiki">source code</a>
@@ -69,7 +75,7 @@
               </div>
             </li>
             <li class="nav-item">
-              <a class="nav-link menu-item" href="/exit" id="exitKiki">exit</a>
+              <a class="nav-link menu-item" href="/exit" id="exitKiki"><i class="fas fa-times-circle"></i></a>
             </li>
           </ul>
           <div class="form-inline my-2 my-md-0">
