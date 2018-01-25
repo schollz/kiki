@@ -38,7 +38,7 @@
 
 </head>
 
-<body style="background-color:#fffcfd;">
+<body style="background-color:#fffcfd;" id="html-body">
 
 <header>
 
@@ -424,6 +424,7 @@
             return onError(data);
           }
           toastr["success"](data['message'], "Posting to KiKi");
+                  refreshPage();
           callback && callback(null, data);
         }
       });
@@ -499,7 +500,16 @@
         }
       }
     });
+
+    function refreshPage () {
+        var page_y = document.getElementsByTagName("body")[0].scrollTop;
+        window.location.href = window.location.href.split('?')[0] + '?page_y=' + page_y;
+    }
     $(document).ready(function() {
+    	if ( window.location.href.indexOf('page_y') != -1 ) {
+            var match = window.location.href.split('?')[1].split("&")[0].split("=");
+            document.getElementsByTagName("body")[0].scrollTop = match[1];
+        }
       $("#syncSpinner").hide();
       // editor.subscribe("editableKeydownEnter", function (event, element) {
       //     if (event.keyCode == 13) {
@@ -554,6 +564,7 @@
            $("#syncSpinner").hide();
            console.log(data);
            toastr["success"](data['message'], "Updating Kiki");
+           refreshPage();
          });
         }
       })
@@ -564,6 +575,7 @@
         posting.done(function( data ) {
                 $("#syncSpinner").hide();
           toastr["success"](data['message'], "Updating Kiki");
+           refreshPage();
         });
       })
       $(".editmodal").click(function(event) {
