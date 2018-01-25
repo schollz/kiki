@@ -1,0 +1,290 @@
+<html>
+
+  <head>
+    <title>kiki</title>
+    <meta charSet="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Hey there, nice to meet you. I'm your website!">
+    <meta property="og:image" content="">
+    <link rel="shortcut icon" href="https://www.launchaco.com/static/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://www.launchaco.com/static/AllTemplates.min.css">
+
+    <style>
+      .launchaco-promo {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        cursor: pointer;
+        width: 0;
+        height: 0;
+        z-index: 999999;
+      }
+
+      .launchaco-promo__active {
+        width: initial;
+        height: initial;
+      }
+
+      .launchaco-promo-speechbubble {
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, "Open Sans", "Helvetica Neue", sans-serif;
+        position: absolute;
+        left: 50px;
+        top: -11px;
+        padding: 9px;
+        color: white;
+        border-radius: 3px;
+        background: linear-gradient(#227ef7, #1290fc);
+        font-size: 14px;
+        font-weight: 600;
+        width: 93px;
+        box-sizing: border-box;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .15s ease-in-out;
+      }
+
+      .launchaco-promo__active:hover .launchaco-promo-speechbubble {
+        opacity: 1;
+      }
+
+      .launchaco-promo svg {
+        transition: all .3s ease-in-out;
+        opacity: 0;
+      }
+
+      .launchaco-promo__active svg {
+        opacity: 1;
+      }
+
+      .launchaco-promo-speechbubble:before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        transform: rotate(45deg);
+        left: -4px;
+        bottom: 10px;
+        border-radius: 3px;
+        background: #1290fc;
+        z-index: 2;
+        position: absolute
+      }
+
+      .launchaco-promo__active .launchaco-promo-speechbubble__animate {
+        animation: popinpopup 3s linear forwards 0.1s;
+      }
+
+      @keyframes popinpopup {
+        0% {
+          opacity: 0;
+          transform: translate3d(0, 3px, 0)
+        }
+        7%,
+        93% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0)
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(0, -4px, 0)
+        }
+      }
+
+      .launchaco-promo-animate:hover {
+        opacity: 1 !important;
+      }
+    </style>
+  </head>
+
+  <body class="font-friendly">
+    <div class="coral-flat">
+      <!---->
+      <header class="header">
+        <div class="container-lrg">
+          <div class="flex col-12 spread">
+            <a class="logo launchaco-builder-hoverable">
+              <img src="https://cdn.launchaco.com/images/1f2ffa3d-804b-4920-b6dc-6cfdf8e3f2fb.png" alt="kikiCompany Logo">
+            </a>
+            <a href="mailto:contact@test.com?subject=kiki%20Feedback&amp;body=Hi%20kiki,%0a%0a%0a" class="paragraph secondary-color email accent-bg header-email">Contact</a>
+          </div>
+        </div>
+      </header>
+      <section class="section">
+        <div class="container">
+          <div class="col-12 text-center">
+            <h1 class="heading-lrg primary-color launchaco-builder-hoverable">kiki is an experimental social network.</h1>
+            <h2 class="subheading secondary-color mt20 launchaco-builder-hoverable">Own your social network. All the data is on your computer all the time. No tracking, and no servers.</h2>
+            <div class="mt40">
+              <a href="index.html" target="_blank" class="button mt10 launchaco-builder-hoverable mr10 primary-color accent-bg">
+                <span> Windows Install </span>
+              </a>
+              <a href="index.html" target="_blank" class="button mt10 launchaco-builder-hoverable">
+                <span> OS X Install </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="container-lrg">
+          <div class="col-12">
+            <div class="computerphone launchaco-builder-hoverable">
+              <div class="computerphone-computer">
+                <div class="mask">
+                  <img src="https://cdn.launchaco.com/images/70c76267-bbd3-48eb-ba88-90474da7cb50.png" alt="Screenshot of App inside a laptop" class="mask-img">
+                </div>
+                <div class="computerphone-computer-bottom"></div>
+              </div>
+              <div class="computerphone-iphone">
+                <div class="mask">
+                  <img src="https://cdn.launchaco.com/images/ff6cab18-ba9b-43fd-b6bb-0b98355a85b4.png" alt="Screenshot of iPhone App" class="mask-img">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <section class="section coral-white">
+      <div class="container-lrg flex">
+        <div class="col-4 text-center flex flex-column center-horizontal">
+          <i class="icon mobile-center-icon secondary-bg launchaco-builder-hoverable">
+            <svg class="svg-fill" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+              <path d="M20 22.494v1a.5.5 0 0 1-1 0v-1a.5.5 0 1 1 1 0zm-14.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 1 0v-1a.5.5 0 0 0-.5-.5zm7 1a10.924 10.924 0 0 1-2.494-.391l-.27 1.76a.528.528 0 0 0 .097.454.498.498 0 0 0 .387.183h4.56a.5.5 0 0 0 .49-.598l-.275-1.8a10.928 10.928 0 0 1-2.495.392zm9.06-7.44L18 11.995v9h2.5a1.5 1.5 0 0 0 1.5-1.5v-2.879a1.5 1.5 0 0 0-.44-1.06zM17 5.995v15a18.472 18.472 0 0 1-4 .974v-7.474a.5.5 0 0 0-1 0v7.474a18.47 18.47 0 0 1-4-.974v-15C8 3.67 11.553.244 12.5 0c.947.244 4.5 3.67 4.5 5.994zm-2.168 1.127A4.374 4.374 0 0 0 12.5 5.994a4.113 4.113 0 0 0-2.343 1.136.5.5 0 0 0 .686.729 3.213 3.213 0 0 1 1.657-.865 3.417 3.417 0 0 1 1.668.874.5.5 0 0 0 .664-.748zM3 16.614v2.88a1.5 1.5 0 0 0 1.5 1.5H7v-9l-3.56 3.56a1.5 1.5 0 0 0-.44 1.06z"></path>
+            </svg>
+          </i>
+          <h3 class="bold primary-color launchaco-builder-hoverable">Easy to use.</h3>
+          <p class="paragraph secondary-color launchaco-builder-hoverable">Launchaco website builder is content driven, which means no matter what you type we pick the best template tailored to your content.</p>
+        </div>
+        <div class="col-4 text-center flex flex-column center-horizontal">
+          <i class="icon mobile-center-icon secondary-bg launchaco-builder-hoverable">
+            <svg class="svg-fill" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+              <path d="M20 22.494v1a.5.5 0 0 1-1 0v-1a.5.5 0 1 1 1 0zm-14.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 1 0v-1a.5.5 0 0 0-.5-.5zm7 1a10.924 10.924 0 0 1-2.494-.391l-.27 1.76a.528.528 0 0 0 .097.454.498.498 0 0 0 .387.183h4.56a.5.5 0 0 0 .49-.598l-.275-1.8a10.928 10.928 0 0 1-2.495.392zm9.06-7.44L18 11.995v9h2.5a1.5 1.5 0 0 0 1.5-1.5v-2.879a1.5 1.5 0 0 0-.44-1.06zM17 5.995v15a18.472 18.472 0 0 1-4 .974v-7.474a.5.5 0 0 0-1 0v7.474a18.47 18.47 0 0 1-4-.974v-15C8 3.67 11.553.244 12.5 0c.947.244 4.5 3.67 4.5 5.994zm-2.168 1.127A4.374 4.374 0 0 0 12.5 5.994a4.113 4.113 0 0 0-2.343 1.136.5.5 0 0 0 .686.729 3.213 3.213 0 0 1 1.657-.865 3.417 3.417 0 0 1 1.668.874.5.5 0 0 0 .664-.748zM3 16.614v2.88a1.5 1.5 0 0 0 1.5 1.5H7v-9l-3.56 3.56a1.5 1.5 0 0 0-.44 1.06z"></path>
+            </svg>
+          </i>
+          <h3 class="bold primary-color launchaco-builder-hoverable">Easy to use.</h3>
+          <p class="paragraph secondary-color launchaco-builder-hoverable">Launchaco website builder is content driven, which means no matter what you type we pick the best template tailored to your content.</p>
+        </div>
+        <div class="col-4 text-center flex flex-column center-horizontal">
+          <i class="icon mobile-center-icon secondary-bg launchaco-builder-hoverable">
+            <svg class="svg-fill" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+              <path d="M20 22.494v1a.5.5 0 0 1-1 0v-1a.5.5 0 1 1 1 0zm-14.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 1 0v-1a.5.5 0 0 0-.5-.5zm7 1a10.924 10.924 0 0 1-2.494-.391l-.27 1.76a.528.528 0 0 0 .097.454.498.498 0 0 0 .387.183h4.56a.5.5 0 0 0 .49-.598l-.275-1.8a10.928 10.928 0 0 1-2.495.392zm9.06-7.44L18 11.995v9h2.5a1.5 1.5 0 0 0 1.5-1.5v-2.879a1.5 1.5 0 0 0-.44-1.06zM17 5.995v15a18.472 18.472 0 0 1-4 .974v-7.474a.5.5 0 0 0-1 0v7.474a18.47 18.47 0 0 1-4-.974v-15C8 3.67 11.553.244 12.5 0c.947.244 4.5 3.67 4.5 5.994zm-2.168 1.127A4.374 4.374 0 0 0 12.5 5.994a4.113 4.113 0 0 0-2.343 1.136.5.5 0 0 0 .686.729 3.213 3.213 0 0 1 1.657-.865 3.417 3.417 0 0 1 1.668.874.5.5 0 0 0 .664-.748zM3 16.614v2.88a1.5 1.5 0 0 0 1.5 1.5H7v-9l-3.56 3.56a1.5 1.5 0 0 0-.44 1.06z"></path>
+            </svg>
+          </i>
+          <h3 class="bold primary-color launchaco-builder-hoverable">Easy to use.</h3>
+          <p class="paragraph secondary-color launchaco-builder-hoverable">Launchaco website builder is content driven, which means no matter what you type we pick the best template tailored to your content.</p>
+        </div>
+      </div>
+      <!---->
+    </section>
+    <section class="section coral-black">
+      <div class="container">
+        <div class="col-12 text-center">
+          <h3 class="heading primary-color launchaco-builder-hoverable">
+            Installation on Windows
+          </h3>
+          <p class="subheading secondary-color mt20 launchaco-builder-hoverable">Can't find an answer? Don't hesitate to reach out!.</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="col-12 mt40">
+          <div class="faq pad20">
+            <b class="bold primary-color launchaco-builder-hoverable">
+              Why is the sky blue?
+            </b>
+            <p class="paragraph secondary-color launchaco-builder-hoverable">
+              The sky is blue due to something called 'Rayleigh scattering'. Basically, light interacts with the air and scatters. However unlike normal scattering (like you would have with a light in a room), this scattering is proportional to the wavelength of the
+              light. Hence higher frequency light (like blue light) is scattered more strongly, while the other colours tend to follow the path of normal sunlight!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section coral-gradient">
+      <div class="container">
+        <div class="col-12 text-center">
+          <h3 class="heading primary-color launchaco-builder-hoverable">
+            Install on OS X
+          </h3>
+          <p class="subheading secondary-color mt20 launchaco-builder-hoverable">Can't find an answer? Don't hesitate to reach out!.</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="col-12 mt40">
+          <div class="faq pad20">
+            <b class="bold primary-color launchaco-builder-hoverable">
+              Why is the sky blue?
+            </b>
+            <p class="paragraph secondary-color launchaco-builder-hoverable">
+              The sky is blue due to something called 'Rayleigh scattering'. Basically, light interacts with the air and scatters. However unlike normal scattering (like you would have with a light in a room), this scattering is proportional to the wavelength of the
+              light. Hence higher frequency light (like blue light) is scattered more strongly, while the other colours tend to follow the path of normal sunlight!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="section text-center coral-accent">
+      <div class="container col-12">
+        <!---->
+        <div>
+          <a href="https://twitter.com/yakczar" target="_blank" class="socialicons accent-bg twitter"></a>
+          <a href="https://facebook.com/yakczar" target="_blank" class="socialicons accent-bg facebook"></a>
+          <a href="mailto:zack.scholl@gmail.com" target="_blank" class="socialicons accent-bg email"></a>
+        </div>
+        <div class="mt50">
+          <span class="span secondary-color">©</span>
+          <span class="span secondary-color">Licensed under MIT. Logo copyright Jessie Doyle and Cloud Supernova,</span>
+        </div>
+      </div>
+    </footer>
+
+    <a id="visual-dreamer" class="launchaco-promo" target="_blank" href="https://www.launchaco.com/">
+      <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient x1="9.394%" y1="57.704%" x2="105.69%" y2="27.607%" id="a">
+            <stop stop-color="#007FFF" offset="0%" />
+            <stop stop-color="#1290FC" offset="100%" />
+          </linearGradient>
+          <linearGradient x1="50%" y1="0%" x2="50%" y2="137.557%" id="b">
+            <stop stop-color="#FF9386" offset="0%" />
+            <stop stop-color="#FF5F86" offset="100%" />
+          </linearGradient>
+          <linearGradient x1="30.817%" y1="-31.6%" x2="63.808%" y2="151.297%" id="c">
+            <stop stop-color="#D7EDFF" offset="0%" />
+            <stop stop-color="#FFF" stop-opacity="0" offset="100%" />
+          </linearGradient>
+        </defs>
+        <g fill="none">
+          <circle fill="url(#a)" cx="19.832" cy="19.832" r="19.832" />
+          <path d="M26.616.325l4.308 12.587-4.669-.315L26.218.388c0-.105.091-.19.204-.191.088 0 .166.051.194.128z" fill="url(#b)" transform="rotate(45 28.571 6.555)" />
+          <path d="M32.031 35.658c-6.164 2.721-12.745-4.33-11.992-10.011 2.617.782 4.626.997 7.904 2.01 2.34.769 4.152.479 5.386-1.13 1.234-1.607 1.316-3.502 0-5.158-4.826-5.49 0 0-10.516-12.264l2.923-2.95C.117 4.123 5.302 32.333 6.903 35.095c4.01 3.54 14.11 8.709 25.128.563z"
+            fill="#FFF" />
+          <path d="M9.782 19.176l-.034-.016c0 5.76 4.425 21.794 22.185 16.378-6.148 2.716-12.71-4.29-12.006-9.97a7.394 7.394 0 0 1-2.73.519c-3.922 0-7.135-3.047-7.415-6.911z" fill="url(#c)" />
+          <ellipse fill="#354158" cx="22.185" cy="14.958" rx="2.017" ry="1.849" />
+          <ellipse fill="#354158" cx="22.185" cy="14.958" rx="2.017" ry="1.849" />
+        </g>
+      </svg>
+      <div class="launchaco-promo-speechbubble launchaco-promo-speechbubble__animate">Built With Launchaco</div>
+      <div class="launchaco-promo-speechbubble">Built With Launchaco</div>
+    </a>
+  </body>
+
+  <script>
+    window.onscroll = function()
+    {
+      showAd()
+    }
+
+    function showAd()
+    {
+      var scrollBarPosition = window.pageYOffset | document.body.scrollTop;
+
+      // At specifiv position do what you want
+      if (scrollBarPosition > 300)
+      {
+        document.getElementById("visual-dreamer").className = "launchaco-promo launchaco-promo__active";
+        window.onscroll = function() {};
+      }
+    }
+  </script>
+
+</html>
