@@ -35,17 +35,17 @@ server:
 server1:
 	go-bindata static/... templates/...
 	go build
-	./kiki -path 1 -no-browser -port-internal 8003 -port-external 8004 -debug
+	./kiki -alias 1 -no-browser -port-internal 8003 -port-external 8004 -debug
 
 server2:
 	go-bindata static/... templates/...
 	go build
-	./kiki -path 2 -no-browser -port-internal 8005 -port-external 8006 -debug
+	./kiki -alias 2 -no-browser -port-internal 8005 -port-external 8006 -debug
 
 server3:
 	go-bindata static/... templates/...
 	go build
-	./kiki -path 3 -no-browser -port-internal 8007 -port-external 8008 -debug
+	./kiki -alias 3 -no-browser -port-internal 8007 -port-external 8008 -debug
 
 dev1:
 	rerun -p "**/*.{go,tmpl,css,js}" --ignore 'bindata.go' make server1

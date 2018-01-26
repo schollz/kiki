@@ -6,9 +6,11 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"path"
 	"time"
 
 	"github.com/darkowlzz/openurl"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/logging"
 	blackfriday "gopkg.in/russross/blackfriday.v2"
@@ -25,9 +27,16 @@ var (
 	GenerateRegion = false
 	// Location defines where to open up the kiki database
 	Location = "."
+	Alias    = "default"
 )
 
 func main() {
+	homeDir, err := homedir.Dir()
+	homeDir = path.Join(homeDir, ".kiki")
+	if err != nil {
+		panic(err)
+		os.Exit(1)
+	}
 	flag.StringVar(&MessageFile, "message-file", MessageFile, "a markdown file for leaving a message")
 	flag.StringVar(&PublicPort, "port-external", PublicPort, "external port for the data (this) server")
 	flag.StringVar(&PrivatePort, "port-internal", PrivatePort, "internal port for the data (this) server")
@@ -36,9 +45,11 @@ func main() {
 	debug := flag.Bool("debug", false, "turn on debug mode")
 	versionPrint := flag.Bool("version", false, "print version")
 	noBrowser := flag.Bool("no-browser", false, "do not open browser")
-	flag.StringVar(&Location, "path", ".kiki", "path to the kiki data")
+	flag.StringVar(&Location, "path", homeDir, "path to the kiki data")
+	flag.StringVar(&Alias, "alias", Alias, "alias for this instance")
 	flag.BoolVar(&GenerateRegion, "generate-region", GenerateRegion, "generate keys for a new region")
 	flag.Parse()
+
 	if GenerateRegion {
 		keys := keypair.New()
 		fmt.Printf(`
@@ -81,9 +92,27 @@ func main() {
 		}()
 	}
 	logging.Log.Infof("kiki version %s", Version)
-	os.Mkdir(Location, 0755)
 
-	err := Run(*debug)
+	// make the directories if they do not exist
+	if !Exists(Location) {
+		logging.Log.Infof("Making directory: %s", Location)
+		err := os.Mkdir(Location, 0755)
+		if err != nil {
+			panic(err)
+			os.Exit(1)
+		}
+	}
+	Location = path.Join(Location, Alias)
+	if !Exists(Location) {
+		logging.Log.Infof("Making directory: %s", Location)
+		err := os.Mkdir(Location, 0755)
+		if err != nil {
+			panic(err)
+			os.Exit(1)
+		}
+	}
+
+	err = Run(*debug)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}

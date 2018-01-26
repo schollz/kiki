@@ -46,6 +46,7 @@ func Run(verbose bool) (err error) {
 	if !verbose {
 		logger.SetLevel("info")
 	}
+
 	// Startup feed
 	logger.Log.Debug("opening feed")
 	f, err = feed.New(Location, RegionPublic, RegionPrivate, verbose)
@@ -260,4 +261,14 @@ func loadTemplates(list ...string) multitemplate.Render {
 		r.Add(x, tmplMessage)
 	}
 	return r
+}
+
+// Exists reports whether the named file or directory exists.
+func Exists(name string) bool {
+	if _, err := os.Stat(name); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }
