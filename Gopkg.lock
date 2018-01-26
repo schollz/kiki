@@ -101,7 +101,7 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
 
 [[projects]]
   branch = "master"
@@ -126,6 +126,12 @@
   name = "github.com/microcosm-cc/bluemonday"
   packages = ["."]
   revision = "542fd4642604d0d0c26112396ce5b1a9d01eee0b"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
 
 [[projects]]
   branch = "master"
@@ -221,7 +227,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","nacl/box","nacl/secretbox","poly1305","salsa20/salsa"]
-  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
+  revision = "0efb9460aaf800c6376acf625be2853bceac2e06"
 
 [[projects]]
   branch = "master"
@@ -233,7 +239,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "af50095a40f9041b3b38960738837185c26e9419"
+  revision = "03467258950d845cd1877eab69461b98e8c09219"
 
 [[projects]]
   branch = "master"
@@ -262,6 +268,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9321371279c703536d7387cc80b26f93df82fcabb3533f63bcb6d4deb1ed908f"
+  inputs-digest = "0ffd8bd4321bb97df67fe860c88d00fcd9cd544c68c435de7a170943aa4a42fd"
   solver-name = "gps-cdcl"
   solver-version = 1

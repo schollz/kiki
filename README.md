@@ -143,13 +143,13 @@ For posting to yourself, just omit `to`, and for posting to friends you can chan
 
 ## Make new profiles
 
-Its easy to make a new profile. Each *kiki* instance is stored in a folder, (default: `.kiki`). For a new profile, just add the `-path` flag:
+Its easy to make a new profile. Each *kiki* instance is stored in a folder, (default: `$HOME/.kiki/default`). For a new profile, just add the `-alias some-profile` flag:
 
 ```
-kiki -path zack-profile
+kiki -alias some-profile
 ```
 
-which will create a new profile in the `./zack-profile` folder. Just use the same command to reload it when you stop the program.
+which will create a new profile in the `$HOME/.kiki/some-profile` folder. Just use the same command to reload it when you stop the program.
 
 ## Make your own sync hub
 
@@ -158,7 +158,7 @@ Currently the only public syncing up is https://kiki.network. To make your own, 
 
 ## Multi-computer user
 
-Since everything on *kiki* is stored in a cloud, you can use *kiki* on multiple computers by just transfering your key file - `kiki.json` to another computer (by default at `.kiki/kiki.json`). Once you re-connect to a hub, it will download and parse your entire feed and recapitulate everything you had before! 
+Since everything on *kiki* is stored in a cloud, you can use *kiki* on multiple computers by just transfering your key file - `kiki.json` to another computer (by default at `$HOME/.kiki/default/kiki.json`). Once you re-connect to a hub, it will download and parse your entire feed and recapitulate everything you had before! 
 
 Since letters are bagged (and not appended to a log) you can have multiple instances out-of-sync without causing any problems.
 
