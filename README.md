@@ -76,7 +76,7 @@ You will be able to understand the design and usage of *kiki* by reading the fol
     "purpose":"share-text",
     "content":"<p>hello, world</p>",
     "reply_to":"",
-    "first_id":"495Q65YF6MJzPv7HA22hoEwHz1RCmuFTsWMEgccvGS4x"
+    "first_id":""
 }
 ```
 3. The **purpose** specifies how a letter is processed (e.g. whether the letter is an image to be shared, or the liking of a post, etc.).
@@ -85,7 +85,7 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 6. A **person** is just a public-private keypair. Your personal keypair is one of two items not stored as a letter. The second item is the **region** keypair.
 8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the **region keypair** that is used to validate identities.
 7. A **region keypair** is a public-private keypair that is shared by everyone.
-8. The **first_id** is the SHA-256 sum of the **purpose** and the **content**. Whenever two letters with the same **first_id** are found, the one with the newest timestamp is shown (this allows you to edit/delete).
+8. The **first_id** is empty to signal the server to generate a new ID for it as a SHA-256 SUM of purpose, content, recipients, and reply-to. When the **first_id** is *not* empty, it used to specify the ID of a letter that this letter is meant to replace. Thus, when two letters with the same **first_id** are found, the one with the newest timestamp is shown (this allows you to edit/delete).
 9. The **reply_to** is the ID of a letter that this leteter is in response to.
 10. Information is securely transfered in **envelopes**. An **envelope** contains a encrypted letter and the meta information about who it is from and where it is going:
 ```json
