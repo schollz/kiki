@@ -900,6 +900,7 @@ func (f *Feed) GetIDs(pubkey, signature string) (ids []string, err error) {
 		ids[i] = id
 		i++
 	}
+	err = f.db.Set("GetIDs", requester.Public, idMap)
 	return
 }
 
@@ -949,6 +950,15 @@ func (f *Feed) Sync(address string) (err error) {
 	if "ok" != target.Status {
 		return errors.New(target.Error)
 	}
+	// check that they have a valid identity
+	targetKey, err := keypair.FromPublic(target.PersonalPublicKey)
+	if err != nil {
+		return errors.Wrap(err, "invalid user")
+	}
+	err = f.RegionKey.Validate(target.PersonalSignature, targetKey)
+	if err != nil {
+		return errors.Wrap(err, "invalid isgnature")
+	}
 
 	f.logger.Log.Debugf("got %d IDs from %s", len(target.IDs), address)
 	targetIDs := make(map[string]struct{})
@@ -979,6 +989,7 @@ func (f *Feed) Sync(address string) (err error) {
 		}
 	}
 
+	err = f.AddAddressToServers(address, target)
 	return
 }
 
@@ -1057,88 +1068,15 @@ func (f *Feed) DownloadEnvelope(address, id string) (err error) {
 	return
 }
 
-// PingKikiInstance will ping a kiki instance to see if it is viable
-func (f *Feed) PingKikiInstance(address string) (err error) {
-	f.servers.RLock()
-	if _, ok := f.servers.connected[address]; ok {
-		f.logger.Log.Debugf("already connected to %s", address)
-		f.servers.RUnlock()
-		return
+func (f *Feed) AddAddressToServers(address string, r Response) (err error) {
+	if r.PersonalPublicKey == "" {
+		return errors.New("person is empty")
 	}
-	f.servers.RUnlock()
-
-	timeout := time.Duration(1500 * time.Millisecond)
-	client := http.Client{
-		Timeout: timeout,
-	}
-
-	regionSignature, _ := f.RegionKey.Signature(f.RegionKey)
-	personalSignature, _ := f.PersonalKey.Signature(f.RegionKey)
-	payload := Response{
-		PersonalPublicKey: f.PersonalKey.Public,
-		PersonalSignature: personalSignature,
-		RegionPublicKey:   f.RegionKey.Public,
-		RegionSignature:   regionSignature,
-	}
-	bPayload, _ := json.Marshal(payload)
-	body := bytes.NewReader(bPayload)
-	f.logger.Log.Debugf("POST %s/handshake", address)
-	resp, err := client.Post(address+"/handshake", "application/json", body)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	f.logger.Log.Debug("decoding response")
-	var target Response
-	err = json.NewDecoder(resp.Body).Decode(&target)
-	if err != nil {
-		return
-	}
-	if "ok" != target.Status {
-		f.logger.Log.Debug("got error")
-		err = errors.New(target.Error)
-		return
-	}
-
-	f.logger.Log.Debugf("validating %s", address)
-	err = f.ValidateKikiInstance(target)
-	if err == nil {
-		f.AddAddressToServers(address, target)
-	} else {
-		f.logger.Log.Warnf("could not validate %s", address)
-	}
-	return
-}
-
-// ValidateKikiInstance will validate whether a ping response is valid when POSTing or when recieving
-func (f *Feed) ValidateKikiInstance(r Response) (err error) {
-	// validate that the same region sent the signature
-	err = f.RegionKey.Validate(r.RegionSignature, f.RegionKey)
-	if err != nil {
-		f.logger.Log.Warn(err)
-		err = errors.Wrap(err, "could not validate region key")
-		return
-	}
-	senderKey, err := keypair.FromPublic(r.PersonalPublicKey)
-	if err != nil {
-		f.logger.Log.Warn(err)
-		err = errors.Wrap(err, "problem deciphering key")
-		return
-	}
-	err = f.RegionKey.Validate(r.PersonalSignature, senderKey)
-	if err != nil {
-		f.logger.Log.Warn(err)
-		err = errors.Wrap(err, "could not validate personal key")
-		return
-	}
-	return
-}
-
-func (f *Feed) AddAddressToServers(address string, r Response) {
 	u := f.GetUser(r.PersonalPublicKey)
 	u.Server = address
-
+	if u.PublicKey == "" {
+		return errors.New("no such person")
+	}
 	f.servers.Lock()
 	defer f.servers.Unlock()
 	f.logger.Log.Debugf("connected to new server %s: %+v", address, u)
@@ -1154,6 +1092,7 @@ func (f *Feed) AddAddressToServers(address string, r Response) {
 		f.Settings.AvailableServers = append(f.Settings.AvailableServers, address)
 		f.Save()
 	}
+	return
 }
 
 // PurgeOverflowingStorage will delete old messages

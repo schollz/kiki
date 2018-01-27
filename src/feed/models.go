@@ -14,8 +14,6 @@ import (
 )
 
 type Response struct {
-	RegionSignature   string          `json:"region_signature"`
-	RegionPublicKey   string          `json:"region_key"`
 	PersonalSignature string          `json:"personal_signature"`
 	PersonalPublicKey string          `json:"personal_key"`
 	IDs               []string        `json:"ids"`

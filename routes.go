@@ -107,30 +107,6 @@ func handlePing(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "error": "pong"})
 }
 
-// POST /handshake
-func handleHandshake(c *gin.Context) {
-	var p feed.Response
-	err := c.BindJSON(&p)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"status": "error", "error": "problem binding data"})
-		return
-	}
-
-	err = f.ValidateKikiInstance(p)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"status": "error", "error": err.Error()})
-		return
-	}
-
-	signature, err := f.RegionKey.Signature(f.RegionKey)
-	personalSignature, err2 := f.PersonalKey.Signature(f.RegionKey)
-	if err != nil || err2 != nil {
-		c.JSON(http.StatusOK, gin.H{"status": "error", "error": "problem signing"})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "pong", "region_key": f.RegionKey.Public, "region_signature": signature, "personal_key": f.PersonalKey.Public, "personal_signature": personalSignature})
-	}
-}
-
 // POST /envelope
 func handleEnvelope(c *gin.Context) (err error) {
 	// bind the payload
@@ -150,11 +126,12 @@ func handleList(c *gin.Context) {
 	signature := c.DefaultQuery("signature", "")
 
 	idList, err := f.GetIDs(pubkey, signature)
+	personalSignature, _ := f.PersonalKey.Signature(f.RegionKey)
 	if err != nil {
 		logger.Log.Error(err)
 		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": idList, "region_key": f.RegionKey.Public})
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": idList, "personal_key": f.PersonalKey.Public, "personal_signature": personalSignature})
 	}
 	return
 }
@@ -196,9 +173,9 @@ func handleSync(c *gin.Context) (err error) {
 	logger.Log.Debug("syncing...")
 	err = f.Sync(p.Address)
 	if err != nil {
-		go f.UpdateEverything()
 		logger.Log.Error(err)
-		return
+	} else {
+		go f.UpdateEverything()
 	}
 	return
 }
