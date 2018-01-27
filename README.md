@@ -62,11 +62,11 @@ kiki
 
 This will start your local server instance and open up a browser to `localhost:8003` so that you can interact with the network. Right now, to sync you can add another open server (currently the only available one is https://kiki.network, but you can make your own).
 
-# The 50 precepts 
+# The 35 precepts 
 
-You will be able to understand the design and usage of *kiki* by reading the following 50 precepts.
+You will be able to understand the design and usage of *kiki* by reading the following 35 precepts.
 
-*Fundamentals*
+### Fundamentals
 
 1. Information in *kiki* is stored in **letters**.
 2. A **letter** is defined to have **recipients**, **content**, and a **purpose**:
@@ -75,16 +75,19 @@ You will be able to understand the design and usage of *kiki* by reading the fol
     "to":["recipient1"],
     "purpose":"share-text",
     "content":"<p>hello, world</p>"
+    "reply_to":"",
+    "first_id":"495Q65YF6MJzPv7HA22hoEwHz1RCmuFTsWMEgccvGS4x"
 }
 ```
 3. The **purpose** specifies how a letter is processed (e.g. whether the letter is an image to be shared, or the liking of a post, etc.).
 4. The **content** is the data, which depends on the purpose (e.g. its base64 data when sharing an image, or the ID of the post if liking, etc.).
-5. The **recipients** is a list of the public keys of the **persons**.
+5. The **to** is a list of the public keys of the **persons**.
 6. A **person** is just a public-private keypair. Your personal keypair is one of two items not stored as a letter. The second item is the **region** keypair.
 8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the **region keypair** that is used to validate identities.
 7. A **region keypair** is a public-private keypair that is shared by everyone.
-10. Information is securely transfered in **envelopes**.
-11. An **envelope** contains a encrypted letter and the meta information about who it is from and where it is going.
+8. The **first_id** is the SHA-256 sum of the **purpose** and the **content**. Whenever two letters with the same **first_id** are found, the one with the newest timestamp is shown (this allows you to edit/delete).
+9. The **reply_to** is the ID of a letter that this leteter is in response to.
+10. Information is securely transfered in **envelopes**. An **envelope** contains a encrypted letter and the meta information about who it is from and where it is going:
 ```json
  {
     "id": "495Q65YF6MJzPv7HA22hoEwHz1RCmuFTsWMEgccvGS4x",
@@ -95,19 +98,22 @@ You will be able to understand the design and usage of *kiki* by reading the fol
     "signature": "AzB7YZaoqUQ3ZXinea4SbRvBVS...",
     "sealed_letter": "RTJ2Q0smLntqv9DmOMgQIeruNnQ...",
     "sealed_recipients": ["2Lw2JuwedqeYBCRetciKU9r7Ei..."],
-    "opened": false
  }
  ```
-12. The **id** of the letter is a SHA-256 sum of the letter contents. The **timestamp** is the current time when submitted to the datbase. The **sender** is the *public key* of their keychain. The **signature** is the encrypted *public key* that is encrypted by the private key of the **region keypair** which verifies the authenticity of the sender. The **sealed letter** is the entire marshalled letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient, in **sealed recipients**. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter.
+11. The **id** of the letter is a SHA-256 sum of the letter contents. 
+12. The **timestamp** is the current time when submitted to the datbase. The **sender** is the *public key* of their keychain. 
+13. The **signature** is the encrypted *public key* that is encrypted by the private key of the **region keypair** which verifies the authenticity of the sender. 
+14. The **sealed letter** is the entire marshalled letter encrypted using the NaCl secret box symmetric cipher with a *random passphrase*. 
+15. The random passphrase used to seal the letter is then encrypted using the public key of each recipient, in **sealed recipients**. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter.
 
-*Syncing*
+### Syncing
 
-12. Two instances of *kiki* are **synced** by exchanging envelopes that they do not have. 
-13. Only instances in the same region can sync. Different regions are autonomous, federated instances of *kiki*.
-14. As *kiki* network grows, syncing envelopes will obey restrictions on storage - 5MB/person, unless they are a friend (50MB/person) or yourself (no limit). This setting is configurable.
-15. Letters whose **purpose** is an *action* are never privy to storage restrictions.
+16. Two instances of *kiki* are **synced** by exchanging envelopes that they do not have. 
+17. Only instances in the same region can sync. Different regions are autonomous, federated instances of *kiki*.
+18. As *kiki* network grows, syncing envelopes will obey restrictions on storage - 5MB/person, unless they are a friend (50MB/person) or yourself (no limit). This setting is configurable.
+19. Letters whose **purpose** is an *action* are never privy to storage restrictions.
 
-*Purposes*
+### Purposes
 
 16. Currently there are two kinds of **purposes** - a *share* and an *action*.
 17. A **share** purpose is to share text/html, images (png/jpg), or keys. 
@@ -115,36 +121,27 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 19. Currently available actions are: following, liking, assigning a profile name, assigning a profile, assigning a profile image, blocking someone, erasing a profile. 
 20. Actions are made **public** in order to allow quantifying aspects of the social network to have reliable reputation and identity.
 
-*Access*
+### Access
 
-32. A envelope is sealed using public-private key encryption so that only intended recipients can open it. You are also a recipient of your own letters.
-33. A public letter is one which is additionally sealed with the *region keypair*. Everyone on the network has this keypair and will be able to unseal the envelope.
-34. A letter for a **friend** is one that is sealed against the latest personal *friends keypair.
-35. A **friend** is someone that you follow, that also follows you.
-36. The *friend keypair* from each friend are shared upon making a **friend**.
-36. The *friends keypair* is just a keypair that is generated for each user on initiation, that allows friends to decrypt your messages.
-38. By unfriending, you generate a new *friends keypair* which is transmitted to your remaining friends. Your ex-friend will still see your old content, but not the new content.
-39. You can also send a letter addressed to specific people by specifying their public keys.
+21. A envelope is sealed using public-private key encryption so that only intended recipients can open it. You are also a recipient of your own letters.
+22. . A public letter is one which is additionally sealed with the *region keypair*. Everyone on the network has this keypair and will be able to unseal the envelope.
+23. A letter for a **friend** is one that is sealed against the latest personal *friends keypair.
+24. A **friend** is someone that you follow, that also follows you.
+25. The *friend keypair* from each friend are shared upon making a **friend**.
+26. The *friends keypair* is just a keypair that is generated for each user on initiation, that allows friends to decrypt your messages.
+27. By unfriending, you generate a new *friends keypair* which is transmitted to your remaining friends. Your ex-friend will still see your old content, but not the new content.
+28. You can also send a letter addressed to specific people by specifying their public keys.
+29. You cannot edit someone elses letter because the sender is always authenticated.
 
-*Editing and deletion*
+### The Feed
 
-40. Every thing on *kiki* is editable. To edit something you create a new letter that identifies the original letter using a *first_id* tag.
-41. You can delete anything you made on *kiki*. By sending a letter with an action to erase a profile, it will erase everything but that letter. When synced with others, it will also erase your content on everyone elses computer. (_Note_: since letters are signed, you cannot delete someone else's profile).
+30. Your **feed** is a representation of all the envelopes that are accessible to you (i.e. addressed to you, addressed to friends, or addressed to public).
+31. The representation of letters is most generally a website where shared images/text are aggregated in reverse-chronological order in a displayed **feed**. (_Note_: *kiki* is not a website - it is an infrastructure. Feel free to build your own display).
+32. You can also hide things from showing up in the feed by editing a post so that its content is empty (effectively deleting it).
+33. When editing content, only the latest edit is shown in the feed.
+34. All functions of *kiki* are accessible from the feed (e.g. sending letters of various purposes).
+35. Even though you have the majority of the envelopes on the network, you can only open ones you have access to.
 
-*The Feed*
-
-42. Your **feed** is a representation of all the envelopes that are accessible to you (i.e. addressed to you, addressed to friends, or addressed to public).
-43. The representation of letters is most generally a website where shared images/text are aggregated in reverse-chronological order in a displayed **feed**. (_Note_: *kiki* is not a website - it is an infrastructure. Feel free to build your own display).
-44. You can also hide things from showing up in the feed by editing a post so that its content is empty (effectively deleting it).
-45. When editing content, only the latest edit is shown in the feed.
-46. All functions of *kiki* are accessible from the feed (e.g. sending letters of various purposes).
-47. Even though you have the majority of the envelopes on the network, you can only open ones you have access to.
-
-*The files*
-
-48. The settings file, containing your personal key, is a single file: *kiki.json*. *You can transfer this file to any computer to reconstitute your entire social network!*
-49. The entire program is a single binary: *kiki*.
-50. The entire database of envelopes is a single `sqlite3` database: *kiki.db*.
 
 # Usage
 
