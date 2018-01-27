@@ -96,11 +96,18 @@ func New(locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug boo
 			Purpose: purpose.ShareText,
 			Content: `## Welcome to Kiki!
 
-To get started, you can change your name, edit your profile, and upload a profile image.
+Right now your feed is empty. If you'd like to join the network, click <strong><i class="fas fa-plus-circle"></i>
+Add server</strong>. You can use <code>https://kiki.network</code> as the server address. 
 
-Right now your feed is empty. If you'd like to join the network, click "Add server" and add a server. 
+You can see your <a href="/home">home feed</a> by clicking <strong><i class="fas fa-rss"></i> <i class="fa fa-caret-right"></i> <em>home</em></strong>. 
 
-Once you are synced up, you can see the public feed by clicking [public](/). Otherwise, you will just see posts from people you follow on your [home feed](/home). *Note*: all the photos from the public feed will be disabled unless you follow that person. Following someone also will allow their posts to show up in your home feed.
+You can see the <a href="/">public feed</a> by clicking <strong><i class="fas fa-rss"></i> <i class="fa fa-caret-right"></i> <em>public</em></strong>. 
+
+<em>Note</em>: all the photos from the public feed will be disabled unless you follow that person. Following someone also will allow their posts to show up in your home feed.
+
+To get started with <code>kiki</code>, you can change your name (<i class="fas fa-comment-alt"></i>), edit your profile (<i class="fas fa-child"></i>), and upload a profile image (<i class="fas fa-upload"></i>).
+
+When you're ready to post, just hit <strong><i class="fas fa-pencil-alt"></i> Share</strong> to the right.
 
 If you need any help, try using the help above.
 `,
@@ -474,6 +481,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 		p := bluemonday.UGCPolicy()
 		p.AllowRelativeURLs(true)
 		p.AddTargetBlankToFullyQualifiedLinks(true)
+		p.AllowElements("i")
+		p.AllowAttrs("class").OnElements("i")
 		l.Content = p.Sanitize(l.Content)
 		// replace hashtags with links to the hash tags
 		r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
