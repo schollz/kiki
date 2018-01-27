@@ -38,8 +38,7 @@ func randomKikiFile() string {
 		"static/grey_scale/kiki_5.png",
 		"static/grey_scale/kiki_6.png",
 		"static/grey_scale/kiki_7.png"}
-	idx := randomInt(0, 7)
-	return files[idx]
+	return files[r.Intn(len(files))]
 }
 
 func handleProfileImage(c *gin.Context) {
