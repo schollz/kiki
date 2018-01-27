@@ -69,15 +69,36 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 *Fundamentals*
 
 1. Information in *kiki* is stored in **letters**.
-2. A **letter** is defined to have **recipients**, **content**, and a **purpose**.
+2. A **letter** is defined to have **recipients**, **content**, and a **purpose**:
+```json 
+{
+    "to":["recipient1"],
+    "purpose":"share-text",
+    "content":"<p>hello, world</p>"
+}
+```
 3. The **purpose** specifies how a letter is processed (e.g. whether the letter is an image to be shared, or the liking of a post, etc.).
 4. The **content** is the data, which depends on the purpose (e.g. its base64 data when sharing an image, or the ID of the post if liking, etc.).
-5. The **recipients** is a list of **persons**.
+5. The **recipients** is a list of the public keys of the **persons**.
 6. A **person** is just a public-private keypair. Your personal keypair is one of two items not stored as a letter. The second item is the **region** keypair.
 8. Every instance of *kiki* belongs to a **region**. Everyone that belongs to a region has the **region keypair** that is used to validate identities.
 7. A **region keypair** is a public-private keypair that is shared by everyone.
 10. Information is securely transfered in **envelopes**.
-11. An **envelope** contains a letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter. The sender signs the envelope using the region keypair and their personal keypair to verify authenticity.
+11. An **envelope** contains a encrypted letter and the meta information about who it is from and where it is going.
+```json
+ {
+    "id": "495Q65YF6MJzPv7HA22hoEwHz1RCmuFTsWMEgccvGS4x",
+    "timestamp": "2018-01-27T13:09:24.392807371Z",
+    "sender": {
+        "public": "6Awitgp9ZwkyeZ5g6fdDkENEm82issg..."
+    },
+    "signature": "AzB7YZaoqUQ3ZXinea4SbRvBVS...",
+    "sealed_letter": "RTJ2Q0smLntqv9DmOMgQIeruNnQ...",
+    "sealed_recipients": ["2Lw2JuwedqeYBCRetciKU9r7Ei..."],
+    "opened": false
+ }
+ ```
+12. The **id** of the letter is a SHA-256 sum of the letter contents. The **timestamp** is the current time when submitted to the datbase. The **sender** is the *public key* of their keychain. The **signature** is the encrypted *public key* that is encrypted by the private key of the **region keypair** which verifies the authenticity of the sender. The **sealed letter** is the entire marshalled letter encrypted using the NaCl secret box symmetric cipher with a random passphrase. The random passphrase is then encrypted using the public key of each recipient, in **sealed recipients**. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter.
 
 *Syncing*
 
