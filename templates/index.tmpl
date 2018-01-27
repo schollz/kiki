@@ -46,16 +46,16 @@
     <nav class="navbar navbar-expand-md"  style="background-color:#e2b1c7;">
       <div class="container">
         <a href="/home" class="pull-left"><img src="/static/kiki.png" class="kiki-pic"></a>
-        <a class="navbar-brand" style="color:black;" href="/home"><em>&nbsp;&nbsp;<strong>kiki.network</strong></em></a>
+        <a class="navbar-brand" style="color:black;" href="/home"><em>&nbsp;&nbsp;<strong>{{ if .ServerName}}{{.ServerName}}{{else}}{{ .User.Name }}{{end}}</strong></em></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
           <i class="fas fa-bars"></i>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarsExample07">
           <ul class="navbar-nav mr-auto">
-          	<li>
-          	<a href="#!" class="nav-item nav-link editmodal" data-title="Write a post" data-purpose="share-text" style="color:black;"><i class="fas fa-pencil-alt"></i></a>
-          </li>
+          	<li class="nav-item">
+            	<a href="#!" class="menu-item nav-link editmodal" data-title="Write a post" data-purpose="share-text"><i class="fas fa-pencil-alt"></i></a>
+            </li>
 
             
             <li class="nav-item dropdown">
@@ -97,9 +97,20 @@
   </main>
  -->  
   <main role="main" class="container" id="main-content" style="display:none;">
-    {{ with .Message }}
+    {{ if .ServerName }}
     <div class="jumbotron lead">
-        {{.}}
+        <h1>Welcome to {{.ServerName}}</h1>
+
+<p>This is a hub that helps to sync across the network. You cannot edit on this hub, but you can view the current feed. The region is defined as:</p>
+
+<ul>
+<li>Public: <code>{{.RegionPublic}}</code></li>
+<li>Private: <code>{{.RegionPrivate}}</code></li>
+</ul>
+
+<p>To start your own profile you can <a href="https://github.com/schollz/kiki/releases/latest">download the latest kiki release</a>. To sync to this hub, just press &ldquo;Add Server&rdquo; and write &ldquo;<code>{{.ServerNameFull}}</code>&rdquo; as the server.</p>
+
+
     </div>
     {{ end }}
 

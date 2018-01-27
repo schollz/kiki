@@ -224,3 +224,7 @@ h6,
   color:black;
   font-style: italic;
 }
+
+.jumbotron {
+  padding: 2rem 2rem;
+}

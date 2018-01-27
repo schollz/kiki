@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
-	"io/ioutil"
 	"os"
 	"path"
 	"time"
@@ -13,18 +11,16 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/schollz/kiki/src/keypair"
 	"github.com/schollz/kiki/src/logging"
-	blackfriday "gopkg.in/russross/blackfriday.v2"
 )
 
 var (
 	Version        = "0.1.0"
 	PrivatePort    = "8003"
-	MessageFile    = ""
-	HTMLMessage    = template.HTML("")
 	PublicPort     = "8004"
 	RegionPublic   = "4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6"
 	RegionPrivate  = "btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
 	GenerateRegion = false
+	ServerName     = ""
 	// Location defines where to open up the kiki database
 	Location = "."
 	Alias    = "default"
@@ -37,7 +33,7 @@ func main() {
 		panic(err)
 		os.Exit(1)
 	}
-	flag.StringVar(&MessageFile, "message-file", MessageFile, "a markdown file for leaving a message")
+	flag.StringVar(&ServerName, "hub", ServerName, "specify server name and include hub message")
 	flag.StringVar(&PublicPort, "port-external", PublicPort, "external port for the data (this) server")
 	flag.StringVar(&PrivatePort, "port-internal", PrivatePort, "internal port for the data (this) server")
 	flag.StringVar(&RegionPublic, "region-public", RegionPublic, "region public key")
@@ -75,15 +71,6 @@ func main() {
 		logging.SetLoggingLevel("debug")
 	} else {
 		logging.SetLoggingLevel("info")
-	}
-	if MessageFile != "" {
-		bMsg, err := ioutil.ReadFile(MessageFile)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		bMsg = blackfriday.Run(bMsg)
-		HTMLMessage = template.HTML(string(bMsg))
 	}
 	if !*noBrowser {
 		go func() {
