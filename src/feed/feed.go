@@ -935,9 +935,12 @@ func (f *Feed) Sync(address string) (err error) {
 	}
 
 	f.logger.Log.Debugf("got %d IDs from %s", len(target.IDs), address)
-
+	targetIDs := make(map[string]struct{})
+	for _, id := range target.IDs {
+		targetIDs[id] = struct{}{}
+	}
 	// check whether I need any of their envelopes
-	for theirID := range target.IDs {
+	for theirID := range targetIDs {
 		if _, ok := myIDs[theirID]; ok {
 			continue
 		}
@@ -950,7 +953,7 @@ func (f *Feed) Sync(address string) (err error) {
 
 	// check whether they need any of my envelopes
 	for myID := range myIDs {
-		if _, ok := target.IDs[myID]; ok {
+		if _, ok := targetIDs[myID]; ok {
 			continue
 		}
 		f.logger.Log.Debugf("my envelope %s is new to %s", myID, address)

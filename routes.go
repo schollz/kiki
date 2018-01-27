@@ -147,11 +147,17 @@ func handleEnvelope(c *gin.Context) (err error) {
 // GET /list
 func handleList(c *gin.Context) {
 	ids, err := f.GetIDs()
+	idList := make([]string, len(ids))
+	i := 0
+	for id := range ids {
+		idList[i] = id
+		i++
+	}
 	if err != nil {
 		logger.Log.Error(err)
 		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": ids, "region_key": f.RegionKey.Public})
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "found IDs", "ids": idList, "region_key": f.RegionKey.Public})
 	}
 	return
 }
