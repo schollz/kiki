@@ -69,12 +69,12 @@ You will be able to understand the design and usage of *kiki* by reading the fol
 ### Fundamentals
 
 1. Information in *kiki* is stored in **letters**.
-2. A **letter** is defined to have **recipients**, **content**, and a **purpose**:
+2. A **letter** is defined to have **to** (address of recipients), **purpose**, and a **content**, **reply_to** and **first_id**:
 ```json 
 {
     "to":["recipient1"],
     "purpose":"share-text",
-    "content":"<p>hello, world</p>"
+    "content":"<p>hello, world</p>",
     "reply_to":"",
     "first_id":"495Q65YF6MJzPv7HA22hoEwHz1RCmuFTsWMEgccvGS4x"
 }
@@ -101,8 +101,8 @@ You will be able to understand the design and usage of *kiki* by reading the fol
  }
  ```
 11. The **id** of the letter is a SHA-256 sum of the letter contents. 
-12. The **timestamp** is the current time when submitted to the datbase. The **sender** is the *public key* of their keychain. 
-13. The **signature** is the encrypted *public key* that is encrypted by the private key of the **region keypair** which verifies the authenticity of the sender. 
+12. The **timestamp** is the current time when submitted to the datbase. 
+13. The **sender** is the *public key* of their keychain. The **signature** is the encrypted *public key* of the **sender** that is encrypted by the private key of the **region keypair**. This verifies the authenticity of the sender. 
 14. The **sealed letter** is the entire marshalled letter encrypted using the NaCl secret box symmetric cipher with a *random passphrase*. 
 15. The random passphrase used to seal the letter is then encrypted using the public key of each recipient, in **sealed recipients**. Thus, only recipients can decipher the passphrase and unseal the envelope and obtain the contents of the letter.
 
@@ -157,7 +157,7 @@ The API for posting to *kiki* is very simple, making it easily extensible to oth
 }
 ```
 
-For posting to yourself, just omit `to`, and for posting to friends you can change `"public"` to `"friends"`.
+For posting to yourself, just omit `to`, and for posting to friends you can change `"public"` to `"friends"`. The server will convert the **to** to the public keys and add in the **first_id**.
 
 ## Make new profiles
 
