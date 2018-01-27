@@ -144,15 +144,12 @@ func handleEnvelope(c *gin.Context) (err error) {
 	return
 }
 
-// GET /list
+// GET /list?user_pub=X&signature=+
 func handleList(c *gin.Context) {
-	ids, err := f.GetIDs()
-	idList := make([]string, len(ids))
-	i := 0
-	for id := range ids {
-		idList[i] = id
-		i++
-	}
+	pubkey := c.DefaultQuery("user_pub", "")
+	signature := c.DefaultQuery("signature", "")
+
+	idList, err := f.GetIDs(pubkey, signature)
 	if err != nil {
 		logger.Log.Error(err)
 		c.JSON(500, gin.H{"status": "error", "error": err.Error()})

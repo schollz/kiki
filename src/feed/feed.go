@@ -883,8 +883,24 @@ func (f *Feed) GetEnvelope(id string) (e letter.Envelope, err error) {
 }
 
 // GetIDs will return an envelope with the given ID
-func (f *Feed) GetIDs() (ids map[string]struct{}, err error) {
-	return f.db.GetIDs()
+func (f *Feed) GetIDs(pubkey, signature string) (ids []string, err error) {
+	requester, err := keypair.FromPublic(pubkey)
+	if err != nil {
+		return
+	}
+	// validate the person against the current region key
+	err = f.RegionKey.Validate(signature, requester)
+	if err != nil {
+		return
+	}
+	idMap, err := f.db.GetIDs()
+	ids = make([]string, len(idMap))
+	i := 0
+	for id := range idMap {
+		ids[i] = id
+		i++
+	}
+	return
 }
 
 // GetConnected returns the users that are currently connected to
@@ -903,21 +919,21 @@ func (f *Feed) GetConnected() (us []User) {
 func (f *Feed) Sync(address string) (err error) {
 	f.logger.Log.Infof("syncing with %s", address)
 
-	// get the information about the kiki server
-	err = f.PingKikiInstance(address)
-	if err != nil {
-		return errors.Wrap(err, "syncing ping doesn't work")
-	}
-
 	// Get a list of my IDs
-	myIDs, err := f.GetIDs()
+	myIDs, err := f.db.GetIDs()
 	if err != nil {
 		return
 	}
 
 	// get the list
 	var target Response
-	req, err := http.NewRequest("GET", address+"/list", nil)
+	signature, err := f.PersonalKey.Signature(f.RegionKey)
+	if err != nil {
+		return
+	}
+	query := fmt.Sprintf("%s/list?user_pub=%s&signature=%s", address, f.PersonalKey.Public, signature)
+	f.logger.Log.Debug(query)
+	req, err := http.NewRequest("GET", query, nil)
 	if err != nil {
 		return
 	}

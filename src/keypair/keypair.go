@@ -5,13 +5,13 @@ import (
 	crypto_rand "crypto/rand"
 	"encoding/binary"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"hash/fnv"
 	"io"
 	"strings"
 
 	"github.com/mr-tron/base58/base58"
+	"github.com/pkg/errors"
 	"github.com/schollz/mnemonicode"
 	"golang.org/x/crypto/nacl/box"
 )
@@ -208,11 +208,11 @@ func (kp KeyPair) Validate(signature string, sender KeyPair) (err error) {
 	}
 	encryptedPublicKey, err := base58.FastBase58Decoding(signature)
 	if err != nil {
-		return
+		return errors.Wrap(err, "not base58")
 	}
 	decryptedPublicKey, err := kp.Decrypt(encryptedPublicKey, sender)
 	if err != nil {
-		return
+		return errors.Wrap(err, "not decryptable")
 	}
 	if string(decryptedPublicKey) != sender.Public {
 		return errors.New("signature corrupted")
