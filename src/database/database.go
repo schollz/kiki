@@ -661,7 +661,7 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 		return errors.Wrap(err, "deleteUsersOldestPost")
 	}
 	logger.Log.Debug(publicKey)
-	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE opened == 1 AND letter_purpose IN ('share-text','share-image/png','share-image/jpg') AND sender == ? ORDER BY time LIMIT 1);"
+	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE letter_purpose IN ('share-text','share-image/png','share-image/jpg','') AND sender == ? ORDER BY time LIMIT 1);"
 	logger.Log.Debug(query)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -960,20 +960,20 @@ func (d *database) getAllVersions(id string) (s []string, err error) {
 func (d *database) getKeyForFriends(user string) (key keypair.KeyPair, err error) {
 	stmt, err := d.db.Prepare("SELECT letter_content FROM letters WHERE opened ==1 AND letter_purpose==? AND sender==? ORDER BY time DESC")
 	if err != nil {
-		err = errors.Wrap(err, "getKeyForFriends")
+		err = errors.Wrap(err, "getKeyForFriends, bad statement")
 		return
 	}
 	defer stmt.Close()
 	var keystring string
 	err = stmt.QueryRow(purpose.ShareKey, user).Scan(&keystring)
 	if err != nil {
-		err = errors.Wrap(err, "getKeyForFriends")
+		err = errors.Wrap(err, "getKeyForFriends, bad scan")
 		return
 	}
-
+	logger.Log.Infof(`query: "SELECT letter_content FROM letters WHERE opened ==1 AND letter_purpose=='%s' AND sender=='%s' ORDER BY time DESC": [%v]`, purpose.ShareKey, user, keystring)
 	err = json.Unmarshal([]byte(keystring), &key)
 	if err != nil {
-		err = errors.Wrap(err, "getKeyForFriends")
+		err = errors.Wrap(err, "getKeyForFriends, bad unmarshal")
 		return
 	}
 

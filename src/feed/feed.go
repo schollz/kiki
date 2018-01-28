@@ -436,63 +436,70 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 		l.To = newTo
 	}
 
-	// determine if their are any images in envelope letter content that should be spliced out
+	// // determine if their are any images in envelope letter content that should be spliced out
 	if l.Purpose == purpose.ShareText || l.Purpose == purpose.ActionProfile || l.Purpose == purpose.ActionImage {
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
-	}
-	f.logger.Log.Debug("capturing base64 images")
-	newHTML, images, err := web.CaptureBase64Images(l.Content)
-	if err != nil {
-		return
-	}
-	f.logger.Log.Debugf("captured %d images", len(images))
-	for name := range images {
-		p := purpose.SharePNG
-		if strings.Contains(name, ".jpg") {
-			p = purpose.ShareJPG
-		}
-		newLetter := letter.Letter{
-			To:      l.To,
-			Content: base64.StdEncoding.EncodeToString(images[name]),
-			Purpose: p,
-		}
-		f.logger.Log.Debug("sealing letter")
-		newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)
+		newHTML, images, err2 := web.CaptureBase64Images(l.Content)
 		if err2 != nil {
 			err = err2
 			return
 		}
-		// seal and add envelope
-		f.logger.Log.Debug("adding letter")
-		err2 = f.db.AddEnvelope(newEnvelope)
-		if err2 != nil {
-			// should throw error if its already added, so don't worry about
-			f.logger.Log.Warn(err2)
+		for name := range images {
+			p := purpose.SharePNG
+			if strings.Contains(name, ".jpg") {
+				p = purpose.ShareJPG
+			}
+			newLetter := letter.Letter{
+				To:      l.To,
+				Content: base64.StdEncoding.EncodeToString(images[name]),
+				Purpose: p,
+			}
+			f.logger.Log.Debug("sealing letter")
+			newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)
+			if err2 != nil {
+				err = err2
+				return
+			}
+			// seal and add envelope
+			f.logger.Log.Debug("adding letter")
+			err2 = f.db.AddEnvelope(newEnvelope)
+			if err2 != nil {
+				// should throw error if its already added, so don't worry about
+				f.logger.Log.Warn(err2)
+			}
+			if l.Purpose == purpose.ActionImage {
+				l.Content = newEnvelope.ID
+				break
+			}
+			f.logger.Log.Debugf("newHTML: %s", newHTML)
+			f.logger.Log.Debugf("name: %s", name)
+			f.logger.Log.Debugf("newEnvelope.ID: '%s'", newEnvelope.ID)
+			newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
+			l.Content = newHTML
 		}
-		if l.Purpose == purpose.ActionImage {
-			newHTML = newEnvelope.ID
-			break
-		}
-		newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
-	}
-	l.Content = newHTML
-	if l.Purpose == purpose.ShareText {
-		// sanitize
-		p := bluemonday.UGCPolicy()
-		p.AllowRelativeURLs(true)
-		p.AddTargetBlankToFullyQualifiedLinks(true)
-		p.AllowElements("i")
-		p.AllowAttrs("class").OnElements("i")
-		l.Content = p.Sanitize(l.Content)
-		// replace hashtags with links to the hash tags
-		r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
-		tags := r.FindAllString(l.Content, -1)
-		tagMap := make(map[string]struct{})
-		for _, tag := range tags {
-			tagMap[tag] = struct{}{}
-		}
-		for tag := range tagMap {
-			l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag[1:], tag), -1)
+		if l.Purpose == purpose.ShareText {
+			// sanitize
+			f.logger.Log.Debugf("BEFORE SANITIZE: %s", l.Content)
+			p := bluemonday.UGCPolicy()
+			p.AllowRelativeURLs(true)
+			p.AddTargetBlankToFullyQualifiedLinks(true)
+			p.AllowElements("i")
+			p.AllowAttrs("class").OnElements("i")
+			p.AllowElements("img")
+			p.AllowAttrs("class").OnElements("img")
+			l.Content = p.Sanitize(l.Content)
+			// replace hashtags with links to the hash tags
+			r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)
+			tags := r.FindAllString(l.Content, -1)
+			tagMap := make(map[string]struct{})
+			for _, tag := range tags {
+				tagMap[tag] = struct{}{}
+			}
+			for tag := range tagMap {
+				l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag[1:], tag), -1)
+			}
+		} else if l.Purpose == purpose.ActionProfile {
+			l.Content = newHTML
 		}
 	}
 	l.Content = strings.TrimSpace(l.Content)
@@ -665,12 +672,12 @@ func (f *Feed) GetUserFriends() (u UserFriends) {
 func (f *Feed) UpdateFriends() (err error) {
 	friendsKey, err := f.db.GetLatestKeyForFriends(f.PersonalKey.Public)
 	if err != nil {
-		err = errors.Wrap(err, "UpdateFriends")
+		err = errors.Wrap(err, "can't get latest key")
 		return
 	}
 	bFriendsKey, err := json.Marshal(friendsKey)
 	if err != nil {
-		err = errors.Wrap(err, "UpdateFriends")
+		err = errors.Wrap(err, "can't marshal")
 		return
 	}
 	_, _, friends := f.db.Friends(f.PersonalKey.Public)
