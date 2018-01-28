@@ -478,7 +478,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 			newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
 			l.Content = newHTML
 		}
-		if l.Purpose == purpose.ShareText {
+		if l.Purpose == purpose.ShareText || l.Purpose == purpose.ActionProfile {
 			// sanitize
 			f.logger.Log.Debugf("BEFORE SANITIZE: %s", l.Content)
 			p := bluemonday.UGCPolicy()
@@ -499,8 +499,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 			for tag := range tagMap {
 				l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag[1:], tag), -1)
 			}
-		} else if l.Purpose == purpose.ActionProfile {
-			l.Content = newHTML
+			// } else if l.Purpose == purpose.ActionProfile {
+			// 	l.Content = newHTML
 		} else if l.Purpose == purpose.ActionImage && len(images) == 0 {
 			// if you get to here, revert to oroginal
 			l.Content = originalContent
