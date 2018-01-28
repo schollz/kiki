@@ -438,6 +438,7 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 
 	// // determine if their are any images in envelope letter content that should be spliced out
 	if l.Purpose == purpose.ShareText || l.Purpose == purpose.ActionProfile || l.Purpose == purpose.ActionImage {
+		originalContent := l.Content
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
 		newHTML, images, err2 := web.CaptureBase64Images(l.Content)
 		if err2 != nil {
@@ -500,6 +501,9 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 			}
 		} else if l.Purpose == purpose.ActionProfile {
 			l.Content = newHTML
+		} else if l.Purpose == purpose.ActionImage && len(images) == 0 {
+			// if you get to here, revert to oroginal
+			l.Content = originalContent
 		}
 	}
 	l.Content = strings.TrimSpace(l.Content)
