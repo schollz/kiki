@@ -14,13 +14,14 @@ import (
 )
 
 var (
-	Version        = "0.1.0"
-	PrivatePort    = "8003"
-	PublicPort     = "8004"
-	RegionPublic   = "4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6"
-	RegionPrivate  = "btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
-	GenerateRegion = false
-	ServerName     = ""
+	Version            = "0.1.0"
+	PrivatePort        = "8003"
+	PublicPort         = "8004"
+	RegionPublic       = "4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6"
+	RegionPrivate      = "btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
+	GenerateRegion     = false
+	ExposeInternalPort = false
+	ServerName         = ""
 	// Location defines where to open up the kiki database
 	Location = "."
 	Alias    = "default"
@@ -44,6 +45,7 @@ func main() {
 	flag.StringVar(&Location, "path", homeDir, "path to the kiki data")
 	flag.StringVar(&Alias, "alias", Alias, "alias for this instance")
 	flag.BoolVar(&GenerateRegion, "generate-region", GenerateRegion, "generate keys for a new region")
+	flag.BoolVar(&ExposeInternalPort, "expose", ExposeInternalPort, "expose the internal port instead of binding to localhost")
 	flag.Parse()
 
 	if GenerateRegion {

@@ -181,7 +181,11 @@ func Run(verbose bool) (err error) {
 
 	// private routes bind to localhost
 	logger.Log.Infof("Running private router on localhost:%s", PrivatePort)
-	err = r.Run("localhost:" + PrivatePort)
+	if ExposeInternalPort {
+		err = r.Run("0.0.0.0:" + PrivatePort)
+	} else {
+		err = r.Run("localhost:" + PrivatePort)
+	}
 	if nil != err {
 		logger.Log.Error(err)
 		return

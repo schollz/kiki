@@ -8,7 +8,7 @@ LDFLAGS=-ldflags "-s -w -X main.Version=${TAG}-${HASH} -X main.RegionPublic=4NfD
 
 basicbuild:
 	go-bindata static/... templates/...
-	go build ${LDFLAGS}
+	go build ${LDFLAGS} -a --installsuffix cgo
 
 update:
 	dep ensure -v
