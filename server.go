@@ -49,8 +49,9 @@ func Run(verbose bool) (err error) {
 
 	// Startup feed
 	logger.Log.Debug("opening feed")
-	f, err = feed.New(Location, RegionPublic, RegionPrivate, verbose)
+	f, err = feed.New(Alias, Location, RegionPublic, RegionPrivate, verbose)
 	if err != nil {
+		logging.Log.Error(err)
 		return
 	}
 	f.Debug(verbose)

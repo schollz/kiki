@@ -29,12 +29,15 @@ type Feed struct {
 	Settings    Settings        `json:"settings"`
 	PersonalKey keypair.KeyPair `json:"personal_key"`
 
-	storagePath string
-	db          database.DatabaseAPI
-	log         seelog.LoggerInterface
-	logger      logging.SeelogWrapper
-	caching     *cache.Cache
-	servers     connections
+	locationToKiki         string
+	locationToKikiDB       string
+	locationToKikiSearch   string
+	locationToKikiSettings string
+	db                     database.DatabaseAPI
+	log                    seelog.LoggerInterface
+	logger                 logging.SeelogWrapper
+	caching                *cache.Cache
+	servers                connections
 }
 
 type connections struct {

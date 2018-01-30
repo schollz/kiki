@@ -23,8 +23,11 @@ var (
 	ExposeInternalPort = false
 	ServerName         = ""
 	// Location defines where to open up the kiki database
-	Location = "."
-	Alias    = "default"
+	Location       = "."
+	dbLocation     = ""
+	keyLocation    = ""
+	searchLocation = ""
+	Alias          = "default"
 )
 
 func main() {
@@ -81,25 +84,6 @@ func main() {
 		}()
 	}
 	logging.Log.Infof("kiki version %s", Version)
-
-	// make the directories if they do not exist
-	if !Exists(Location) {
-		logging.Log.Infof("Making directory: %s", Location)
-		err := os.Mkdir(Location, 0755)
-		if err != nil {
-			panic(err)
-			os.Exit(1)
-		}
-	}
-	Location = path.Join(Location, Alias)
-	if !Exists(Location) {
-		logging.Log.Infof("Making directory: %s", Location)
-		err := os.Mkdir(Location, 0755)
-		if err != nil {
-			panic(err)
-			os.Exit(1)
-		}
-	}
 
 	err = Run(*debug)
 	if err != nil {

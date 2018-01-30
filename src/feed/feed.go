@@ -44,7 +44,7 @@ func (f *Feed) Debug(b bool) {
 }
 
 // New generates a new feed based on the location to find the identity file, the database, and the settings
-func New(locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug bool) (f *Feed, err error) {
+func New(alias, locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug bool) (f *Feed, err error) {
 	locationToSaveData, err = filepath.Abs(locationToSaveData)
 	if err != nil {
 		return
@@ -54,16 +54,23 @@ func New(locationToSaveData, regionKeyPublic, regionKeyPrivate string, debug boo
 	f.logger = logging.New()
 	f.Debug(debug)
 	f.Settings = GenerateSettings()
-	f.db = database.Setup(locationToSaveData)
-	f.storagePath = locationToSaveData
+	f.locationToKiki = locationToSaveData
+
+	f.locationToKikiDB = path.Join(locationToSaveData, "db", alias+".db")
+	f.locationToKikiSearch = path.Join(locationToSaveData, "search", alias)
+	f.locationToKikiSettings = path.Join(locationToSaveData, "keys", alias+".json")
+	os.MkdirAll(path.Join(locationToSaveData, "db"), 0755)
+	os.MkdirAll(path.Join(locationToSaveData, "search", alias), 0755)
+	os.MkdirAll(path.Join(locationToSaveData, "keys"), 0755)
+	f.db = database.Setup(f.locationToKikiDB)
 	f.caching = cache.New(1*time.Minute, 5*time.Minute)
 	f.servers.Lock()
 	f.servers.connected = make(map[string]User)
 	f.servers.blockedUsers = make(map[string]struct{})
 	f.servers.syncingCount = 0
 	f.servers.Unlock()
-	f.logger.Log.Infof("feed located at: '%s'", f.storagePath)
-	bFeed, errLoad := ioutil.ReadFile(path.Join(f.storagePath, "kiki.json"))
+	f.logger.Log.Infof("feed located at: '%s'", f.locationToKikiSettings)
+	bFeed, errLoad := ioutil.ReadFile(f.locationToKikiSettings)
 	if errLoad != nil {
 		f.logger.Log.Info("generating new feed")
 
@@ -138,6 +145,9 @@ If you need any help, try using the help above.
 	}
 
 	err = f.Save()
+	if err != nil {
+		f.logger.Log.Error(err)
+	}
 	f.UpdateEverything()
 
 	go f.UpdateOnUpload()
@@ -153,12 +163,19 @@ func (f *Feed) SetRegionKey(public, private string) (err error) {
 }
 
 func (f *Feed) Save() (err error) {
+	f.logger.Log.Debug("saving data")
 	// overwrite the feed file
 	feedBytes, err := json.MarshalIndent(f, "", " ")
 	if err != nil {
+		f.logger.Log.Error(err)
 		return
 	}
-	err = ioutil.WriteFile(path.Join(f.storagePath, "kiki.json"), feedBytes, 0644)
+	err = ioutil.WriteFile(f.locationToKikiSettings, feedBytes, 0644)
+	if err == nil {
+		f.logger.Log.Infof("wrote file: '%s'", f.locationToKikiSettings)
+	} else {
+		f.logger.Log.Error(err)
+	}
 	return
 }
 
@@ -1185,9 +1202,9 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 // MakeSearchIndex will make a search index
 func (f *Feed) MakeSearchIndex() (err error) {
 	t := time.Now()
-	os.RemoveAll(path.Join(f.storagePath, "search.bleve"))
+	os.RemoveAll(f.locationToKikiSearch)
 	mapping := bleve.NewIndexMapping()
-	index, err := bleve.New(path.Join(f.storagePath, "search.bleve"), mapping)
+	index, err := bleve.New(f.locationToKikiSearch, mapping)
 	if err != nil {
 		return errors.Wrap(err, "problem making index")
 	}
@@ -1208,14 +1225,14 @@ func (f *Feed) MakeSearchIndex() (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path.Join(f.storagePath, "search.bleve", "posts.json"), bPosts, 0644)
+	err = ioutil.WriteFile(path.Join(f.locationToKikiSearch, "posts.json"), bPosts, 0644)
 	f.logger.Log.Debugf("indexed %d posts in %s", len(posts), time.Since(t))
 	return
 }
 
 func (f *Feed) SearchIndexedPosts(search string) (posts []Post, err error) {
 	t := time.Now()
-	index, err := bleve.Open(path.Join(f.storagePath, "search.bleve"))
+	index, err := bleve.Open(f.locationToKikiSearch)
 	if err != nil {
 		return
 	}
@@ -1227,7 +1244,7 @@ func (f *Feed) SearchIndexedPosts(search string) (posts []Post, err error) {
 		return
 	}
 	f.logger.Log.Debug(searchResult.Took)
-	bAllPosts, err := ioutil.ReadFile(path.Join(f.storagePath, "search.bleve", "posts.json"))
+	bAllPosts, err := ioutil.ReadFile(path.Join(f.locationToKikiSearch, "posts.json"))
 	if err != nil {
 		return
 	}

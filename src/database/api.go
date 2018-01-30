@@ -4,7 +4,6 @@ import (
 	// "encoding/json"
 	"database/sql"
 	"fmt"
-	"path"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,13 +18,9 @@ type DatabaseAPI struct {
 	FileName string
 }
 
-func Setup(locationToDatabase string, databaseName ...string) (api DatabaseAPI) {
-	name := "kiki.db"
-	if len(databaseName) > 0 {
-		name = databaseName[0]
-	}
+func Setup(locationToDatabase string) (api DatabaseAPI) {
 	api = DatabaseAPI{
-		FileName: path.Join(locationToDatabase, name),
+		FileName: locationToDatabase,
 	}
 	return
 }
