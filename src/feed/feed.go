@@ -148,7 +148,7 @@ If you need any help, try using the help above.
 	if err != nil {
 		f.logger.Log.Error(err)
 	}
-	f.UpdateEverything()
+	f.UpdateEverythingAndSync()
 
 	go f.UpdateOnUpload()
 	return

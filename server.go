@@ -54,6 +54,12 @@ func Run(verbose bool) (err error) {
 		logging.Log.Error(err)
 		return
 	}
+	if SyncAddress != "" {
+		go func() {
+			f.Sync(SyncAddress)
+			f.UpdateEverything()
+		}()
+	}
 	f.Debug(verbose)
 	logger.Log.Debug("opened feed")
 	err = f.SetRegionKey(RegionPublic, RegionPrivate)

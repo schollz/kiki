@@ -22,6 +22,7 @@ var (
 	GenerateRegion     = false
 	ExposeInternalPort = false
 	ServerName         = ""
+	SyncAddress        = ""
 	// Location defines where to open up the kiki database
 	Location       = "."
 	dbLocation     = ""
@@ -42,6 +43,7 @@ func main() {
 	flag.StringVar(&PrivatePort, "port-internal", PrivatePort, "internal port for the data (this) server")
 	flag.StringVar(&RegionPublic, "region-public", RegionPublic, "region public key")
 	flag.StringVar(&RegionPrivate, "region-private", RegionPrivate, "region private key")
+	flag.StringVar(&SyncAddress, "sync", SyncAddress, "address to sync with")
 	debug := flag.Bool("debug", false, "turn on debug mode")
 	versionPrint := flag.Bool("version", false, "print version")
 	noBrowser := flag.Bool("no-browser", false, "do not open browser")
