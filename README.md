@@ -44,6 +44,13 @@ Widespread centralized social networks are becoming increasingly odious: Twitter
 
 The easiest way to get started is to [download the latest release](https://github.com/schollz/kiki/releases/latest).
 
+Or, you could use the latest Docker images:
+
+```
+docker pull schollz/kiki
+docker run --user `id -u` --rm -it -p 8003:8003 -v /location/to/data:/data -t schollz/kiki
+```
+
 Or, if you have Go installed you can build from the source:
 
 ```
