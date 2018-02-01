@@ -454,9 +454,9 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 	}
 
 	// // determine if their are any images in envelope letter content that should be spliced out
+	l.Content = strings.Split(l.Content, `<div class="medium-insert-buttons"`)[0]
 	if l.Purpose == purpose.ShareText || l.Purpose == purpose.ActionProfile || l.Purpose == purpose.ActionImage {
 		originalContent := l.Content
-		l.Content = strings.Split(l.Content, `<div class="medium-insert-buttons"`)[0]
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
 		newHTML, images, err2 := web.CaptureBase64Images(l.Content)
 		if err2 != nil {
@@ -560,8 +560,6 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 			for tag := range tagMap {
 				l.Content = strings.Replace(l.Content, tag, fmt.Sprintf(`<a href="/?hashtag=%s" class="hashtag">%s</a>`, tag[1:], tag), -1)
 			}
-			// } else if l.Purpose == purpose.ActionProfile {
-			// 	l.Content = newHTML
 		} else if l.Purpose == purpose.ActionImage && len(images) == 0 {
 			// if you get to here, revert to oroginal
 			l.Content = originalContent
