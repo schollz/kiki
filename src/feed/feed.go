@@ -456,12 +456,54 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 	// // determine if their are any images in envelope letter content that should be spliced out
 	if l.Purpose == purpose.ShareText || l.Purpose == purpose.ActionProfile || l.Purpose == purpose.ActionImage {
 		originalContent := l.Content
+		l.Content = strings.Split(l.Content, `<div class="medium-insert-buttons"`)[0]
 		l.Content = string(blackfriday.Run([]byte(l.Content)))
 		newHTML, images, err2 := web.CaptureBase64Images(l.Content)
 		if err2 != nil {
 			err = err2
 			return
 		}
+		f.logger.Log.Debugf(l.Content)
+		f.logger.Log.Debugf("found %d images from html", len(images))
+		for name := range images {
+			p := purpose.SharePNG
+			if strings.Contains(name, ".jpg") {
+				p = purpose.ShareJPG
+			}
+			newLetter := letter.Letter{
+				To:      l.To,
+				Content: base64.StdEncoding.EncodeToString(images[name]),
+				Purpose: p,
+			}
+			f.logger.Log.Debug("sealing letter")
+			newEnvelope, err2 := newLetter.Seal(f.PersonalKey, f.RegionKey)
+			if err2 != nil {
+				err = err2
+				return
+			}
+			// seal and add envelope
+			f.logger.Log.Debug("adding letter")
+			err2 = f.db.AddEnvelope(newEnvelope)
+			if err2 != nil {
+				// should throw error if its already added, so don't worry about
+				f.logger.Log.Warn(err2)
+			}
+			if l.Purpose == purpose.ActionImage {
+				l.Content = newEnvelope.ID
+				break
+			}
+			f.logger.Log.Debugf("newHTML: %s", newHTML)
+			f.logger.Log.Debugf("name: %s", name)
+			f.logger.Log.Debugf("newEnvelope.ID: '%s'", newEnvelope.ID)
+			newHTML = strings.Replace(newHTML, name, newEnvelope.ID, 1)
+			l.Content = newHTML
+		}
+		newHTML, images, err2 = web.CaptureBase64ImagesFromMarkdown(l.Content)
+		if err2 != nil {
+			err = err2
+			return
+		}
+		f.logger.Log.Debugf("found %d images from markdown", len(images))
 		for name := range images {
 			p := purpose.SharePNG
 			if strings.Contains(name, ".jpg") {
@@ -505,6 +547,8 @@ func (f *Feed) ProcessLetter(l letter.Letter) (ue letter.Envelope, err error) {
 			p.AllowAttrs("class").OnElements("i")
 			p.AllowElements("img")
 			p.AllowAttrs("class").OnElements("img")
+			p.AllowElements("div")
+			p.AllowAttrs("class").OnElements("div")
 			l.Content = p.Sanitize(l.Content)
 			// replace hashtags with links to the hash tags
 			r, _ := regexp.Compile(`(\#[a-z-A-Z]+\b)`)

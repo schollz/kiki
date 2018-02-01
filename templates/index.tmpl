@@ -15,6 +15,9 @@
   <script defer src="/static/all.js"></script>
   <link href="/static/toastr.css" rel="stylesheet" />
   <link rel="stylesheet" href="/static/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+<link rel="stylesheet" href="/static/default.css">
+<link rel="stylesheet" href="/static/medium-editor-insert-plugin.min.css">
+
   <link href="/static/bootstrap.medium.css" rel="stylesheet" />
 
 <link rel="apple-touch-icon" sizes="57x57" href="/static/apple-icon-57x57.png">
@@ -408,6 +411,12 @@
   <script src="/static/medium-editor.min.js"></script>
   <script src="/static/me-markdown.standalone.js"></script>
   <script src="/static/toastr.min.js"></script>
+<script src="/static/handlebars.runtime.min.js"></script>
+<script src="/static/jquery-sortable-min.js"></script>
+<script src="/static/jquery.ui.widget.js"></script>
+<script src="/static/jquery.iframe-transport.js"></script>
+<script src="/static/jquery.fileupload.js"></script>
+<script src="/static/medium-editor-insert-plugin.min.js"></script>
   <script>
     function submitLetter(letter, callback) {
 
@@ -519,6 +528,10 @@
         window.location.href = window.location.href.split('?')[0] + '?page_y=' + page_y;
     }
     $(document).ready(function() {
+        $('.editable').mediumInsert({
+            editor: editor
+        });
+
     	if ( window.location.href.indexOf('page_y') != -1 ) {
             var match = window.location.href.split('?')[1].split("&")[0].split("=");
             document.getElementsByTagName("body")[0].scrollTop = match[1];

@@ -228,3 +228,31 @@ h6,
 .jumbotron {
   padding: 2rem 2rem;
 }
+
+
+        .medium-insert-images figure figcaption,
+        .mediumInsert figure figcaption,
+        .medium-insert-embeds figure figcaption,
+        .mediumInsert-embeds figure figcaption {
+            font-size: 12px;
+            line-height: 1.2em;
+        }
+        .medium-insert-images-slideshow figure {
+            width: 100%;
+        }
+        .medium-insert-images-slideshow figure img {
+            margin: 0;
+        }
+        .medium-insert-images.medium-insert-images-grid.small-grid figure {
+            width: 12.5%;
+        }
+        @media (max-width: 750px) {
+            .medium-insert-images.medium-insert-images-grid.small-grid figure {
+                width: 25%;
+            }
+        }
+        @media (max-width: 450px) {
+            .medium-insert-images.medium-insert-images-grid.small-grid figure {
+                width: 50%;
+            }
+        }
