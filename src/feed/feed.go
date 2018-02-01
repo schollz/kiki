@@ -1223,23 +1223,6 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 				return err2
 			}
 		}
-
-		for {
-			f.logger.Log.Debugf("user: %s: space: %d / %d", user, currentSpace, limit)
-			if currentSpace < limit {
-				break
-			}
-			err = f.db.DeleteUsersOldestPost(user)
-			if err != nil {
-				f.logger.Log.Debug(err)
-				break
-			}
-			currentSpace, err2 = f.db.DiskSpaceForUser(user)
-			if err2 != nil {
-				f.logger.Log.Debug(err2)
-				break
-			}
-		}
 		for {
 			f.logger.Log.Debugf("user: %s: space: %d / %d", user, currentSpace, limit)
 			if currentSpace < limit {
@@ -1256,6 +1239,23 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 				break
 			}
 		}
+		for {
+			f.logger.Log.Debugf("user: %s: space: %d / %d", user, currentSpace, limit)
+			if currentSpace < limit {
+				break
+			}
+			err = f.db.DeleteUsersOldestPost(user)
+			if err != nil {
+				f.logger.Log.Debug(err)
+				break
+			}
+			currentSpace, err2 = f.db.DiskSpaceForUser(user)
+			if err2 != nil {
+				f.logger.Log.Debug(err2)
+				break
+			}
+		}
+
 	}
 	return
 }
