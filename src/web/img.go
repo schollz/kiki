@@ -19,6 +19,8 @@ func ContentType(filename string) string {
 		return "text/css"
 	case strings.Contains(filename, ".jpg"):
 		return "image/jpeg"
+	case strings.Contains(filename, ".jpeg"):
+		return "image/jpeg"
 	case strings.Contains(filename, ".png"):
 		return "image/png"
 	case strings.Contains(filename, ".js"):
@@ -27,6 +29,60 @@ func ContentType(filename string) string {
 		return "application/xml"
 	}
 	return "text/html"
+}
+
+func CaptureBase64ImagesFromMarkdown(startingMarkdown string) (newContent string, images map[string][]byte, err error) {
+	images = make(map[string][]byte)
+	newContent = startingMarkdown
+	r, err := regexp.Compile(`(?:!\[(.*?)\]\((.*?)\))`)
+	if err != nil {
+		return
+	}
+	for _, img := range r.FindAllString(startingMarkdown, -1) {
+		base64data := between(img, "base64,", ")")
+		if len(base64data) == 0 {
+			continue
+		}
+		imageMimeType := between(img, "data:", ";base64")
+
+		// https://stackoverflow.com/questions/46022262/covert-base64-string-to-jpg-golang
+		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64data))
+		m, _, err2 := image.Decode(reader)
+		if err2 != nil {
+			log.Error(err2)
+			err = err2
+			return
+		}
+		// bounds := m.Bounds()
+		// fmt.Println(bounds, formatString)
+
+		//Encode from image format to writer
+		h := sha256.New()
+		h.Write([]byte(base64data))
+		filename := fmt.Sprintf("%x.%s", h.Sum(nil), strings.TrimLeft(imageMimeType, "image/"))
+		f := bytes.NewBuffer(nil)
+
+		switch imageMimeType {
+		case "image/jpeg":
+			err = jpeg.Encode(f, m, nil)
+			if err != nil {
+				break
+			}
+		case "image/png":
+			err = png.Encode(f, m)
+			if err != nil {
+				break
+			}
+		default:
+			continue
+		}
+		images[filename] = f.Bytes()
+		newContent = strings.Replace(newContent, img, fmt.Sprintf(`<img class="img-fluid" src="/img/%s" />`, filename), -1)
+	}
+	if err != nil {
+		return
+	}
+	return
 }
 
 // CaptureBase64Images takes HTML and replaces all base64 representations (except GIF) with a filename. It returns the new HTML and also a map of the new file names and their associated data (converted from base64 to binary).
@@ -39,6 +95,9 @@ func CaptureBase64Images(startingHTML string) (newHTML string, images map[string
 	}
 	for _, img := range r.FindAllString(startingHTML, -1) {
 		base64data := after(img, "base64,")
+		if len(base64data) == 0 {
+			continue
+		}
 		base64data = base64data[:len(base64data)-1]
 		imageMimeType := between(img, "data:", ";base64")
 
@@ -110,5 +169,5 @@ func after(value string, a string) string {
 	if adjustedPos >= len(value) {
 		return ""
 	}
-	return value[adjustedPos:len(value)]
+	return value[adjustedPos:]
 }
