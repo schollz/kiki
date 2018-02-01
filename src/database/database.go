@@ -681,6 +681,33 @@ func (d *database) deleteUsersOldestPost(publicKey string) (err error) {
 	return
 }
 
+// deleteUsersOldestPost will delete a letter with the pertaining ID.
+func (d *database) deleteUsersOldestLargestPost(publicKey string) (err error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestLargestPost")
+	}
+	logger.Log.Debug(publicKey)
+	query := "DELETE from letters WHERE id in (SELECT id FROM letters WHERE LENGTH(sealed_letter) > 5000 AND sender == ? ORDER BY time LIMIT 1);"
+	logger.Log.Debug(query)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestLargestPost")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(publicKey)
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestLargestPost")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, "deleteUsersOldestLargestPost")
+	}
+	return
+}
+
 // deleteUser will delete everything except the ActionErases
 func (d *database) deleteUsers() (err error) {
 	tx, err := d.db.Begin()
@@ -755,7 +782,7 @@ func (d *database) deleteUsersOldActions(publicKey string, purpose string) (err 
 
 	err = tx.Commit()
 	if err != nil {
-		return errors.Wrap(err, "deleteUsersOldestPost")
+		return errors.Wrap(err, "deleteUsersOldActions")
 	}
 	return
 }

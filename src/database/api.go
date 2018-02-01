@@ -905,6 +905,16 @@ func (api DatabaseAPI) DeleteUsersOldestPost(publicKey string) (err error) {
 	return db.deleteUsersOldestPost(publicKey)
 }
 
+// DeleteUsersOldestPost will delete the users oldest post
+func (api DatabaseAPI) DeleteUsersOldestLargestPost(publicKey string) (err error) {
+	db, err := open(api.FileName)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	return db.deleteUsersOldestLargestPost(publicKey)
+}
+
 // DeleteUsersEdits will delete the users edits made to posts
 func (api DatabaseAPI) DeleteUsersEdits(publicKey string) (err error) {
 	db, err := open(api.FileName)

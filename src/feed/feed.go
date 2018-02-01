@@ -1231,11 +1231,29 @@ func (f *Feed) PurgeOverflowingStorage() (err error) {
 			}
 			err = f.db.DeleteUsersOldestPost(user)
 			if err != nil {
-				return
+				f.logger.Log.Debug(err)
+				break
 			}
 			currentSpace, err2 = f.db.DiskSpaceForUser(user)
 			if err2 != nil {
-				return err2
+				f.logger.Log.Debug(err2)
+				break
+			}
+		}
+		for {
+			f.logger.Log.Debugf("user: %s: space: %d / %d", user, currentSpace, limit)
+			if currentSpace < limit {
+				break
+			}
+			err = f.db.DeleteUsersOldestLargestPost(user)
+			if err != nil {
+				f.logger.Log.Debug(err)
+				break
+			}
+			currentSpace, err2 = f.db.DiskSpaceForUser(user)
+			if err2 != nil {
+				f.logger.Log.Debug(err2)
+				break
 			}
 		}
 	}
