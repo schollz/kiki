@@ -1077,30 +1077,31 @@ func (f *Feed) UploadEnvelope(address, id string) (err error) {
 func (f *Feed) DownloadEnvelope(address, id string) (err error) {
 	req, err := http.NewRequest("GET", address+"/download/"+id, nil)
 	if err != nil {
-		return
+		return errors.Wrap(err, "problem making req")
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return
+		return errors.Wrap(err, "problem doing req")
 	}
 	defer resp.Body.Close()
 
 	var target Response
 	err = json.NewDecoder(resp.Body).Decode(&target)
 	if err != nil {
-		return
+		return errors.Wrap(err, "could not decode")
 	}
 	if "ok" != target.Status {
-		return errors.New(target.Error)
+		return errors.Wrap(errors.New(target.Error), "bad status")
 	}
 
 	f.logger.Log.Debugf("downloaded %s from %s", target.Envelope.ID, address)
 
 	err = f.ProcessEnvelope(target.Envelope)
 	if err != nil {
-		f.logger.Log.Error(err)
+		f.logger.Log.Error(errors.Wrap(err, "processing envlope"))
+		err = nil
 	}
 	return
 }
