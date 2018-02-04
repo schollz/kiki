@@ -48,7 +48,8 @@ Or, you could use the latest Docker images:
 
 ```
 docker pull schollz/kiki
-docker run --user `id -u` --rm -it -p 8003:8003 -v /location/to/data:/data -t schollz/kiki
+mkdir /tmp/kiki # make a directory to hold data
+docker run --user `id -u` --rm -it -p 8003:8003 -v /tmp/kiki:/data -t schollz/kiki
 ```
 
 Or, if you have Go installed you can build from the source:
