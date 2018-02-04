@@ -1,9 +1,8 @@
 .PHONY: scratch, install, basicbuild, server, server1, server2, server3, dev1, dev2, dev3
 
 
-TAG=$(shell git tag)
-HASH=$(shell git log --pretty=format:"%h" -n 1)
-LDFLAGS=-ldflags "-s -w -X main.Version=${TAG}-${HASH} -X main.RegionPublic=4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6 -X main.RegionPrivate=btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
+HASH=$(shell git describe)
+LDFLAGS=-ldflags "-s -w -X main.Version=${HASH} -X main.RegionPublic=4NfD9kWESGycUdbhbrFygNDjFun6NPk6utpkviyE1Ai6 -X main.RegionPrivate=btbsjnjTtgi3aL9z2X8bqb1URVnCo3zqg4fC4co2JEu"
 
 
 basicbuild:
